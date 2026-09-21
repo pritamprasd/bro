@@ -2,9 +2,26 @@
 
 import json
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 import requests
 from jarvis.models.base import BaseLLMProvider, ChatMessage, CoordinatePrediction, ModelResponse, ToolCall
+
+def normalize_keep_alive(val: Any) -> Any:
+    """Normalize keep_alive value for Ollama API.
+    
+    Ollama requires either an integer duration in seconds (-1 for permanent),
+    or a string with duration units (e.g. '24h', '5m', '-1m').
+    Passing plain string '-1' causes Go's time.ParseDuration to fail with 400 Bad Request.
+    """
+    if isinstance(val, (int, float)):
+        return int(val) if isinstance(val, int) or (isinstance(val, float) and val.is_integer()) else val
+    if isinstance(val, str):
+        cleaned = val.strip().strip("'\"")
+        try:
+            return int(cleaned)
+        except ValueError:
+            return cleaned
+    return -1
 
 class OllamaProvider(BaseLLMProvider):
     def __init__(
@@ -12,13 +29,13 @@ class OllamaProvider(BaseLLMProvider):
         base_url: str = "http://localhost:11434",
         text_model: str = "gemma4:12b",
         vision_model: str = "qwen2.5vl:7b",
-        keep_alive: str = "-1",
+        keep_alive: Any = -1,
         timeout: int = 120,
     ):
         self.base_url = base_url.rstrip("/")
         self.text_model = text_model
         self.vision_model = vision_model
-        self.keep_alive = keep_alive
+        self.keep_alive = normalize_keep_alive(keep_alive)
         self.timeout = timeout
 
     def check_health(self) -> bool:
@@ -37,7 +54,7 @@ class OllamaProvider(BaseLLMProvider):
                 json={
                     "model": self.text_model,
                     "messages": [{"role": "user", "content": "ping"}],
-                    "keep_alive": self.keep_alive,
+                    "keep_alive": normalize_keep_alive(self.keep_alive),
                     "stream": False,
                 },
                 timeout=180,
@@ -65,7 +82,7 @@ class OllamaProvider(BaseLLMProvider):
         payload: Dict[str, Any] = {
             "model": self.text_model,
             "messages": formatted_messages,
-            "keep_alive": self.keep_alive,
+            "keep_alive": normalize_keep_alive(self.keep_alive),
             "stream": False,
             "options": {
                 "temperature": 0.2,
@@ -81,7 +98,31 @@ class OllamaProvider(BaseLLMProvider):
                 json=payload,
                 timeout=self.timeout,
             )
-            resp.raise_for_status()
+            if resp.status_code >= 400:
+                err_detail = resp.text
+                try:
+                    err_json = resp.json()
+                    if "error" in err_json:
+                        err_detail = err_json["error"]
+                except Exception:
+                    pass
+
+                # If Ollama rejected tools parameter with 400, retry once without tools
+                if tools and resp.status_code == 400 and ("tool" in err_detail.lower() or "schema" in err_detail.lower() or "invalid" in err_detail.lower()):
+                    payload_no_tools = dict(payload)
+                    payload_no_tools.pop("tools", None)
+                    retry_resp = requests.post(
+                        f"{self.base_url}/api/chat",
+                        json=payload_no_tools,
+                        timeout=self.timeout,
+                    )
+                    if retry_resp.status_code < 400:
+                        resp = retry_resp
+                    else:
+                        raise RuntimeError(f"Ollama API returned HTTP {resp.status_code}: {err_detail}")
+                else:
+                    raise RuntimeError(f"Ollama API returned HTTP {resp.status_code}: {err_detail}")
+
             data = resp.json()
             message_data = data.get("message", {})
             content = message_data.get("content", "")
@@ -143,6 +184,7 @@ class OllamaProvider(BaseLLMProvider):
                 },
             ],
             "format": "json",
+            "keep_alive": normalize_keep_alive(self.keep_alive),
             "stream": False,
             "options": {
                 "temperature": 0.1,
@@ -155,7 +197,16 @@ class OllamaProvider(BaseLLMProvider):
                 json=payload,
                 timeout=self.timeout,
             )
-            resp.raise_for_status()
+            if resp.status_code >= 400:
+                err_detail = resp.text
+                try:
+                    err_json = resp.json()
+                    if "error" in err_json:
+                        err_detail = err_json["error"]
+                except Exception:
+                    pass
+                raise RuntimeError(f"Ollama vision API returned HTTP {resp.status_code}: {err_detail}")
+
             data = resp.json()
             raw_text = data.get("message", {}).get("content", "")
 

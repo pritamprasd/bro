@@ -7,7 +7,7 @@ from jarvis.core.agent import JarvisAgent
 from jarvis.models.base import ModelResponse
 
 def test_agent_react_loop_finish():
-    config = JarvisConfig(output_mode="cli")
+    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
     agent = JarvisAgent(config)
 
     # Mock the router to return a finish action
@@ -19,7 +19,7 @@ def test_agent_react_loop_finish():
     assert "Result is 42" in result
 
 def test_agent_react_loop_with_python_action():
-    config = JarvisConfig(output_mode="cli")
+    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
     agent = JarvisAgent(config)
 
     # 1st step: run python
@@ -37,7 +37,7 @@ def test_agent_react_loop_with_python_action():
     assert "The sum is 4" in result
 
 def test_agent_show_media_action():
-    config = JarvisConfig(output_mode="cli")
+    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
     media_captured = []
     def on_media(payload):
         media_captured.append(payload)
@@ -62,7 +62,7 @@ def test_agent_show_media_action():
     assert "graph TD; X-->Y" in media_captured[0]["content"]
 
 def test_agent_auto_detect_mermaid_in_finish():
-    config = JarvisConfig(output_mode="cli")
+    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
     media_captured = []
     def on_media(payload):
         media_captured.append(payload)
@@ -83,7 +83,7 @@ def test_agent_auto_detect_mermaid_in_finish():
     assert "Start --> Stop" in media_captured[0]["content"]
 
 def test_agent_desktop_switch_monitor():
-    config = JarvisConfig(output_mode="cli", desktop={"screen_index": 1})
+    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False}, desktop={"screen_index": 1})
     agent = JarvisAgent(config)
     assert agent.desktop.screen_index == 1
 

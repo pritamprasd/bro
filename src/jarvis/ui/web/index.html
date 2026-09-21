@@ -3156,7 +3156,9 @@ desktop:
             }
           }
           if (msg.event === 'conversation_mode_changed') {
-            syncConversationModeUI(msg.data.conversation_mode);
+            if (currentConversationMode !== msg.data.conversation_mode) {
+              syncConversationModeUI(msg.data.conversation_mode, true);
+            }
           }
           if (msg.event === 'task_finish') {
             appendLog('result', '✔ ' + msg.data.result);
@@ -3594,8 +3596,8 @@ desktop:
     }
 
     async function setConversationMode(mode) {
-      currentConversationMode = mode;
-      syncConversationModeUI(mode);
+      if (currentConversationMode === mode) return;
+      syncConversationModeUI(mode, true);
 
       try {
         await fetch('/api/settings/conversation-mode', {
@@ -3608,7 +3610,8 @@ desktop:
       }
     }
 
-    function syncConversationModeUI(mode) {
+    function syncConversationModeUI(mode, logChange = false) {
+      const modeChanged = (currentConversationMode !== mode);
       currentConversationMode = mode;
       document.querySelectorAll('.mode-pill').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById('btn-mode-' + mode.replace('+', '_'));
@@ -3627,8 +3630,12 @@ desktop:
         }
         if (audioHud) audioHud.style.display = 'block';
         if (voiceToggleBtn) voiceToggleBtn.innerHTML = '<i data-lucide="volume-2" class="hud-icon-xs"></i> Voice: ON (Audio Only)';
-        updateVoiceVisualizerState('idle', 'READY // CLICK CORE TO COMMENCE SPEECH');
-        appendLog('step', 'Conversation Mode: AUDIO ONLY (Continuous Voice Dialogue Active)');
+        if (modeChanged) {
+          updateVoiceVisualizerState('idle', 'READY // CLICK CORE TO COMMENCE SPEECH');
+          if (logChange) {
+            appendLog('step', 'Conversation Mode: AUDIO ONLY (Continuous Voice Dialogue Active)');
+          }
+        }
       } else if (mode === 'audio+chat') {
         if (badge) {
           badge.innerHTML = '<i data-lucide="zap" class="hud-icon-xs"></i> AUDIO + CHAT';
@@ -3638,7 +3645,9 @@ desktop:
         }
         if (audioHud) audioHud.style.display = 'none';
         if (voiceToggleBtn) voiceToggleBtn.innerHTML = '<i data-lucide="volume-2" class="hud-icon-xs"></i> Voice Reply: ON';
-        appendLog('step', 'Conversation Mode: AUDIO + CHAT (Voice Replies + Terminal Stream)');
+        if (modeChanged && logChange) {
+          appendLog('step', 'Conversation Mode: AUDIO + CHAT (Voice Replies + Terminal Stream)');
+        }
       } else if (mode === 'chat_only') {
         if (badge) {
           badge.innerHTML = '<i data-lucide="message-square" class="hud-icon-xs"></i> CHAT ONLY (SILENT)';
@@ -3648,8 +3657,12 @@ desktop:
         }
         if (audioHud) audioHud.style.display = 'none';
         if (voiceToggleBtn) voiceToggleBtn.innerHTML = '<i data-lucide="volume-x" class="hud-icon-xs"></i> Voice Reply: MUTED';
-        stopSpeechRecognition();
-        appendLog('step', 'Conversation Mode: CHAT ONLY (Spoken Voice Disabled)');
+        if (modeChanged) {
+          stopSpeechRecognition();
+          if (logChange) {
+            appendLog('step', 'Conversation Mode: CHAT ONLY (Spoken Voice Disabled)');
+          }
+        }
       }
       renderIcons();
     }
@@ -4320,7 +4333,9 @@ desktop:
         const data = await res.json();
         if (data.telemetry) updateTelemetry(data.telemetry);
         if (data.conversation_mode && (!window.userInteractingWithMode)) {
-          syncConversationModeUI(data.conversation_mode);
+          if (currentConversationMode !== data.conversation_mode) {
+            syncConversationModeUI(data.conversation_mode, false);
+          }
         }
         document.getElementById('val-auto').innerText = data.autonomous_mode ? 'ON (Full Autonomy)' : 'OFF (Approval Overlay Active)';
         document.getElementById('val-policy').innerText = data.policy.toUpperCase();

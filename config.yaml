@@ -1,5 +1,5 @@
-conversation_mode: audio_only
-output_mode: voice
+conversation_mode: audio+chat
+output_mode: both
 autonomous_mode: false
 model:
   policy: local_only
@@ -9,7 +9,7 @@ model:
   local_vision_model: qwen2.5vl:7b
   cloud_model: gemini-2.5-flash
   ollama_url: http://localhost:11434
-  keep_alive: '-1'
+  keep_alive: -1
   gemini_api_key: null
 voice:
   enabled: true
@@ -19,7 +19,7 @@ voice:
   tts_voice: en-GB-RyanNeural
   tts_rate: +2%
   tts_pitch: -4Hz
-  always_voice_response: true
+  always_voice_response: false
   voice_reply_on_chat: true
 safety:
   prompt_on_high_stakes: true

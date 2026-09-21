@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel
 import requests
 from jarvis.config import ModelConfig
+from jarvis.models.ollama_provider import normalize_keep_alive
 
 class IntentClassification(BaseModel):
     intent: str  # CONVERSATION, DESKTOP_GUI, BROWSER, PYTHON_TASK, SYSTEM_SHELL, WATCHDOG
@@ -59,11 +60,11 @@ class Tier0Router:
                         {"role": "user", "content": user_goal},
                     ],
                     "format": "json",
-                    "keep_alive": self.config.keep_alive,
+                    "keep_alive": normalize_keep_alive(self.config.keep_alive),
                     "stream": False,
                     "options": {"temperature": 0.0, "num_predict": 120},
                 },
-                timeout=5,
+                timeout=3,
             )
             elapsed_ms = (time.time() - start_time) * 1000
 

@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 import yaml
 from pydantic import BaseModel, Field
 
@@ -18,7 +18,7 @@ class ModelConfig(BaseModel):
     local_vision_model: str = "qwen2.5vl:7b"
     cloud_model: str = "gemini-2.5-flash"
     ollama_url: str = "http://localhost:11434"
-    keep_alive: str = "-1"  # -1 keeps models in RAM/VRAM permanently
+    keep_alive: Union[int, str] = -1  # -1 keeps models in RAM/VRAM permanently (int -1 or duration "24h")
     gemini_api_key: Optional[str] = None
 
 class VoiceConfig(BaseModel):
