@@ -1,8 +1,7 @@
 """Main CLI entrypoint for Jarvis Phase 2."""
 
 import sys
-from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -24,6 +23,9 @@ console = Console()
 @app.command()
 def run(
     goal: str = typer.Argument(..., help="The task or goal for Jarvis to execute"),
+    file: Optional[List[str]] = typer.Option(
+        None, "--file", "-f", help="Attach resource files needed for the task"
+    ),
     autonomous: Optional[bool] = typer.Option(
         None, "--autonomous", "-a", help="Run without asking for confirmation on high-stakes actions"
     ),
@@ -45,7 +47,7 @@ def run(
         config.output_mode = output_mode  # type: ignore
 
     agent = JarvisAgent(config)
-    agent.run_task(goal)
+    agent.run_task(goal, file_paths=file)
 
 @app.command()
 def voice(
@@ -75,6 +77,17 @@ def voice(
     agent = JarvisAgent(config)
     agent.run_task(spoken_text)
 
+@app.command()
+def brief():
+    """Trigger the Daily brief on demand."""
+    config = load_config()
+    from jarvis.watchdogs.cron_engine import CronEngine
+    from jarvis.voice.tts import TextToSpeech
+    tts = TextToSpeech(config.voice)
+    engine = CronEngine(config.watchdogs.cron, briefing_callback=lambda b: tts.speak(b))
+    msg = engine.trigger_brief()
+    console.print(Panel(msg, title="[bold cyan]☀️ Jarvis Mark 1 Daily Brief[/bold cyan]", border_style="cyan"))
+
 # System Lifecycle Commands (Start, Stop, Status)
 @app.command()
 def start():
@@ -84,7 +97,7 @@ def start():
     if res["status"] == "already_running":
         console.print("[yellow]Jarvis is already running.[/yellow]")
     else:
-        console.print("[bold green]✔ Jarvis Mark VII System Online![/bold green]")
+        console.print("[bold green]✔ Jarvis Mark 1 System Online![/bold green]")
         console.print(f"[cyan]Web HUD Dashboard:[/cyan] [bold underline]{res['web_url']}[/bold underline]")
         console.print("[dim]Spotlight Bar active: Press Alt+J anywhere on desktop.[/dim]")
 
@@ -93,7 +106,7 @@ def stop():
     """Trigger Master Kill-Switch to cleanly terminate all running Jarvis services."""
     supervisor = Supervisor()
     res = supervisor.stop()
-    console.print("[bold red]🛑 Master Kill-Switch Activated:[/bold red] All Jarvis services terminated.")
+    console.print("[bold red]🛑 Master Kill-Switch Activated:[/bold red] All Jarvis Mark 1 services terminated.")
     for p in res.get("processes", []):
         console.print(f"  [dim]• Terminated {p}[/dim]")
 

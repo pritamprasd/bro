@@ -15,17 +15,36 @@ class HardwareSentinel:
 
     def get_hardware_metrics(self) -> Dict[str, Any]:
         """Fetch current hardware stats."""
+        root_disk = psutil.disk_usage("/")
         metrics = {
             "cpu_percent": psutil.cpu_percent(interval=0.1),
             "ram_percent": psutil.virtual_memory().percent,
             "ram_used_gb": round(psutil.virtual_memory().used / (1024**3), 1),
             "ram_total_gb": round(psutil.virtual_memory().total / (1024**3), 1),
-            "disk_percent": psutil.disk_usage("/").percent,
+            "disk_percent": root_disk.percent,
+            "disk_root_used_gb": round(root_disk.used / (1024**3), 1),
+            "disk_root_total_gb": round(root_disk.total / (1024**3), 1),
+            "disk_root_free_gb": round(root_disk.free / (1024**3), 1),
+            "disk_hdd": None,
             "gpu_temp": None,
             "vram_used_mb": None,
             "vram_total_mb": None,
             "gpu_name": "Unknown",
         }
+
+        # Check secondary storage /mnt/HDD-500GB if mounted
+        try:
+            import os
+            if os.path.exists("/mnt/HDD-500GB"):
+                hdd = psutil.disk_usage("/mnt/HDD-500GB")
+                metrics["disk_hdd"] = {
+                    "percent": hdd.percent,
+                    "used_gb": round(hdd.used / (1024**3), 1),
+                    "total_gb": round(hdd.total / (1024**3), 1),
+                    "free_gb": round(hdd.free / (1024**3), 1),
+                }
+        except Exception:
+            pass
 
         # Query nvidia-smi
         try:

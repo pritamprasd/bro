@@ -15,25 +15,80 @@ pyautogui.FAILSAFE = True
 
 class DesktopActuator(BaseActuator):
     def __init__(self, screen_index: int = 1):
-        self.screen_index = screen_index
         self._sct = mss.MSS()
-        # Monitor bounds
         self.monitors = self._sct.monitors
-        target_mon = self.monitors[screen_index] if screen_index < len(self.monitors) else self.monitors[0]
+        self.set_screen_index(screen_index)
+
+    def reset(self) -> None:
+        pass
+
+    def set_screen_index(self, screen_index: int) -> None:
+        """Switch the target desktop / monitor for screen capture and mouse actions."""
+        self.monitors = self._sct.monitors
+        total = len(self.monitors)
+        # 0 is all monitors combined, 1..N are individual displays
+        if 0 <= screen_index < total:
+            self.screen_index = screen_index
+        else:
+            self.screen_index = 1 if total > 1 else 0
+
+        target_mon = self.monitors[self.screen_index]
         self.width = target_mon["width"]
         self.height = target_mon["height"]
         self.left = target_mon["left"]
         self.top = target_mon["top"]
 
-    def reset(self) -> None:
-        pass
+    def get_active_monitor_info(self) -> dict:
+        target_mon = self.monitors[self.screen_index]
+        return {
+            "screen_index": self.screen_index,
+            "width": self.width,
+            "height": self.height,
+            "left": self.left,
+            "top": self.top,
+            "output": target_mon.get("output", "DEFAULT"),
+            "name": target_mon.get("name", f"Display {self.screen_index}"),
+            "is_primary": target_mon.get("is_primary", False)
+        }
+
+    @classmethod
+    def list_monitors(cls) -> List[dict]:
+        """Detect and return all physical and virtual desktop displays."""
+        with mss.MSS() as sct:
+            res = []
+            for idx, m in enumerate(sct.monitors):
+                is_all = (idx == 0)
+                is_primary = m.get("is_primary", False)
+                output = m.get("output") or ("ALL-COMBINED" if is_all else f"DISPLAY-{idx}")
+                name = m.get("name") or ("All Displays (Virtual Canvas)" if is_all else f"Display {idx}")
+                
+                if is_all:
+                    label = f"Display 0: All Displays Combined ({m['width']}x{m['height']})"
+                elif is_primary:
+                    label = f"Display {idx}: {output} ({m['width']}x{m['height']}) [PRIMARY]"
+                else:
+                    label = f"Display {idx}: {output} ({m['width']}x{m['height']})"
+
+                res.append({
+                    "index": idx,
+                    "name": name,
+                    "output": output,
+                    "width": m["width"],
+                    "height": m["height"],
+                    "left": m["left"],
+                    "top": m["top"],
+                    "is_primary": is_primary,
+                    "label": label
+                })
+            return res
 
     def get_screen_dimensions(self) -> Tuple[int, int]:
         return self.width, self.height
 
-    def capture_screenshot(self, max_dimension: Optional[int] = 1280) -> Tuple[Image.Image, str]:
-        """Capture screenshot of the screen and return (PIL.Image, base64_png)."""
-        target_mon = self.monitors[self.screen_index] if self.screen_index < len(self.monitors) else self.monitors[0]
+    def capture_screenshot(self, max_dimension: Optional[int] = 1280, target_screen_index: Optional[int] = None) -> Tuple[Image.Image, str]:
+        """Capture screenshot of chosen desktop monitor and return (PIL.Image, base64_png)."""
+        idx = target_screen_index if target_screen_index is not None else self.screen_index
+        target_mon = self.monitors[idx] if (0 <= idx < len(self.monitors)) else self.monitors[0]
         sct_img = self._sct.grab(target_mon)
         img = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
 
@@ -49,6 +104,22 @@ class DesktopActuator(BaseActuator):
         resized_img.save(buffer, format="PNG", optimize=True)
         b64_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
         return img, b64_str
+
+    def inspect_screen(self, screen_index: Optional[int] = None) -> ActionResult:
+        """Capture screenshot of the desktop and return details."""
+        if screen_index is not None:
+            self.set_screen_index(screen_index)
+        img, b64 = self.capture_screenshot(max_dimension=1920)
+        info = self.get_active_monitor_info()
+        output_desc = (
+            f"Active Desktop: Display {info['screen_index']} ({info['output']}, {info['width']}x{info['height']} "
+            f"at offset +{info['left']}+{info['top']}) [Primary: {info['is_primary']}]. Captured 1080p desktop image."
+        )
+        return ActionResult(
+            success=True,
+            output=output_desc,
+            screenshot_base64=b64
+        )
 
     def click(self, x: int, y: int, button: str = "left", clicks: int = 1) -> ActionResult:
         """Click at coordinate (x, y)."""

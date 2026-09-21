@@ -29,3 +29,21 @@ def test_audit_manager_lifecycle():
         assert runs[0]["run_id"] == run.run_id
         assert len(runs[0]["steps"]) == 1
         assert runs[0]["status"] == "success"
+
+        # Verify analytics
+        analytics = am.get_analytics()
+        assert analytics["total_runs"] == 1
+        assert analytics["success_count"] == 1
+        assert analytics["failed_count"] == 0
+        assert analytics["success_rate"] == 100.0
+        assert analytics["total_steps"] == 1
+        assert analytics["actuator_breakdown"]["desktop"] == 1
+        assert len(analytics["recent_timeline"]) == 1
+        assert analytics["recent_timeline"][0]["goal"] == "Open calculator and compute 5 * 5"
+
+        # Verify markdown export
+        md = am.export_run_markdown(run.run_id)
+        assert f"Mission Audit Report: {run.run_id}" in md
+        assert "Open calculator and compute 5 * 5" in md
+        assert "desktop_click" in md
+        assert "Result is 25" in md

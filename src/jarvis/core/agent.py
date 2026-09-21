@@ -1,6 +1,7 @@
 """Core ReAct Agent Orchestrator for Jarvis Phase 2."""
 
 import json
+from pathlib import Path
 import re
 from typing import Any, Dict, List, Optional
 from jarvis.actuators.browser import BrowserActuator
@@ -11,6 +12,7 @@ from jarvis.actuators.recorder import MacroRecorder
 from jarvis.actuators.shell import ShellActuator
 from jarvis.config import JarvisConfig
 from jarvis.core.audit import AuditManager
+from jarvis.core.errors import error_tracker
 from jarvis.core.safety import SafetyClassifier
 from jarvis.memory.store import MemoryStore
 from jarvis.models.base import ChatMessage, ModelResponse
@@ -42,7 +44,11 @@ Available Actions:
 15. `run_macro(macro_name)`: Execute a previously compiled deterministic macro.
 16. `get_secret(key)`: Retrieve a credential from the secure vault (e.g. "telegram_bot_token").
 17. `save_workflow(topic, content)`: Save a learned workflow or note to persistent memory.
-18. `finish(result)`: Task is finished. Provide the final response to the user.
+18. `request_file(description, expected_filename=None)`: Ask the user to supply a required file, dataset, or image if it was not provided or not found.
+19. `show_media(media_type, content, title="Visual Display", caption=None, target="auto")`: Display a diagram (mermaid), chart (svg or image path), or image to the user in a dialog or desktop system window.
+20. `desktop_switch_monitor(screen_index)`: Switch which desktop monitor Jarvis interacts with (0=all displays combined, 1=display 1, 2=display 2).
+21. `desktop_inspect_screen(screen_index=None)`: Take a high-resolution screenshot of the active desktop monitor, observe active windows, and report visual state.
+22. `finish(result)`: Task is finished. Provide the final response to the user.
 
 To call an action, output valid JSON in this exact structure:
 ```json
@@ -66,12 +72,15 @@ Always output ONLY the JSON object.
 """
 
 class JarvisAgent:
-    def __init__(self, config: JarvisConfig):
+    def __init__(self, config: JarvisConfig, request_file_cb: Optional[Any] = None, show_media_cb: Optional[Any] = None):
         self.config = config
+        self.request_file_cb = request_file_cb
+        self.show_media_cb = show_media_cb
         self.console = JarvisConsole(output_mode=config.output_mode)
         self.router = ModelRouter(config.model)
         self.tier0 = Tier0Router(config.model)
-        self.desktop = DesktopActuator()
+        screen_idx = getattr(self.config.desktop, "screen_index", 1) if hasattr(self.config, "desktop") else 1
+        self.desktop = DesktopActuator(screen_index=screen_idx)
         self.browser = BrowserActuator(config.browser)
         self.cdp_browser = CDPBrowserActuator(port=config.browser.cdp_port)
         self.python_runner = PythonRunner()
@@ -84,9 +93,27 @@ class JarvisAgent:
         self.tts = TextToSpeech(config.voice)
         self.audit = AuditManager()
 
-    def run_task(self, user_goal: str, max_steps: int = 15) -> str:
+    def run_task(self, user_goal: str, file_paths: Optional[List[str]] = None, max_steps: int = 15) -> str:
         """Execute a user goal through perception, reasoning, and action."""
         self.console.banner()
+
+        # Handle attached resources
+        if file_paths:
+            file_summaries = []
+            for fp in file_paths:
+                p = Path(fp).expanduser()
+                if p.exists():
+                    size_kb = round(p.stat().st_size / 1024, 1)
+                    content_preview = ""
+                    try:
+                        with open(p, "r", encoding="utf-8", errors="ignore") as f:
+                            lines = [f.readline() for _ in range(8)]
+                            content_preview = "".join(lines)
+                    except Exception:
+                        pass
+                    file_summaries.append(f"Attached Resource: '{p.name}' ({size_kb} KB, path: '{p.resolve()}')\nPreview:\n{content_preview}")
+            user_goal += "\n\nAttached Resources:\n" + "\n---\n".join(file_summaries)
+
         self.console.console.print(f"[bold]Goal:[/bold] {user_goal}\n")
 
         # 0. Start Audit Run
@@ -120,6 +147,7 @@ class JarvisAgent:
             except Exception as e:
                 err_msg = f"Model execution failed: {e}"
                 self.console.error(err_msg)
+                error_tracker.log_error("ModelExecutionFailure", err_msg, context=f"Goal: {user_goal}", exc=e)
                 self.audit.complete_run(err_msg, status="failed")
                 return err_msg
 
@@ -149,7 +177,22 @@ class JarvisAgent:
             if action_name == "finish":
                 final_result = params.get("result", "Task finished successfully.")
                 self.console.success("Task completed!")
-                self._deliver_output(final_result)
+
+                # Auto-detect Mermaid diagrams in final response
+                mermaid_match = re.search(r"```mermaid\s*([\s\S]*?)```", final_result)
+                if mermaid_match:
+                    d_code = mermaid_match.group(1).strip()
+                    self.show_media("diagram", d_code, title="Generated Diagram", caption="Rendered from assistant response", target="auto")
+
+                # Auto-detect local image markdown in final response
+                img_match = re.search(r"!\[(.*?)\]\((.*?)\)", final_result)
+                if img_match:
+                    c_text = img_match.group(1)
+                    i_path = Path(img_match.group(2)).expanduser()
+                    if i_path.exists():
+                        self.show_media("image", str(i_path.resolve()), title=c_text or "Visual Result", caption=c_text, target="auto")
+
+                self._deliver_output(final_result, is_conversation=(tier0_result.intent == "CONVERSATION"))
                 self.audit.complete_run(final_result, status="success")
 
                 # Compile macro if multi-step desktop/browser workflow
@@ -205,6 +248,7 @@ class JarvisAgent:
 
         timeout_msg = "Task reached maximum execution step limit."
         self.console.warning(timeout_msg)
+        error_tracker.log_error("StepTimeout", timeout_msg, context=f"Goal: {user_goal}")
         self.audit.complete_run(timeout_msg, status="timeout")
         return timeout_msg
 
@@ -244,6 +288,28 @@ class JarvisAgent:
 
             elif action == "desktop_hotkey":
                 return self.desktop.hotkey(params.get("keys", []))
+
+            elif action == "desktop_switch_monitor":
+                s_idx = params.get("screen_index", 1)
+                self.desktop.set_screen_index(s_idx)
+                info = self.desktop.get_active_monitor_info()
+                from jarvis.actuators.base import ActionResult
+                return ActionResult(success=True, output=f"Switched active desktop to Display {s_idx} ({info['output']}, {info['width']}x{info['height']}).")
+
+            elif action == "desktop_inspect_screen":
+                s_idx = params.get("screen_index")
+                res = self.desktop.inspect_screen(s_idx)
+                if res.success and res.screenshot_base64:
+                    try:
+                        import tempfile
+                        buf = base64.b64decode(res.screenshot_base64)
+                        t_path = Path(tempfile.gettempdir()) / f"jarvis_display_{self.desktop.screen_index}_inspect.png"
+                        with open(t_path, "wb") as f:
+                            f.write(buf)
+                        self.show_media("image", str(t_path), title=f"Desktop Display {self.desktop.screen_index} Inspection", caption=f"Active Display: {self.desktop.get_active_monitor_info()['output']}", target="auto")
+                    except Exception:
+                        pass
+                return res
 
             elif action == "browser_navigate":
                 return self.browser.navigate(params.get("url", ""))
@@ -303,12 +369,79 @@ class JarvisAgent:
                 from jarvis.actuators.base import ActionResult
                 return ActionResult(success=True, output=f"Saved workflow to {path}")
 
+            elif action == "request_file":
+                desc = params.get("description", "A required resource file")
+                exp = params.get("expected_filename")
+                from jarvis.actuators.base import ActionResult
+                self.console.warning(f"Resource Needed: {desc}")
+
+                supplied_path = None
+                if self.request_file_cb:
+                    supplied_path = self.request_file_cb(desc, exp)
+                else:
+                    from rich.prompt import Prompt
+                    supplied_path = Prompt.ask(f"[bold yellow]Jarvis needs a file:[/bold yellow] {desc}\n[dim]Enter full file path[/dim]")
+
+                if supplied_path and Path(supplied_path).exists():
+                    p = Path(supplied_path).resolve()
+                    self.console.success(f"User supplied file: {p.name}")
+                    preview = ""
+                    try:
+                        with open(p, "r", encoding="utf-8", errors="ignore") as f:
+                            lines = [f.readline() for _ in range(12)]
+                            preview = "".join(lines)
+                    except Exception:
+                        pass
+                    return ActionResult(success=True, output=f"User supplied file at '{p}'. Content preview:\n{preview}")
+                else:
+                    return ActionResult(success=False, error=f"User cancelled or file '{supplied_path}' does not exist.")
+
+            elif action == "show_media":
+                m_type = params.get("media_type", "image")
+                content = params.get("content", "")
+                title = params.get("title", "Jarvis Visual Display")
+                caption = params.get("caption")
+                target = params.get("target", "auto")
+                return self.show_media(m_type, content, title, caption, target)
+
             else:
                 from jarvis.actuators.base import ActionResult
                 return ActionResult(success=False, error=f"Unknown action: {action}")
 
         except Exception as e:
             from jarvis.actuators.base import ActionResult
+            return ActionResult(success=False, error=str(e))
+
+    def show_media(self, media_type: str, content: str, title: str = "Jarvis Visual Display", caption: Optional[str] = None, target: str = "auto"):
+        """Display a diagram, chart, or image to the user via dialog or system window."""
+        from jarvis.actuators.base import ActionResult
+        try:
+            # Resolve image file paths if local
+            resolved_content = content
+            if media_type in ["image", "chart"]:
+                p = Path(content).expanduser()
+                if p.exists():
+                    resolved_content = str(p.resolve())
+
+            # 1. Callback (e.g. Web UI WebSocket broadcast)
+            if self.show_media_cb:
+                try:
+                    self.show_media_cb(media_type, resolved_content, title, caption, target)
+                except TypeError:
+                    self.show_media_cb({
+                        "media_type": media_type,
+                        "content": resolved_content,
+                        "title": title,
+                        "caption": caption,
+                        "target": target,
+                    })
+            elif target in ["auto", "window", "system_window"]:
+                from jarvis.ui.system_window import SystemWindowManager
+                SystemWindowManager.show_media(media_type, resolved_content, title, caption)
+
+            self.console.action("show_media", f"{media_type.upper()}: '{title}' via {target}")
+            return ActionResult(success=True, output=f"Displayed {media_type} '{title}' to user via {target}.")
+        except Exception as e:
             return ActionResult(success=False, error=str(e))
 
     def _parse_action_json(self, text: str) -> Optional[Dict[str, Any]]:
@@ -323,9 +456,26 @@ class JarvisAgent:
                     return None
         return None
 
-    def _deliver_output(self, text: str) -> None:
-        """Deliver output according to configured output_mode ('both', 'cli', 'voice')."""
+    def _deliver_output(self, text: str, is_conversation: bool = False) -> None:
+        """Deliver output according to configured conversation_mode, output_mode and voice settings."""
+        if self.config.conversation_mode == "chat_only":
+            self.console.response(text)
+            return
+
+        if self.config.conversation_mode == "audio_only":
+            self.console.response(text)
+            if self.config.voice.enabled:
+                self.tts.speak(text)
+            return
+
+        # Default / audio+chat mode
         if self.config.output_mode in ["both", "cli"]:
             self.console.response(text)
-        if self.config.output_mode in ["both", "voice"]:
+
+        should_speak = (
+            self.config.output_mode in ["both", "voice"]
+            or self.config.voice.always_voice_response
+            or (self.config.voice.voice_reply_on_chat and is_conversation)
+        )
+        if should_speak and self.config.voice.enabled:
             self.tts.speak(text)

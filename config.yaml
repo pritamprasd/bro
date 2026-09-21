@@ -1,79 +1,57 @@
-# Jarvis Assistant Configuration (Phase 2)
-
-# Response delivery mode: "both" (CLI + Voice), "cli" (Text only), or "voice" (Spoken only)
-output_mode: "both"
-
-# Autonomous mode: If false, prompts for approval on high-stakes tasks via overlay
+conversation_mode: audio_only
+output_mode: voice
 autonomous_mode: false
-
-# Model Routing Configuration
 model:
-  policy: "local_only"  # "local_only", "tier_fallback", "cloud_only"
-  
-  # Tier-0 Instant Router: Sub-100ms intent classification using Llama 3.2 3B
+  policy: local_only
   tier0_enabled: true
-  tier0_model: "llama3.2:3b"
-  
-  # Local heavy reasoning & vision models
-  local_text_model: "gemma4:12b"
-  local_vision_model: "qwen2.5vl:7b"
-  
-  # Persistent keep-alive locks models in VRAM/RAM (-1 = infinite)
-  keep_alive: "-1"
-  
-  # Cloud fallback model
-  cloud_model: "gemini-2.5-flash"
-  ollama_url: "http://localhost:11434"
-  # gemini_api_key: ""
-
-# Voice Configuration (Iron Man JARVIS Persona)
+  tier0_model: llama3.2:3b
+  local_text_model: gemma4:12b
+  local_vision_model: qwen2.5vl:7b
+  cloud_model: gemini-2.5-flash
+  ollama_url: http://localhost:11434
+  keep_alive: '-1'
+  gemini_api_key: null
 voice:
   enabled: true
-  whisper_model: "base"
-  device: "cuda"
-  compute_type: "float16"
-  tts_voice: "en-GB-RyanNeural"  # Refined British Butler
-  tts_rate: "+2%"
-  tts_pitch: "-4Hz"
-
-# Safety & Confirmation Rules
+  whisper_model: base
+  device: cuda
+  compute_type: float16
+  tts_voice: en-GB-RyanNeural
+  tts_rate: +2%
+  tts_pitch: -4Hz
+  always_voice_response: true
+  voice_reply_on_chat: true
 safety:
   prompt_on_high_stakes: true
   high_stakes_keywords:
-    - "rm -rf"
-    - "delete"
-    - "destroy"
-    - "wipe"
-    - "format"
-    - "sudo"
-    - "passwd"
-    - "shutdown"
-    - "reboot"
-    - "send email"
-    - "payment"
-    - "buy"
-    - "purchase"
-    - "checkout"
-    - "order"
-    - "transfer"
-    - "bank"
-    - "credit card"
-    - "telegram send"
-    - "post to"
-
-# Browser Settings
+  - rm -rf
+  - delete
+  - destroy
+  - wipe
+  - format
+  - sudo
+  - passwd
+  - shutdown
+  - reboot
+  - send email
+  - payment
+  - buy
+  - purchase
+  - checkout
+  - order
+  - transfer
+  - bank
+  - credit card
+  - telegram send
+  - post to
 browser:
   headless: false
   viewport_width: 1280
   viewport_height: 800
-  user_data_dir: "~/.jarvis/browser_data"
+  user_data_dir: ~/.jarvis/browser_data
   cdp_port: 9222
-
-# Lean Memory Storage Path
 memory:
-  memory_dir: "~/.jarvis/memory"
-
-# Proactive Background Watchdogs
+  memory_dir: ~/.jarvis/memory
 watchdogs:
   sentinel:
     enabled: true
@@ -81,24 +59,22 @@ watchdogs:
     gpu_temp_threshold: 80
     disk_threshold_percent: 90
   organizer:
-    enabled: false  # Configurable download sorter
-    watch_dir: "~/Downloads"
+    enabled: false
+    watch_dir: ~/Downloads
     rules:
-      "pdf": "~/Documents/PDFs"
-      "csv,xlsx,json": "~/Documents/Data"
-      "tar.gz,zip,rar,7z": "~/Downloads/Archives"
-      "mp4,mkv,avi": "~/Media/Videos"
-      "png,jpg,jpeg,webp": "~/Media/Images"
+      pdf: ~/Documents/PDFs
+      csv,xlsx,json: ~/Documents/Data
+      tar.gz,zip,rar,7z: ~/Downloads/Archives
+      mp4,mkv,avi: ~/Media/Videos
+      png,jpg,jpeg,webp: ~/Media/Images
   cron:
-    enabled: true
-    briefing_time: "08:30"
-
-# Decoupled Web UI Server
+    enabled: false
+    briefing_time: 08:30
 web_ui:
-  host: "127.0.0.1"
+  host: 127.0.0.1
   port: 8765
-
-# Global Hotkey & Desktop Spotlight Bar
 spotlight:
   enabled: true
-  hotkey: "<alt>+j"
+  hotkey: <alt>+j
+desktop:
+  screen_index: 1

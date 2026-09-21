@@ -17,8 +17,8 @@ class TelegramRemoteDaemon:
         self.config = config
         self.vault = SecretVault()
         self.task_runner_cb = task_runner_cb
-        self.kill_cb = kill_cb
-        self.desktop = DesktopActuator()
+        screen_idx = getattr(self.config.desktop, "screen_index", 1) if hasattr(self.config, "desktop") else 1
+        self.desktop = DesktopActuator(screen_index=screen_idx)
         self.sentinel = HardwareSentinel(config.watchdogs.sentinel)
         self.running = False
         self._thread = None

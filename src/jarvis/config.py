@@ -29,6 +29,8 @@ class VoiceConfig(BaseModel):
     tts_voice: str = "en-GB-RyanNeural"  # Iron Man JARVIS British voice
     tts_rate: str = "+2%"
     tts_pitch: str = "-4Hz"
+    always_voice_response: bool = False
+    voice_reply_on_chat: bool = True
 
 class SafetyConfig(BaseModel):
     prompt_on_high_stakes: bool = True
@@ -71,7 +73,7 @@ class OrganizerConfig(BaseModel):
     )
 
 class CronConfig(BaseModel):
-    enabled: bool = True
+    enabled: bool = False
     briefing_time: str = "08:30"
 
 class WatchdogsConfig(BaseModel):
@@ -87,7 +89,11 @@ class SpotlightConfig(BaseModel):
     enabled: bool = True
     hotkey: str = "<alt>+j"
 
+class DesktopConfig(BaseModel):
+    screen_index: int = 1  # 0: All combined virtual canvas, 1: Display 1 (default primary), 2: Display 2, etc.
+
 class JarvisConfig(BaseModel):
+    conversation_mode: Literal["audio_only", "audio+chat", "chat_only"] = "audio+chat"
     output_mode: Literal["both", "cli", "voice"] = "both"
     autonomous_mode: bool = False
     model: ModelConfig = Field(default_factory=ModelConfig)
@@ -98,6 +104,7 @@ class JarvisConfig(BaseModel):
     watchdogs: WatchdogsConfig = Field(default_factory=WatchdogsConfig)
     web_ui: WebUIConfig = Field(default_factory=WebUIConfig)
     spotlight: SpotlightConfig = Field(default_factory=SpotlightConfig)
+    desktop: DesktopConfig = Field(default_factory=DesktopConfig)
 
 def load_config(config_path: Optional[Path] = None) -> JarvisConfig:
     candidates = []

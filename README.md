@@ -1,60 +1,81 @@
-# 🤖 JARVIS: Autonomous Personal AI Assistant for Linux X11
+# 🤖 JARVIS // MARK 1: Autonomous Personal AI Assistant for Linux X11
 
-JARVIS is an autonomous, multi-modal personal assistant designed for Linux workstations (X11) powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7**, and **96 GB of RAM**.
+**JARVIS // Mark 1** is an autonomous, multi-modal personal assistant designed for Linux workstations (X11) powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7**, and **96 GB of RAM**.
 
-It operates with **zero cloud billing required** using local Ollama models, supports **Vision-based Computer Use**, an **isolated Playwright browser**, an **everyday Chrome CDP bridge**, an **interactive decoupled Web UI (Stark Industries HUD)**, a **desktop Spotlight Bar (`Alt+J`)**, a **Two-Way Telegram Bot daemon**, **Proactive Watchdogs**, a **"Watch & Learn" Macro Recorder**, and an **Iron Man voice persona**.
+It operates with **zero cloud billing required** using local Ollama models, featuring:
+- **Vision-based Computer Use** (driving desktop apps, mouse, and keyboard)
+- **Dual Browser Automation** (Everyday Chrome CDP attach vs. Isolated Playwright sandbox)
+- **Decoupled Graphical UI & Tactical HUD** (`http://127.0.0.1:8765`)
+- **Context-Aware Desktop Spotlight Bar** (<kbd>Alt</kbd> + <kbd>J</kbd>)
+- **Two-Way Telegram Remote Control** (control workstation from mobile anywhere)
+- **Interactive Voice Communication** (Web HUD microphone, CLI `jarvis voice`, and Iron Man voice replies)
+- **"Watch & Learn" Macro Compiler** (converts repeated visual tasks into 100x faster Python scripts)
+- **Multi-Desktop Display Selection** (choose which physical monitor or virtual combined screen Jarvis sees & controls)
+- **Visual Media Display** (interactive Mermaid SVG diagrams & charts via Web HUD dialog and native X11 desktop windows)
+- **Proactive Watchdogs** (Hardware thermal/storage sentinel, download auto-organizer, on-demand Daily brief)
+- **Master Process Lifecycle Supervisor** with Master Kill-Switch
 
 ---
 
-## 🌟 Major Highlights (Phase 2)
+## 🏗️ Architecture & How Jarvis Works
 
-### 1. Zero-Billing Local AI + Latency Optimizations
-- **Persistent Keep-Alive (`keep_alive: "-1"`):** Eliminates HDD cold-start latency by pinning `gemma4:12b` and `qwen2.5vl:7b` directly in RAM/VRAM.
-- **Configurable Tier-0 Instant Router (`llama3.2:3b`):** Sub-100ms intent classification and query routing with automatic fallback to `gemma4:12b`.
-- **Cloud Escalation:** Optional fallback to Gemini 3.8 / 2.5 Flash via Google AI Studio's $0 free tier.
+Jarvis runs on a **Perception-Reasoning-Action (ReAct)** loop powered by a tiered local model hierarchy:
 
-### 2. Decoupled Graphical UI & Tactical HUD
-- Standalone web dashboard running on `http://127.0.0.1:8765`.
-- Designed with a **Stark Industries / Iron Man HUD aesthetic** (deep space obsidian, neon cyan arc-reactor glow, glassmorphic panels).
-- **Features:**
-  - Real-time token and thought streaming over WebSockets.
-  - Live hardware telemetry (RTX 3060 VRAM bar, GPU temperature, CPU load, RAM usage).
-  - Visual Audit & Filmstrip viewer: inspect past runs with before/after screenshots for every action.
-  - Quick action buttons (Attach Chrome CDP, Organize Downloads, Kill Switch).
-  - Markdown Memory & Secret Vault manager.
+```
+[User Input] (Web HUD Mic / Alt+J Spotlight / Telegram / CLI)
+     │
+     ▼
+[Tier-0 Instant Router: Llama 3.2 3B] (Sub-100ms intent classification)
+     │
+     ├── If Conversation ──> Direct Assistant Voice Reply (Iron Man JARVIS)
+     │
+     └── If Complex Task ──> [Tier-1 Logic: Gemma 4 12B] (Pinned in VRAM via keep-alive)
+                                  │
+                                  ├── Visual UI Grounding ──> [Qwen2.5-VL 7B]
+                                  ├── High-Stakes Action? ──> [Safety Approval Overlay]
+                                  └── Actuators:
+                                        ├── Desktop GUI (mss + pyautogui)
+                                        ├── Everyday Browser (Chrome CDP :9222)
+                                        ├── Sandboxed Web (Playwright)
+                                        └── Python Runner (Data crunching / Telegram)
+```
 
-### 3. Desktop Spotlight Bar (`Alt+J`)
-- Minimalist, floating translucent search bar on X11.
-- **Context-Aware:** Automatically captures the active window title and current clipboard text, injecting them into your prompt.
+### Runtime Background Processes (`jarvis start`):
+When you execute `uv run jarvis start`, the central **Process Supervisor** (`jarvis/core/supervisor.py`) manages two background processes:
+1. **`ui_server` (FastAPI + Uvicorn on port 8765):** Serves the Stark Industries HUD dashboard and manages WebSocket streaming, telemetry, audit runs, and model selection.
+2. **`worker` daemon:** Listens for the global <kbd>Alt</kbd> + <kbd>J</kbd> desktop hotkey, runs the Two-Way Telegram polling bot, and monitors hardware sentinels.
 
-### 4. Two-Way Telegram Remote Daemon
-- Control your workstation from your phone anywhere via your private Telegram bot.
-- Commands: `/run <goal>`, `/status` (telemetry), `/screen` (sends desktop screenshot to your phone), `/kill`.
-- Proactive push notifications when hardware sentinels trigger or jobs finish.
+---
 
-### 5. Desktop & Web Automation: Dual Browser & Macro Recorder
-- **Everyday Browser CDP Attach:** One-click button to launch Chrome/Brave with `--remote-debugging-port=9222`, allowing Jarvis to automate your already logged-in accounts without 2FA / CAPTCHA hassles.
-- **Isolated Playwright Sandbox:** Dedicated browser profile for disposable or privacy-focused tasks.
-- **"Watch & Learn" Macro Recorder:** Compiles successful multi-step visual workflows into deterministic, instant Python macros (`~/.jarvis/memory/workflows/<name>.py`).
+## 🌟 Key Capabilities in Mark 1
 
-### 6. Proactive Background Watchdogs
-- **Hardware Sentinel:** Monitors GPU thermal limits (>80°C) and root disk saturation (>90%).
-- **Configurable Download Organizer:** Watches `~/Downloads` and organizes files into categorized folders (`~/Documents/PDFs`, `~/Documents/Data`, `~/Downloads/Archives`, `~/Media/`).
-- **Morning Briefing:** Speaks a morning system health briefing at 08:30 AM using the Iron Man British voice.
-
-### 7. Master Process Lifecycle & Kill-Switch
-- One command to start all services: `uv run jarvis start`
-- Master Kill-Switch to cleanly terminate everything: `uv run jarvis stop` (or one-click UI button)
-
-### 8. Iron Man Voice Profile
-- Refined British AI butler voice (`en-GB-RyanNeural`) with tuned cadence (`+2%` rate, `-4Hz` pitch).
+| Component | Capabilities |
+| :--- | :--- |
+| **System Responsiveness** | Local models (`gemma4:12b`, `qwen2.5vl:7b`) are locked into VRAM/RAM with `keep_alive: "-1"`, eliminating HDD read penalties. |
+| **Tier-0 Router** | Sub-100ms classification via `llama3.2:3b`. Configurable via UI; falls back to `gemma4:12b` if disabled. |
+| **Decoupled Web HUD** | Tactical dashboard on `:8765` with live WebSocket streaming, hardware telemetry, and run filmstrips. |
+| **Spotlight Bar (`Alt+J`)** | Floating translucent HUD bar that automatically captures your active X11 window title and clipboard text. |
+| **Interactive Voice** | 4 communication channels: Web HUD mic button, Spotlight Bar, CLI `jarvis voice`, and Telegram voice notes. |
+| **Everyday Chrome CDP** | Connects to your logged-in everyday browser tabs on port 9222 to bypass 2FA and CAPTCHAs. |
+| **Daily brief** | On-demand system briefing (`jarvis brief` or HUD button) spoken via the Iron Man British voice (`en-GB-RyanNeural`). |
+| **Macro Recorder** | Compiles multi-step visual workflows into deterministic Python scripts in `~/.jarvis/memory/workflows/`. |
+| **Resource Attachments** | Attach files/datasets upfront via Web HUD or `-f` in CLI. If forgotten, Jarvis prompts on-demand via an interactive modal to supply the file and seamlessly resumes. |
+| **Visual Audit Trail** | Human-readable KPI cards, native SVG Actuator Donut, Latency Bar chart, Success ratio gauge, full-res screenshot lightbox, and 1-click Markdown export. |
+| **Command Center Widgets**| Live Watchdogs Sentinels Matrix, Multi-Disk Storage Health (NVMe `/` & secondary HDD `/mnt/HDD-500GB/`), Recent Missions feed, and Terminal controls. |
+| **Conversation Modes** | 3 Web UI modes: `audio_only` (hands-free Arc Reactor HUD with auto-listen loop), `audio+chat` (voice replies + terminal logs), and `chat_only` (silent text mode). |
+| **In-UI System Manual** | Integrated 13-section tactical handbook tab inside the Web HUD with 1-click code copy and live action triggers. |
+| **System Error Log** | Real-time error tracking card in the UI displaying any model disconnects, step timeouts, or unhandled exceptions. |
+| **Visual Media Display**| Interactive Mermaid.js SVG architecture diagrams, SVG data charts, and image viewers displayed via Web HUD modal or native X11 desktop system windows. |
+| **Multi-Desktop Support**| Designate active monitor (Display 1, Display 2, or All Combined) via HUD header dropdown or dedicated management tab with live thumbnails and automatic coordinate offset grounding. |
+| **Terminal Typography & Scaler**| Enhanced JetBrains Mono monospace console with line-height 1.7, letter-spacing, categorized translucent accent badges, and dynamic font scaling stepper (`[A-] [15px] [A+] [Reset]`) persisted in `localStorage`. |
+| **World-Class Glassmorphic UX**| Floating non-wrapping header with unified center control capsule, standardized button hierarchy (`.btn`, `.btn-sm`, `.btn-lg`), precision 52px prompt bar, uniform holographic tiles, and Lucide vector iconography. |
 
 ---
 
 ## 🚀 Quick Reference Commands
 
 ```bash
-# 1. Master Startup (Web UI, Spotlight, Telegram, Watchdogs)
+# 1. Master Startup (Web HUD, Spotlight, Telegram, Watchdogs)
 uv run jarvis start
 
 # 2. Check System Status & Running Daemons
@@ -63,32 +84,41 @@ uv run jarvis status
 # 3. Master Kill-Switch (Cleanly terminate all background services)
 uv run jarvis stop
 
-# 4. Run a task directly via CLI
-uv run jarvis run "Open calculator and calculate 987 * 654"
+# 4. Trigger Daily brief On-Demand
+uv run jarvis brief
 
-# 5. Run with Voice (STT + Iron Man Spoken Response)
+# 5. Run a task directly via CLI (with resource attachments)
+uv run jarvis run "Analyze sales spreadsheet" -f ~/Downloads/sales_q3.csv
+
+# 6. Speak with Jarvis via Terminal Voice Mode
 uv run jarvis voice
 
-# 6. Launch Everyday Browser with CDP Remote Debugging
+# 7. Launch Everyday Browser with CDP Remote Debugging
 uv run jarvis cdp
 
-# 7. Inspect Audit Trail of Past Runs
+# 8. Inspect Audit Trail of Past Runs
 uv run jarvis audit
 
-# 8. Manage Credentials in Vault
+# 9. Manage Credentials in Vault
 uv run jarvis vault set telegram_bot_token "YOUR_BOT_TOKEN"
 uv run jarvis vault set telegram_chat_id "YOUR_CHAT_ID"
-uv run jarvis vault list
 
-# 9. List Structured Memory Files
+# 10. List Structured Memory Files
 uv run jarvis memory list
 ```
 
 ---
 
+## 📘 User Guide & In-UI Manual
+
+For detailed walkthroughs on every feature, voice settings, and remote mobile usage, read:
+👉 **[user-guide.md](file:///home/pritam/code/ai/jarvis/user-guide.md)** or open the **📖 System Manual** tab inside the Web HUD at [`http://127.0.0.1:8765`](http://127.0.0.1:8765).
+
+---
+
 ## 🧪 Testing
 
-Run the full automated test suite (18 unit and integration tests):
+Run the full automated test suite:
 ```bash
 uv run pytest -v
 ```
