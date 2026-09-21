@@ -1,4 +1,4 @@
-# Jarvis Assistant Configuration
+# Jarvis Assistant Configuration (Phase 2)
 
 # Response delivery mode: "both" (CLI + Voice), "cli" (Text only), or "voice" (Spoken only)
 output_mode: "both"
@@ -8,29 +8,33 @@ autonomous_mode: false
 
 # Model Routing Configuration
 model:
-  # Options:
-  # - "local_only": 100% Free, runs on your RTX 3060 via Ollama (No API keys or billing needed!)
-  # - "tier_fallback": Starts locally, escalates to cloud on high complexity or visual ambiguity
-  # - "cloud_only": Uses Gemini API directly
-  policy: "local_only"
+  policy: "local_only"  # "local_only", "tier_fallback", "cloud_only"
   
-  # Local models running in Ollama
+  # Tier-0 Instant Router: Sub-100ms intent classification using Llama 3.2 3B
+  tier0_enabled: true
+  tier0_model: "llama3.2:3b"
+  
+  # Local heavy reasoning & vision models
   local_text_model: "gemma4:12b"
   local_vision_model: "qwen2.5vl:7b"
   
-  # Cloud model (optional, uses free tier key from aistudio.google.com if set)
+  # Persistent keep-alive locks models in VRAM/RAM (-1 = infinite)
+  keep_alive: "-1"
+  
+  # Cloud fallback model
   cloud_model: "gemini-2.5-flash"
   ollama_url: "http://localhost:11434"
-  # gemini_api_key: "AIzaSy..." # Or store in secret vault via `jarvis vault set gemini_api_key`
+  # gemini_api_key: ""
 
-# Voice Configuration
+# Voice Configuration (Iron Man JARVIS Persona)
 voice:
   enabled: true
   whisper_model: "base"
   device: "cuda"
   compute_type: "float16"
-  tts_voice: "en-US-GuyNeural"
-  tts_rate: "+0%"
+  tts_voice: "en-GB-RyanNeural"  # Refined British Butler
+  tts_rate: "+2%"
+  tts_pitch: "-4Hz"
 
 # Safety & Confirmation Rules
 safety:
@@ -57,13 +61,44 @@ safety:
     - "telegram send"
     - "post to"
 
-# Isolated Browser Settings
+# Browser Settings
 browser:
   headless: false
   viewport_width: 1280
   viewport_height: 800
   user_data_dir: "~/.jarvis/browser_data"
+  cdp_port: 9222
 
 # Lean Memory Storage Path
 memory:
   memory_dir: "~/.jarvis/memory"
+
+# Proactive Background Watchdogs
+watchdogs:
+  sentinel:
+    enabled: true
+    check_interval_seconds: 30
+    gpu_temp_threshold: 80
+    disk_threshold_percent: 90
+  organizer:
+    enabled: false  # Configurable download sorter
+    watch_dir: "~/Downloads"
+    rules:
+      "pdf": "~/Documents/PDFs"
+      "csv,xlsx,json": "~/Documents/Data"
+      "tar.gz,zip,rar,7z": "~/Downloads/Archives"
+      "mp4,mkv,avi": "~/Media/Videos"
+      "png,jpg,jpeg,webp": "~/Media/Images"
+  cron:
+    enabled: true
+    briefing_time: "08:30"
+
+# Decoupled Web UI Server
+web_ui:
+  host: "127.0.0.1"
+  port: 8765
+
+# Global Hotkey & Desktop Spotlight Bar
+spotlight:
+  enabled: true
+  hotkey: "<alt>+j"

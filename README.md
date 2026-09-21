@@ -1,120 +1,94 @@
-# 🤖 Jarvis: Autonomous Personal AI Assistant for Linux X11
+# 🤖 JARVIS: Autonomous Personal AI Assistant for Linux X11
 
-Jarvis is a powerful, cost-effective personal AI assistant tailored for Linux workstations (X11). It combines **Vision-based Computer Use** (driving desktop apps and mouse/keyboard), an **isolated sandboxed Playwright browser**, an **inline Python runner** (for background scripts, data processing, and Telegram bot messaging), a **voice interface** with speech-to-text and text-to-speech, a **safety approval overlay**, and an **on-demand lean Markdown memory store**.
+JARVIS is an autonomous, multi-modal personal assistant designed for Linux workstations (X11) powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7**, and **96 GB of RAM**.
 
----
-
-## 🌟 Key Highlights
-
-- **100% Zero-Billing Local AI Support:** Runs locally on your NVIDIA RTX 3060 GPU using Ollama:
-  - **Reasoning & Planning:** `gemma4:12b`
-  - **Vision UI Grounding:** `qwen2.5vl:7b`
-- **Optional Cloud Escalation:** Configurable fallback to Google Gemini 3.8 / 2.5 Flash (compatible with Google AI Studio's $0 free tier).
-- **Vision Computer Use:** Real-time X11 screen capture (`mss`), visual coordinate prediction, and human-like mouse/keyboard interaction (`pyautogui`).
-- **Isolated Web Automation:** Headless or visual Playwright browser with persistent sandboxed user session.
-- **Python Task Runner:** Runs arbitrary Python tasks, heavy data processing routines, and Telegram bot messaging without leaving the assistant.
-- **Configurable Output Modality:** Get responses in `cli`, `voice`, or `both`.
-- **Safety Gatekeeper & Approval Overlay:** Automatically classifies actions into safe vs high-stakes (e.g. deletions, payments, emails). High-stakes actions trigger an always-on-top approval overlay with `Enter` (Approve) / `Esc` (Reject) hotkeys.
-- **Lean Markdown Memory:** Selective, on-demand loading of memory files (`preferences.md`, `system.md`, `contacts.md`, `workflows/*.md`) keeps context lean and token-efficient.
-- **Secure Secret Vault:** Stores tokens, passwords, and API keys securely using Linux Secret Service / Keyring.
+It operates with **zero cloud billing required** using local Ollama models, supports **Vision-based Computer Use**, an **isolated Playwright browser**, an **everyday Chrome CDP bridge**, an **interactive decoupled Web UI (Stark Industries HUD)**, a **desktop Spotlight Bar (`Alt+J`)**, a **Two-Way Telegram Bot daemon**, **Proactive Watchdogs**, a **"Watch & Learn" Macro Recorder**, and an **Iron Man voice persona**.
 
 ---
 
-## 🚀 Quickstart
+## 🌟 Major Highlights (Phase 2)
 
-### 1. Requirements
-- Linux X11
-- Python 3.11+
-- `uv` package manager (`snap install astral-uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`)
-- Ollama with `gemma4:12b` and `qwen2.5vl:7b`
+### 1. Zero-Billing Local AI + Latency Optimizations
+- **Persistent Keep-Alive (`keep_alive: "-1"`):** Eliminates HDD cold-start latency by pinning `gemma4:12b` and `qwen2.5vl:7b` directly in RAM/VRAM.
+- **Configurable Tier-0 Instant Router (`llama3.2:3b`):** Sub-100ms intent classification and query routing with automatic fallback to `gemma4:12b`.
+- **Cloud Escalation:** Optional fallback to Gemini 3.8 / 2.5 Flash via Google AI Studio's $0 free tier.
 
-### 2. Installation
-```bash
-# Clone or navigate to the directory
-cd /home/pritam/code/ai/jarvis
+### 2. Decoupled Graphical UI & Tactical HUD
+- Standalone web dashboard running on `http://127.0.0.1:8765`.
+- Designed with a **Stark Industries / Iron Man HUD aesthetic** (deep space obsidian, neon cyan arc-reactor glow, glassmorphic panels).
+- **Features:**
+  - Real-time token and thought streaming over WebSockets.
+  - Live hardware telemetry (RTX 3060 VRAM bar, GPU temperature, CPU load, RAM usage).
+  - Visual Audit & Filmstrip viewer: inspect past runs with before/after screenshots for every action.
+  - Quick action buttons (Attach Chrome CDP, Organize Downloads, Kill Switch).
+  - Markdown Memory & Secret Vault manager.
 
-# Install dependencies and sync virtual environment
-uv sync
+### 3. Desktop Spotlight Bar (`Alt+J`)
+- Minimalist, floating translucent search bar on X11.
+- **Context-Aware:** Automatically captures the active window title and current clipboard text, injecting them into your prompt.
 
-# Install Playwright browser
-uv run playwright install chromium
-```
+### 4. Two-Way Telegram Remote Daemon
+- Control your workstation from your phone anywhere via your private Telegram bot.
+- Commands: `/run <goal>`, `/status` (telemetry), `/screen` (sends desktop screenshot to your phone), `/kill`.
+- Proactive push notifications when hardware sentinels trigger or jobs finish.
+
+### 5. Desktop & Web Automation: Dual Browser & Macro Recorder
+- **Everyday Browser CDP Attach:** One-click button to launch Chrome/Brave with `--remote-debugging-port=9222`, allowing Jarvis to automate your already logged-in accounts without 2FA / CAPTCHA hassles.
+- **Isolated Playwright Sandbox:** Dedicated browser profile for disposable or privacy-focused tasks.
+- **"Watch & Learn" Macro Recorder:** Compiles successful multi-step visual workflows into deterministic, instant Python macros (`~/.jarvis/memory/workflows/<name>.py`).
+
+### 6. Proactive Background Watchdogs
+- **Hardware Sentinel:** Monitors GPU thermal limits (>80°C) and root disk saturation (>90%).
+- **Configurable Download Organizer:** Watches `~/Downloads` and organizes files into categorized folders (`~/Documents/PDFs`, `~/Documents/Data`, `~/Downloads/Archives`, `~/Media/`).
+- **Morning Briefing:** Speaks a morning system health briefing at 08:30 AM using the Iron Man British voice.
+
+### 7. Master Process Lifecycle & Kill-Switch
+- One command to start all services: `uv run jarvis start`
+- Master Kill-Switch to cleanly terminate everything: `uv run jarvis stop` (or one-click UI button)
+
+### 8. Iron Man Voice Profile
+- Refined British AI butler voice (`en-GB-RyanNeural`) with tuned cadence (`+2%` rate, `-4Hz` pitch).
 
 ---
 
-## 🛠️ Usage
+## 🚀 Quick Reference Commands
 
-### Run a Task via CLI
 ```bash
-# Run a desktop or browser task
-uv run jarvis run "Open calculator and compute 987 * 654"
+# 1. Master Startup (Web UI, Spotlight, Telegram, Watchdogs)
+uv run jarvis start
 
-# Run a web automation task
-uv run jarvis run "Search Wikipedia for James Webb Telescope and summarize the first paragraph"
+# 2. Check System Status & Running Daemons
+uv run jarvis status
 
-# Run with full autonomy (disables confirmation overlay)
-uv run jarvis run "Process the data in /tmp/data.csv" --autonomous
+# 3. Master Kill-Switch (Cleanly terminate all background services)
+uv run jarvis stop
 
-# Override model policy for a specific run
-uv run jarvis run "Analyze complex UI layout" --policy tier_fallback
-```
+# 4. Run a task directly via CLI
+uv run jarvis run "Open calculator and calculate 987 * 654"
 
-### Voice Mode
-```bash
-# Record for 5 seconds and execute recognized command
+# 5. Run with Voice (STT + Iron Man Spoken Response)
 uv run jarvis voice
 
-# Custom recording duration
-uv run jarvis voice --duration 8
-```
+# 6. Launch Everyday Browser with CDP Remote Debugging
+uv run jarvis cdp
 
-### Python Script & Telegram Bot Execution
-Jarvis can directly execute Python routines. Store your Telegram Bot Token and Chat ID in the vault:
-```bash
-uv run jarvis vault set telegram_bot_token "YOUR_TELEGRAM_BOT_TOKEN"
+# 7. Inspect Audit Trail of Past Runs
+uv run jarvis audit
+
+# 8. Manage Credentials in Vault
+uv run jarvis vault set telegram_bot_token "YOUR_BOT_TOKEN"
 uv run jarvis vault set telegram_chat_id "YOUR_CHAT_ID"
+uv run jarvis vault list
 
-# Then instruct Jarvis:
-uv run jarvis run "Send a telegram message saying 'Build complete!' using the python runner"
-```
-
----
-
-## ⚙️ Configuration (`config.yaml`)
-
-Manage configuration easily via CLI or by editing `config.yaml`:
-```bash
-# Show configuration
-uv run jarvis config show
-
-# Switch output mode to CLI-only or voice-only
-uv run jarvis config set output_mode cli
-uv run jarvis config set output_mode voice
-uv run jarvis config set output_mode both
-
-# Switch model policy: "local_only", "tier_fallback", or "cloud_only"
-uv run jarvis config set model.policy local_only
-```
-
----
-
-## 🧠 Lean Markdown Memory
-
-Memory is stored in `~/.jarvis/memory/`. Jarvis only loads specific files when relevant:
-- `preferences.md`: User persona and rules.
-- `system.md`: Workstation specifications and display configuration.
-- `contacts.md`: People and handles.
-- `workflows/`: Task recipes (e.g. `telegram.md`, `data_processing.md`).
-
-```bash
-# Inspect stored memory files
+# 9. List Structured Memory Files
 uv run jarvis memory list
 ```
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Testing
 
+Run the full automated test suite (18 unit and integration tests):
 ```bash
 uv run pytest -v
 ```

@@ -9,12 +9,14 @@ authors = [
 requires-python = ">=3.11"
 dependencies = [
     "edge-tts>=7.2.8",
+    "fastapi>=0.141.1",
     "faster-whisper>=1.2.1",
     "google-genai>=2.24.0",
     "keyring>=25.7.0",
     "mss>=10.2.0",
     "pillow>=12.3.0",
     "playwright>=1.63.0",
+    "psutil>=7.2.2",
     "pyautogui>=0.9.54",
     "pydantic>=2.13.5",
     "pynput>=1.8.2",
@@ -25,6 +27,7 @@ dependencies = [
     "rich>=15.0.0",
     "sounddevice>=0.5.6",
     "typer>=0.27.2",
+    "uvicorn[standard]>=0.53.0",
 ]
 
 [project.scripts]

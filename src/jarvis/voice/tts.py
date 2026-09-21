@@ -13,6 +13,7 @@ class TextToSpeech:
         self.config = config
         self.voice = config.tts_voice
         self.rate = config.tts_rate
+        self.pitch = config.tts_pitch
         self.enabled = config.enabled
 
     def speak(self, text: str, blocking: bool = False) -> None:
@@ -44,7 +45,7 @@ class TextToSpeech:
             temp_path = f.name
 
         try:
-            communicate = edge_tts.Communicate(text, self.voice, rate=self.rate)
+            communicate = edge_tts.Communicate(text, self.voice, rate=self.rate, pitch=self.pitch)
             await communicate.save(temp_path)
 
             # Play using available Linux audio player (ffplay, aplay, or mpv)

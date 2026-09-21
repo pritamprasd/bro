@@ -1,8 +1,8 @@
-"""Configuration loader and schema for Jarvis."""
+"""Configuration loader and schema for Jarvis Phase 2."""
 
 import os
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 import yaml
 from pydantic import BaseModel, Field
 
@@ -12,19 +12,23 @@ LOCAL_CONFIG_PATH = Path("config.yaml")
 
 class ModelConfig(BaseModel):
     policy: Literal["local_only", "tier_fallback", "cloud_only"] = "local_only"
+    tier0_enabled: bool = True
+    tier0_model: str = "llama3.2:3b"
     local_text_model: str = "gemma4:12b"
     local_vision_model: str = "qwen2.5vl:7b"
     cloud_model: str = "gemini-2.5-flash"
     ollama_url: str = "http://localhost:11434"
+    keep_alive: str = "-1"  # -1 keeps models in RAM/VRAM permanently
     gemini_api_key: Optional[str] = None
 
 class VoiceConfig(BaseModel):
     enabled: bool = True
     whisper_model: str = "base"
-    device: str = "cuda"  # or "cpu"
-    compute_type: str = "float16"  # or "int8"
-    tts_voice: str = "en-US-GuyNeural"
-    tts_rate: str = "+0%"
+    device: str = "cuda"
+    compute_type: str = "float16"
+    tts_voice: str = "en-GB-RyanNeural"  # Iron Man JARVIS British voice
+    tts_rate: str = "+2%"
+    tts_pitch: str = "-4Hz"
 
 class SafetyConfig(BaseModel):
     prompt_on_high_stakes: bool = True
@@ -42,9 +46,46 @@ class BrowserConfig(BaseModel):
     viewport_width: int = 1280
     viewport_height: int = 800
     user_data_dir: str = str(DEFAULT_CONFIG_DIR / "browser_data")
+    cdp_port: int = 9222
 
 class MemoryConfig(BaseModel):
     memory_dir: str = str(DEFAULT_CONFIG_DIR / "memory")
+
+class SentinelConfig(BaseModel):
+    enabled: bool = True
+    check_interval_seconds: int = 30
+    gpu_temp_threshold: int = 80
+    disk_threshold_percent: int = 90
+
+class OrganizerConfig(BaseModel):
+    enabled: bool = False
+    watch_dir: str = "~/Downloads"
+    rules: Dict[str, str] = Field(
+        default_factory=lambda: {
+            "pdf": "~/Documents/PDFs",
+            "csv,xlsx,json": "~/Documents/Data",
+            "tar.gz,zip,rar,7z": "~/Downloads/Archives",
+            "mp4,mkv,avi": "~/Media/Videos",
+            "png,jpg,jpeg,webp": "~/Media/Images",
+        }
+    )
+
+class CronConfig(BaseModel):
+    enabled: bool = True
+    briefing_time: str = "08:30"
+
+class WatchdogsConfig(BaseModel):
+    sentinel: SentinelConfig = Field(default_factory=SentinelConfig)
+    organizer: OrganizerConfig = Field(default_factory=OrganizerConfig)
+    cron: CronConfig = Field(default_factory=CronConfig)
+
+class WebUIConfig(BaseModel):
+    host: str = "127.0.0.1"
+    port: int = 8765
+
+class SpotlightConfig(BaseModel):
+    enabled: bool = True
+    hotkey: str = "<alt>+j"
 
 class JarvisConfig(BaseModel):
     output_mode: Literal["both", "cli", "voice"] = "both"
@@ -54,9 +95,11 @@ class JarvisConfig(BaseModel):
     safety: SafetyConfig = Field(default_factory=SafetyConfig)
     browser: BrowserConfig = Field(default_factory=BrowserConfig)
     memory: MemoryConfig = Field(default_factory=MemoryConfig)
+    watchdogs: WatchdogsConfig = Field(default_factory=WatchdogsConfig)
+    web_ui: WebUIConfig = Field(default_factory=WebUIConfig)
+    spotlight: SpotlightConfig = Field(default_factory=SpotlightConfig)
 
 def load_config(config_path: Optional[Path] = None) -> JarvisConfig:
-    """Load configuration from local or default global path, falling back to defaults."""
     candidates = []
     if config_path:
         candidates.append(config_path)
@@ -74,7 +117,6 @@ def load_config(config_path: Optional[Path] = None) -> JarvisConfig:
     return JarvisConfig()
 
 def save_config(config: JarvisConfig, target_path: Optional[Path] = None) -> Path:
-    """Save configuration to disk."""
     path = target_path or LOCAL_CONFIG_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:

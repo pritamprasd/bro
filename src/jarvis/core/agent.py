@@ -1,24 +1,28 @@
-"""Core ReAct Agent Orchestrator for Jarvis."""
+"""Core ReAct Agent Orchestrator for Jarvis Phase 2."""
 
 import json
 import re
 from typing import Any, Dict, List, Optional
 from jarvis.actuators.browser import BrowserActuator
+from jarvis.actuators.cdp_browser import CDPBrowserActuator
 from jarvis.actuators.desktop import DesktopActuator
 from jarvis.actuators.python_runner import PythonRunner
+from jarvis.actuators.recorder import MacroRecorder
 from jarvis.actuators.shell import ShellActuator
 from jarvis.config import JarvisConfig
+from jarvis.core.audit import AuditManager
 from jarvis.core.safety import SafetyClassifier
 from jarvis.memory.store import MemoryStore
 from jarvis.models.base import ChatMessage, ModelResponse
 from jarvis.models.router import ModelRouter
+from jarvis.models.tier0 import Tier0Router
 from jarvis.security.vault import SecretVault
 from jarvis.ui.console import JarvisConsole
 from jarvis.ui.overlay import ApprovalOverlay
 from jarvis.voice.tts import TextToSpeech
 
 SYSTEM_PROMPT = """You are Jarvis, an elite personal AI assistant executing tasks on a Linux X11 workstation.
-You have actuators to control the desktop GUI, an isolated Playwright web browser, a local Python runner, and bash shell.
+You have actuators to control the desktop GUI, an isolated Playwright web browser, your everyday browser via CDP, a local Python runner, and bash shell.
 
 Available Actions:
 1. `desktop_ground_and_act(instruction)`: Take a screenshot of the X11 desktop, identify the target element using computer vision, and click/type.
@@ -30,11 +34,15 @@ Available Actions:
 7. `browser_click(selector=None, x=None, y=None)`: Click in the isolated browser.
 8. `browser_type(text, selector=None)`: Type text into a browser input field.
 9. `browser_get_text()`: Read the visible page content of the active browser page.
-10. `run_python(code)`: Execute Python code (e.g. data processing, math, Telegram bot API calls via requests).
-11. `run_shell(command)`: Execute a safe bash shell command.
-12. `get_secret(key)`: Retrieve a credential from the secure vault (e.g. "telegram_bot_token").
-13. `save_workflow(topic, content)`: Save a learned workflow or note to persistent memory.
-14. `finish(result)`: Task is finished. Provide the final response to the user.
+10. `browser_cdp_navigate(url)`: Navigate everyday Chrome/Brave browser (via CDP :9222).
+11. `browser_cdp_click(selector)`: Click in everyday Chrome/Brave browser (via CDP :9222).
+12. `browser_cdp_get_text()`: Read content from everyday Chrome/Brave browser.
+13. `run_python(code)`: Execute Python code (e.g. data processing, math, Telegram bot API calls via requests).
+14. `run_shell(command)`: Execute a safe bash shell command.
+15. `run_macro(macro_name)`: Execute a previously compiled deterministic macro.
+16. `get_secret(key)`: Retrieve a credential from the secure vault (e.g. "telegram_bot_token").
+17. `save_workflow(topic, content)`: Save a learned workflow or note to persistent memory.
+18. `finish(result)`: Task is finished. Provide the final response to the user.
 
 To call an action, output valid JSON in this exact structure:
 ```json
@@ -62,22 +70,33 @@ class JarvisAgent:
         self.config = config
         self.console = JarvisConsole(output_mode=config.output_mode)
         self.router = ModelRouter(config.model)
+        self.tier0 = Tier0Router(config.model)
         self.desktop = DesktopActuator()
         self.browser = BrowserActuator(config.browser)
+        self.cdp_browser = CDPBrowserActuator(port=config.browser.cdp_port)
         self.python_runner = PythonRunner()
         self.shell = ShellActuator()
+        self.macro_recorder = MacroRecorder()
         self.memory = MemoryStore(config.memory)
         self.vault = SecretVault()
         self.safety = SafetyClassifier(config.safety)
         self.overlay = ApprovalOverlay()
         self.tts = TextToSpeech(config.voice)
+        self.audit = AuditManager()
 
     def run_task(self, user_goal: str, max_steps: int = 15) -> str:
         """Execute a user goal through perception, reasoning, and action."""
         self.console.banner()
         self.console.console.print(f"[bold]Goal:[/bold] {user_goal}\n")
 
-        # 1. On-demand lean memory loading
+        # 0. Start Audit Run
+        self.audit.start_run(user_goal)
+
+        # 1. Tier-0 Fast Classification (sub-100ms)
+        tier0_result = self.tier0.classify(user_goal)
+        self.console.thought(f"[Tier-0 Intent: {tier0_result.intent}] {tier0_result.summary} ({tier0_result.elapsed_ms}ms)")
+
+        # 2. On-demand lean memory loading
         relevant_memory = self.memory.get_relevant_memory(user_goal)
         system_instructions = SYSTEM_PROMPT
         if relevant_memory:
@@ -86,6 +105,8 @@ class JarvisAgent:
         messages = [
             ChatMessage(role="user", content=f"Goal: {user_goal}"),
         ]
+
+        recorded_steps: List[Dict[str, Any]] = []
 
         for step_idx in range(1, max_steps + 1):
             self.console.step(step_idx, max_steps, "Thinking & Planning...")
@@ -99,6 +120,7 @@ class JarvisAgent:
             except Exception as e:
                 err_msg = f"Model execution failed: {e}"
                 self.console.error(err_msg)
+                self.audit.complete_run(err_msg, status="failed")
                 return err_msg
 
             content = model_resp.content.strip()
@@ -128,6 +150,14 @@ class JarvisAgent:
                 final_result = params.get("result", "Task finished successfully.")
                 self.console.success("Task completed!")
                 self._deliver_output(final_result)
+                self.audit.complete_run(final_result, status="success")
+
+                # Compile macro if multi-step desktop/browser workflow
+                if len(recorded_steps) >= 2:
+                    macro_name = re.sub(r"[^a-zA-Z0-9_-]", "_", user_goal[:25]).strip("_")
+                    self.macro_recorder.compile_macro(macro_name, recorded_steps)
+                    self.console.thought(f"Compiled reusable macro: {macro_name}.py")
+
                 return final_result
 
             # Safety Assessment
@@ -156,26 +186,36 @@ class JarvisAgent:
             self.console.action(action_name, str(params))
             action_result = self._dispatch_action(action_name, params)
 
+            # Record step in Audit Manager & Macro Recorder
+            obs_text = action_result.output if action_result.success else f"Error: {action_result.error}"
+            self.audit.record_step(
+                step_num=step_idx,
+                thought=thought,
+                action=action_name,
+                params=params,
+                observation=obs_text,
+                success=action_result.success,
+                screenshot_b64=action_result.screenshot_base64,
+            )
+            recorded_steps.append({"action": action_name, "params": params, "thought": thought})
+
             # Feedback loop
-            result_str = action_result.output if action_result.success else f"Error: {action_result.error}"
             messages.append(ChatMessage(role="assistant", content=content))
-            messages.append(ChatMessage(role="user", content=f"Observation ({action_name}): {result_str}"))
+            messages.append(ChatMessage(role="user", content=f"Observation ({action_name}): {obs_text}"))
 
         timeout_msg = "Task reached maximum execution step limit."
         self.console.warning(timeout_msg)
+        self.audit.complete_run(timeout_msg, status="timeout")
         return timeout_msg
 
     def _dispatch_action(self, action: str, params: Dict[str, Any]):
         try:
             if action == "desktop_ground_and_act":
-                # 1. Capture screen
                 _, b64 = self.desktop.capture_screenshot()
-                # 2. VLM Grounding
                 w, h = self.desktop.get_screen_dimensions()
                 instruction = params.get("instruction", "")
                 pred = self.router.ground_coordinates(b64, instruction, w, h)
                 self.console.thought(f"Grounding '{instruction}' -> ({pred.x}, {pred.y}) action={pred.action}")
-                # 3. Act
                 if pred.action in ["click", "none"]:
                     return self.desktop.click(pred.x, pred.y)
                 elif pred.action == "double_click":
@@ -224,9 +264,20 @@ class JarvisAgent:
             elif action == "browser_get_text":
                 return self.browser.get_text_content()
 
+            elif action == "browser_cdp_navigate":
+                return self.cdp_browser.navigate(params.get("url", ""))
+
+            elif action == "browser_cdp_click":
+                return self.cdp_browser.click(params.get("selector", ""))
+
+            elif action == "browser_cdp_get_text":
+                return self.cdp_browser.get_text_content()
+
+            elif action == "run_macro":
+                return self.macro_recorder.run_macro(params.get("macro_name", ""))
+
             elif action == "run_python":
                 code = params.get("code", "")
-                # Inject vault secrets as environment variables if needed
                 env = {}
                 for k in self.vault.list_keys():
                     secret = self.vault.get_secret(k)

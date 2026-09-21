@@ -12,11 +12,13 @@ class OllamaProvider(BaseLLMProvider):
         base_url: str = "http://localhost:11434",
         text_model: str = "gemma4:12b",
         vision_model: str = "qwen2.5vl:7b",
+        keep_alive: str = "-1",
         timeout: int = 120,
     ):
         self.base_url = base_url.rstrip("/")
         self.text_model = text_model
         self.vision_model = vision_model
+        self.keep_alive = keep_alive
         self.timeout = timeout
 
     def check_health(self) -> bool:
@@ -26,6 +28,22 @@ class OllamaProvider(BaseLLMProvider):
             return r.status_code == 200
         except Exception:
             return False
+
+    def warmup(self) -> None:
+        """Pre-warm model into RAM/VRAM with keep_alive."""
+        try:
+            requests.post(
+                f"{self.base_url}/api/chat",
+                json={
+                    "model": self.text_model,
+                    "messages": [{"role": "user", "content": "ping"}],
+                    "keep_alive": self.keep_alive,
+                    "stream": False,
+                },
+                timeout=180,
+            )
+        except Exception as e:
+            print(f"[Warning] Ollama warmup for {self.text_model} encountered: {e}")
 
     def generate_text(
         self,
@@ -47,6 +65,7 @@ class OllamaProvider(BaseLLMProvider):
         payload: Dict[str, Any] = {
             "model": self.text_model,
             "messages": formatted_messages,
+            "keep_alive": self.keep_alive,
             "stream": False,
             "options": {
                 "temperature": 0.2,

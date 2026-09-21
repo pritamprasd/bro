@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS // Mark VII Tactical AI HUD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #060910;
+      --panel-bg: rgba(12, 18, 32, 0.75);
+      --panel-border: rgba(0, 229, 255, 0.18);
+      --panel-hover: rgba(0, 229, 255, 0.3);
+      --neon-cyan: #00e5ff;
+      --neon-blue: #2979ff;
+      --neon-green: #00e676;
+      --neon-red: #ff1744;
+      --neon-amber: #ffab00;
+      --text-main: #e2e8f0;
+      --text-muted: #8492a6;
+      --glow: 0 0 16px rgba(0, 229, 255, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 10%, #0d1b2e 0%, #060910 80%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation HUD */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(6, 9, 16, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--panel-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .arc-reactor {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan), inset 0 0 8px var(--neon-cyan);
+      animation: pulse 2.5s infinite alternate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .arc-reactor::after {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 8px #ffffff;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.96); box-shadow: 0 0 8px var(--neon-cyan); }
+      100% { transform: scale(1.04); box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 12px var(--neon-cyan); }
+    }
+    .logo-text h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    .logo-text span {
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      letter-spacing: 1px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: 1px solid transparent;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-cyan {
+      background: rgba(0, 229, 255, 0.1);
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+    .btn-cyan:hover {
+      background: var(--neon-cyan);
+      color: #060910;
+      box-shadow: var(--glow);
+    }
+    .btn-danger {
+      background: rgba(255, 23, 68, 0.15);
+      border-color: var(--neon-red);
+      color: var(--neon-red);
+    }
+    .btn-danger:hover {
+      background: var(--neon-red);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(255, 23, 68, 0.4);
+    }
+
+    /* Tabs Navigation */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem 2rem;
+      background: rgba(10, 15, 26, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: #ffffff;
+      background: rgba(0, 229, 255, 0.15);
+      border-bottom: 2px solid var(--neon-cyan);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 1.5rem 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: grid; gap: 1.5rem; }
+
+    /* Grid Layout for Command Center */
+    #command-center {
+      grid-template-columns: 1fr 380px;
+    }
+    .card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--neon-cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Prompt Input Bar */
+    .input-box {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .input-box input {
+      flex: 1;
+      background: rgba(6, 9, 16, 0.8);
+      border: 1px solid var(--panel-border);
+      padding: 0.85rem 1.25rem;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-box input:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+    }
+
+    /* Chips */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .chip:hover {
+      background: rgba(0, 229, 255, 0.1);
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+
+    /* Terminal Log */
+    .terminal {
+      background: #04060a;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      height: 480px;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .log-line { line-height: 1.4; word-break: break-word; }
+    .log-thought { color: #89b4fa; font-style: italic; }
+    .log-action { color: #fab387; font-weight: 600; }
+    .log-step { color: var(--neon-cyan); font-weight: 700; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 0.4rem; }
+    .log-result { color: var(--neon-green); }
+    .log-error { color: var(--neon-red); font-weight: bold; }
+
+    /* Telemetry Meters */
+    .meter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    /* History Filmstrip */
+    .history-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.5rem;
+    }
+    .history-list {
+      max-height: 650px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .history-item {
+      padding: 0.85rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .history-item:hover, .history-item.selected {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 229, 255, 0.08);
+    }
+    .history-filmstrip {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-height: 650px;
+      overflow-y: auto;
+    }
+    .step-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .step-img {
+      width: 100%;
+      max-height: 380px;
+      object-fit: contain;
+      border-radius: 6px;
+      margin-top: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="logo-group">
+      <div class="arc-reactor"></div>
+      <div class="logo-text">
+        <h1>JARVIS</h1>
+        <span id="sys-status">● SYSTEM READY // RTX 3060 ARMED</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-cyan" onclick="launchCDP()" id="btn-cdp">🌐 Attach Chrome (CDP :9222)</button>
+      <button class="btn btn-cyan" onclick="runOrganizer()">📁 Organize Downloads</button>
+      <button class="btn btn-danger" onclick="killSwitch()">🛑 KILL SWITCH</button>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('command')">⚡ Command Center</button>
+    <button class="tab-btn" onclick="switchTab('history')">🎞️ Audit & History</button>
+    <button class="tab-btn" onclick="switchTab('telemetry')">📊 Telemetry & Watchdogs</button>
+    <button class="tab-btn" onclick="switchTab('memory')">🧠 Memory & Secrets</button>
+  </div>
+
+  <main>
+    <!-- TAB 1: Command Center -->
+    <div id="tab-command" class="tab-content active">
+      <div style="display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem;">
+        
+        <!-- Left Column: Input & Terminal -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">▶ Mission Control</div>
+            <span style="font-size: 0.8rem; color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;" id="active-task-label">IDLE</span>
+          </div>
+
+          <div class="input-box">
+            <input type="text" id="goal-input" placeholder="Give Jarvis a task (e.g. 'Search Wikipedia for Artemis II', 'Open calculator', 'Process data')..." onkeydown="if(event.key==='Enter') runTask()">
+            <button class="btn btn-cyan" onclick="runTask()">Execute</button>
+          </div>
+
+          <div class="chips">
+            <div class="chip" onclick="setGoal('Open calculator and calculate 987 * 654')">🧮 Calculator Task</div>
+            <div class="chip" onclick="setGoal('Search Wikipedia for James Webb Space Telescope and summarize first paragraph')">🔭 Web Research</div>
+            <div class="chip" onclick="setGoal('Run python script to calculate the first 50 fibonacci numbers')">🐍 Python Crunch</div>
+            <div class="chip" onclick="setGoal('Take a desktop screenshot and describe active windows')">📸 Visual Inspection</div>
+          </div>
+
+          <div class="terminal" id="terminal-logs">
+            <div class="log-line" style="color: var(--neon-cyan);">[SYSTEM] Jarvis Mark VII Tactical HUD Initialized.</div>
+            <div class="log-line" style="color: var(--text-muted);">[SYSTEM] Local Ollama Engine connected (Gemma 4 12B + Qwen2.5-VL 7B).</div>
+            <div class="log-line" style="color: var(--text-muted);">[SYSTEM] WebSocket stream active on ws://127.0.0.1:8765/ws</div>
+          </div>
+        </div>
+
+        <!-- Right Column: Quick Telemetry & Status -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🖥️ Hardware Telemetry</div>
+          </div>
+
+          <div class="meter-group">
+            <div>
+              <div class="meter-label">
+                <span>GPU (RTX 3060) Temp</span>
+                <span id="val-gpu-temp">--°C</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar" id="bar-gpu-temp" style="width: 45%;"></div></div>
+            </div>
+
+            <div>
+              <div class="meter-label">
+                <span>VRAM Usage (12 GB)</span>
+                <span id="val-vram">-- / 12288 MB</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar" id="bar-vram" style="width: 20%;"></div></div>
+            </div>
+
+            <div>
+              <div class="meter-label">
+                <span>System RAM (96 GB)</span>
+                <span id="val-ram">--%</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar" id="bar-ram" style="width: 15%;"></div></div>
+            </div>
+
+            <div>
+              <div class="meter-label">
+                <span>CPU Load (16 Threads)</span>
+                <span id="val-cpu">--%</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar" id="bar-cpu" style="width: 8%;"></div></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08);">
+            <div class="card-title" style="font-size: 0.85rem; margin-bottom: 0.75rem;">🛡️ Safety Status</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Autonomous Mode: <b style="color: var(--neon-cyan);" id="val-auto">OFF (Approval Overlay Active)</b></p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;">Model Policy: <b style="color: var(--neon-green);" id="val-policy">Local Only ($0)</b></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: Audit & History -->
+    <div id="tab-history" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🎞️ Audit Trail & Visual Filmstrips</div>
+          <button class="btn btn-cyan" onclick="loadHistory()">Refresh History</button>
+        </div>
+
+        <div class="history-grid">
+          <div class="history-list" id="history-items">
+            <p style="color: var(--text-muted); padding: 1rem;">Loading past runs...</p>
+          </div>
+          <div class="history-filmstrip" id="history-details">
+            <p style="color: var(--text-muted); padding: 1rem;">Select a run from the left to inspect step screenshots and actions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Telemetry & Watchdogs -->
+    <div id="tab-telemetry" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Proactive Watchdog Sentinels</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+          <div class="step-card">
+            <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Thermal & Storage Sentinel</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Monitors RTX 3060 temperatures and notifies before thermal throttling (>80°C) or disk saturation (>90%).</p>
+            <span style="display: inline-block; margin-top: 0.75rem; color: var(--neon-green); font-size: 0.8rem; font-weight: bold;">● ACTIVE & MONITORING</span>
+          </div>
+          <div class="step-card">
+            <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Download Auto-Organizer</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Watches ~/Downloads and categorizes PDFs, Data, Archives, and Media into structured folders.</p>
+            <button class="btn btn-cyan" style="margin-top: 0.75rem;" onclick="runOrganizer()">Trigger Scan Now</button>
+          </div>
+          <div class="step-card">
+            <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">Daily Iron Man Morning Briefing</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Speaks a morning status update with system health, workstation status, and pending tasks at 08:30 AM.</p>
+            <span style="display: inline-block; margin-top: 0.75rem; color: var(--neon-green); font-size: 0.8rem; font-weight: bold;">● SCHEDULED (08:30 AM)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Memory & Secrets -->
+    <div id="tab-memory" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🧠 Lean Markdown Memory & Vault Credentials</div>
+          <button class="btn btn-cyan" onclick="loadMemory()">Reload</button>
+        </div>
+        <div id="memory-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+          <p style="color: var(--text-muted);">Loading memory files...</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Tab switching
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      const target = document.getElementById('tab-' + name);
+      if (target) target.classList.add('active');
+      if (name === 'history') loadHistory();
+      if (name === 'memory') loadMemory();
+    }
+
+    function setGoal(text) {
+      document.getElementById('goal-input').value = text;
+    }
+
+    // Terminal logging
+    function appendLog(type, text) {
+      const term = document.getElementById('terminal-logs');
+      const div = document.createElement('div');
+      div.className = 'log-line log-' + type;
+      div.innerText = text;
+      term.appendChild(div);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    // WebSocket connection
+    let ws;
+    function connectWS() {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${proto}//${location.host}/ws`);
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.event === 'thought') appendLog('thought', '💭 ' + msg.data);
+          if (msg.event === 'action') appendLog('action', `⚡ [${msg.data.actuator}] ${msg.data.detail}`);
+          if (msg.event === 'step') appendLog('step', `▶ Step ${msg.data.step}/${msg.data.total}: ${msg.data.desc}`);
+          if (msg.event === 'task_finish') {
+            appendLog('result', '✔ ' + msg.data.result);
+            document.getElementById('active-task-label').innerText = 'COMPLETED';
+          }
+          if (msg.event === 'telemetry') updateTelemetry(msg.data);
+        } catch(e) {}
+      };
+      ws.onclose = () => setTimeout(connectWS, 3000);
+    }
+    connectWS();
+
+    function updateTelemetry(data) {
+      if (data.gpu_temp) {
+        document.getElementById('val-gpu-temp').innerText = data.gpu_temp + '°C';
+        document.getElementById('bar-gpu-temp').style.width = Math.min(100, (data.gpu_temp / 90) * 100) + '%';
+      }
+      if (data.vram_used_mb) {
+        document.getElementById('val-vram').innerText = data.vram_used_mb + ' / ' + data.vram_total_mb + ' MB';
+        document.getElementById('bar-vram').style.width = Math.min(100, (data.vram_used_mb / data.vram_total_mb) * 100) + '%';
+      }
+      if (data.ram_percent) {
+        document.getElementById('val-ram').innerText = data.ram_percent + '% (' + data.ram_used_gb + ' GB)';
+        document.getElementById('bar-ram').style.width = data.ram_percent + '%';
+      }
+      if (data.cpu_percent) {
+        document.getElementById('val-cpu').innerText = data.cpu_percent + '%';
+        document.getElementById('bar-cpu').style.width = data.cpu_percent + '%';
+      }
+    }
+
+    // Run Task
+    async function runTask() {
+      const input = document.getElementById('goal-input');
+      const goal = input.value.trim();
+      if (!goal) return;
+      document.getElementById('active-task-label').innerText = 'EXECUTING...';
+      appendLog('step', `▶ User Goal: "${goal}"`);
+      input.value = '';
+      try {
+        await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ goal })
+        });
+      } catch(e) {
+        appendLog('error', 'Task execution request failed: ' + e);
+      }
+    }
+
+    // Launch CDP Everyday Browser
+    async function launchCDP() {
+      const btn = document.getElementById('btn-cdp');
+      btn.innerText = 'Connecting to Chrome...';
+      try {
+        const res = await fetch('/api/browser/launch-cdp', { method: 'POST' });
+        const data = await res.json();
+        if (data.available || data.success) {
+          btn.innerText = '✔ Chrome Attached (CDP :9222)';
+          btn.style.borderColor = 'var(--neon-green)';
+        } else {
+          btn.innerText = '✖ Launch Failed';
+        }
+      } catch(e) {
+        btn.innerText = '✖ Error';
+      }
+    }
+
+    // Trigger Organizer
+    async function runOrganizer() {
+      try {
+        const res = await fetch('/api/organizer/run', { method: 'POST' });
+        const data = await res.json();
+        alert(`Organized ${data.moved_count} file(s):\n` + data.details.join('\n'));
+      } catch(e) { alert('Organizer error: ' + e); }
+    }
+
+    // Master Kill Switch
+    async function killSwitch() {
+      if (confirm('Are you sure you want to trigger the Master Kill Switch? This will terminate all Jarvis processes.')) {
+        await fetch('/api/system/kill', { method: 'POST' });
+        alert('Kill signal sent.');
+      }
+    }
+
+    // Load History
+    async function loadHistory() {
+      const container = document.getElementById('history-items');
+      container.innerHTML = '<p style="color: var(--text-muted);">Loading...</p>';
+      try {
+        const res = await fetch('/api/history');
+        const runs = await res.json();
+        if (!runs.length) {
+          container.innerHTML = '<p style="color: var(--text-muted);">No recorded runs found.</p>';
+          return;
+        }
+        container.innerHTML = '';
+        runs.forEach((r, idx) => {
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          div.innerHTML = `
+            <div style="font-weight: 700; font-size: 0.85rem; color: var(--neon-cyan);">${r.goal.substring(0, 35)}...</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">
+              Status: <b style="color: ${r.status==='success'?'var(--neon-green)':'var(--neon-red)'};">${r.status.toUpperCase()}</b> • Steps: ${r.steps ? r.steps.length : 0}
+            </div>
+          `;
+          div.onclick = () => selectRun(r.run_id, div);
+          container.appendChild(div);
+          if (idx === 0) selectRun(r.run_id, div);
+        });
+      } catch(e) {}
+    }
+
+    async function selectRun(runId, elem) {
+      document.querySelectorAll('.history-item').forEach(i => i.classList.remove('selected'));
+      if (elem) elem.classList.add('selected');
+      const viewer = document.getElementById('history-details');
+      viewer.innerHTML = '<p style="color: var(--text-muted);">Loading run steps...</p>';
+      try {
+        const res = await fetch('/api/history/' + runId);
+        const data = await res.json();
+        viewer.innerHTML = `
+          <div style="margin-bottom: 1rem;">
+            <h3 style="color: #ffffff;">Goal: "${data.goal}"</h3>
+            <span style="font-size: 0.8rem; color: var(--neon-cyan);">Run ID: ${data.run_id} • Status: ${data.status}</span>
+          </div>
+        `;
+        if (data.steps && data.steps.length) {
+          data.steps.forEach(s => {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step-card';
+            let shotHtml = '';
+            if (s.screenshot_file) {
+              shotHtml = `<img src="/api/history/${runId}/${s.screenshot_file}" class="step-img" alt="Step Screenshot">`;
+            }
+            stepDiv.innerHTML = `
+              <div style="font-weight: 700; color: var(--neon-cyan);">Step ${s.step_num}: ${s.action}</div>
+              <div style="font-size: 0.85rem; color: #89b4fa; font-style: italic; margin-top: 0.3rem;">💭 ${s.thought}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">Observation: ${s.observation.substring(0, 200)}</div>
+              ${shotHtml}
+            `;
+            viewer.appendChild(stepDiv);
+          });
+        } else {
+          viewer.innerHTML += '<p style="color: var(--text-muted);">No visual steps recorded for this run.</p>';
+        }
+      } catch(e) {}
+    }
+
+    // Load Memory
+    async function loadMemory() {
+      const container = document.getElementById('memory-container');
+      container.innerHTML = '<p style="color: var(--text-muted);">Loading memory...</p>';
+      try {
+        const res = await fetch('/api/memory');
+        const files = await res.json();
+        container.innerHTML = '';
+        files.forEach(f => {
+          const card = document.createElement('div');
+          card.className = 'step-card';
+          card.innerHTML = `
+            <div class="card-title" style="font-size: 0.9rem; margin-bottom: 0.5rem;">📄 ${f.name}</div>
+            <textarea style="width: 100%; height: 180px; background: #060910; color: #a6e3a1; border: 1px solid var(--panel-border); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; padding: 0.75rem; border-radius: 6px;" id="mem-${f.name}">${f.content}</textarea>
+            <button class="btn btn-cyan" style="margin-top: 0.5rem;" onclick="saveMemory('${f.name}')">Save Changes</button>
+          `;
+          container.appendChild(card);
+        });
+      } catch(e) {}
+    }
+
+    async function saveMemory(filename) {
+      const text = document.getElementById('mem-' + filename).value;
+      await fetch('/api/memory', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ filename, content: text })
+      });
+      alert(`Saved changes to ${filename}`);
+    }
+
+    // Initial Telemetry Polling
+    async function pollStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (data.telemetry) updateTelemetry(data.telemetry);
+        document.getElementById('val-auto').innerText = data.autonomous_mode ? 'ON (Full Autonomy)' : 'OFF (Approval Overlay Active)';
+        document.getElementById('val-policy').innerText = data.policy.toUpperCase();
+      } catch(e) {}
+    }
+    pollStatus();
+    setInterval(pollStatus, 5000);
+  </script>
+</body>
+</html>

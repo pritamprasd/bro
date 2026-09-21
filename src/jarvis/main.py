@@ -1,4 +1,4 @@
-"""Main CLI entrypoint for Jarvis."""
+"""Main CLI entrypoint for Jarvis Phase 2."""
 
 import sys
 from pathlib import Path
@@ -8,8 +8,11 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from jarvis.actuators.cdp_browser import CDPBrowserActuator
 from jarvis.config import JarvisConfig, load_config, save_config
 from jarvis.core.agent import JarvisAgent
+from jarvis.core.audit import AuditManager
+from jarvis.core.supervisor import Supervisor
 from jarvis.security.vault import SecretVault
 
 app = typer.Typer(
@@ -72,6 +75,76 @@ def voice(
     agent = JarvisAgent(config)
     agent.run_task(spoken_text)
 
+# System Lifecycle Commands (Start, Stop, Status)
+@app.command()
+def start():
+    """Start all Jarvis background services (Web UI, Spotlight Bar, Telegram Bot, Watchdogs)."""
+    supervisor = Supervisor()
+    res = supervisor.start()
+    if res["status"] == "already_running":
+        console.print("[yellow]Jarvis is already running.[/yellow]")
+    else:
+        console.print("[bold green]✔ Jarvis Mark VII System Online![/bold green]")
+        console.print(f"[cyan]Web HUD Dashboard:[/cyan] [bold underline]{res['web_url']}[/bold underline]")
+        console.print("[dim]Spotlight Bar active: Press Alt+J anywhere on desktop.[/dim]")
+
+@app.command()
+def stop():
+    """Trigger Master Kill-Switch to cleanly terminate all running Jarvis services."""
+    supervisor = Supervisor()
+    res = supervisor.stop()
+    console.print("[bold red]🛑 Master Kill-Switch Activated:[/bold red] All Jarvis services terminated.")
+    for p in res.get("processes", []):
+        console.print(f"  [dim]• Terminated {p}[/dim]")
+
+@app.command()
+def status():
+    """Check status of Jarvis supervisor and running components."""
+    supervisor = Supervisor()
+    stat = supervisor.status()
+    if stat.get("running"):
+        console.print("[bold green]● Jarvis System Status: ONLINE[/bold green]")
+        console.print(f"  Web HUD: {stat.get('web_url')}")
+        pids = stat.get("pids", {})
+        for k, v in pids.items():
+            console.print(f"  • {k}: PID {v}")
+    else:
+        console.print("[bold yellow]○ Jarvis System Status: OFFLINE[/bold yellow]")
+
+@app.command()
+def cdp():
+    """Launch user's everyday browser (Chrome/Brave) with CDP remote debugging on port 9222."""
+    config = load_config()
+    browser = CDPBrowserActuator(port=config.browser.cdp_port)
+    console.print("[cyan]Launching everyday browser with remote debugging port 9222...[/cyan]")
+    if browser.launch_everyday_browser():
+        console.print("[bold green]✔ Everyday browser is ready for Jarvis automation![/bold green]")
+    else:
+        console.print("[bold red]✖ Could not find or launch everyday browser.[/bold red]")
+
+@app.command()
+def audit():
+    """Inspect recent execution runs and visual audit trails."""
+    am = AuditManager()
+    runs = am.list_recent_runs(limit=15)
+    if not runs:
+        console.print("[dim]No recorded runs found.[/dim]")
+        return
+    table = Table(title="Jarvis Audit Trail (Recent Runs)")
+    table.add_column("Run ID", style="cyan")
+    table.add_column("Goal", style="white")
+    table.add_column("Status", style="green")
+    table.add_column("Steps", style="yellow")
+    for r in runs:
+        st_color = "green" if r.get("status") == "success" else "red"
+        table.add_row(
+            r.get("run_id", ""),
+            r.get("goal", "")[:40] + "...",
+            f"[{st_color}]{r.get('status', '').upper()}[/{st_color}]",
+            str(len(r.get("steps", []))),
+        )
+    console.print(table)
+
 # Vault sub-commands
 vault_app = typer.Typer(help="Manage secure credentials in Secret Vault")
 app.add_typer(vault_app, name="vault")
@@ -92,7 +165,6 @@ def vault_get(key: str = typer.Argument(..., help="Secret name")):
     vault = SecretVault()
     val = vault.get_secret(key)
     if val:
-        # Mask characters for security
         masked = val[:3] + "..." + val[-3:] if len(val) > 8 else "***"
         console.print(f"[cyan]{key}:[/cyan] {masked}")
     else:
