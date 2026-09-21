@@ -1,0 +1,175 @@
+"""Main CLI entrypoint for Jarvis."""
+
+import sys
+from pathlib import Path
+from typing import Optional
+import typer
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
+from jarvis.config import JarvisConfig, load_config, save_config
+from jarvis.core.agent import JarvisAgent
+from jarvis.security.vault import SecretVault
+
+app = typer.Typer(
+    help="Jarvis: Autonomous Personal AI Assistant for Linux X11 Desktop & Web.",
+    no_args_is_help=True,
+)
+console = Console()
+
+@app.command()
+def run(
+    goal: str = typer.Argument(..., help="The task or goal for Jarvis to execute"),
+    autonomous: Optional[bool] = typer.Option(
+        None, "--autonomous", "-a", help="Run without asking for confirmation on high-stakes actions"
+    ),
+    policy: Optional[str] = typer.Option(
+        None, "--policy", "-p", help="Model policy: 'local_only', 'tier_fallback', 'cloud_only'"
+    ),
+    output_mode: Optional[str] = typer.Option(
+        None, "--output", "-o", help="Output mode: 'both', 'cli', 'voice'"
+    ),
+):
+    """Execute a task via Jarvis."""
+    config = load_config()
+
+    if autonomous is not None:
+        config.autonomous_mode = autonomous
+    if policy:
+        config.model.policy = policy  # type: ignore
+    if output_mode:
+        config.output_mode = output_mode  # type: ignore
+
+    agent = JarvisAgent(config)
+    agent.run_task(goal)
+
+@app.command()
+def voice(
+    duration: int = typer.Option(5, "--duration", "-d", help="Recording duration in seconds"),
+    autonomous: bool = typer.Option(False, "--autonomous", "-a", help="Enable autonomous mode"),
+):
+    """Interact with Jarvis via voice (Speech-to-Text & Text-to-Speech)."""
+    config = load_config()
+    config.autonomous_mode = autonomous
+    from jarvis.voice.stt import SpeechToText
+
+    console.print("[bold cyan]🎙️ Jarvis Voice Interface Active[/bold cyan]")
+    console.print(f"[dim]Recording for {duration} seconds... Speak your command now:[/dim]")
+
+    stt = SpeechToText(config.voice)
+    try:
+        spoken_text = stt.record_and_transcribe(duration_seconds=duration)
+    except Exception as e:
+        console.print(f"[bold red]Speech recording failed:[/bold red] {e}")
+        raise typer.Exit(1)
+
+    if not spoken_text.strip():
+        console.print("[yellow]No speech detected. Please try again.[/yellow]")
+        raise typer.Exit(0)
+
+    console.print(f"\n[bold green]Recognized Command:[/bold green] \"{spoken_text}\"\n")
+    agent = JarvisAgent(config)
+    agent.run_task(spoken_text)
+
+# Vault sub-commands
+vault_app = typer.Typer(help="Manage secure credentials in Secret Vault")
+app.add_typer(vault_app, name="vault")
+
+@vault_app.command("set")
+def vault_set(key: str = typer.Argument(..., help="Secret name (e.g. telegram_bot_token)"),
+              value: str = typer.Argument(..., help="Secret value")):
+    """Store a secret in the vault."""
+    vault = SecretVault()
+    if vault.set_secret(key, value):
+        console.print(f"[green]✔ Secret '{key}' saved successfully.[/green]")
+    else:
+        console.print(f"[red]✖ Failed to save secret '{key}'.[/red]")
+
+@vault_app.command("get")
+def vault_get(key: str = typer.Argument(..., help="Secret name")):
+    """Retrieve a secret."""
+    vault = SecretVault()
+    val = vault.get_secret(key)
+    if val:
+        # Mask characters for security
+        masked = val[:3] + "..." + val[-3:] if len(val) > 8 else "***"
+        console.print(f"[cyan]{key}:[/cyan] {masked}")
+    else:
+        console.print(f"[yellow]Secret '{key}' not found.[/yellow]")
+
+@vault_app.command("list")
+def vault_list():
+    """List stored secret keys."""
+    vault = SecretVault()
+    keys = vault.list_keys()
+    if not keys:
+        console.print("[dim]No secrets currently stored in fallback vault.[/dim]")
+        return
+    table = Table(title="Stored Credentials in Vault")
+    table.add_column("Key Name", style="cyan")
+    for k in keys:
+        table.add_row(k)
+    console.print(table)
+
+# Config sub-commands
+config_app = typer.Typer(help="Inspect and update Jarvis configuration")
+app.add_typer(config_app, name="config")
+
+@config_app.command("show")
+def config_show():
+    """Display current configuration."""
+    cfg = load_config()
+    import yaml
+    console.print(Panel(yaml.dump(cfg.model_dump()), title="Current Jarvis Configuration", border_style="cyan"))
+
+@config_app.command("set")
+def config_set(key: str = typer.Argument(..., help="Config dot-path (e.g. model.policy, autonomous_mode)"),
+               value: str = typer.Argument(..., help="Value to set")):
+    """Set a configuration value."""
+    cfg = load_config()
+    data = cfg.model_dump()
+    parts = key.split(".")
+    target = data
+    for p in parts[:-1]:
+        if p not in target:
+            target[p] = {}
+        target = target[p]
+
+    val: any = value
+    if value.lower() == "true":
+        val = True
+    elif value.lower() == "false":
+        val = False
+
+    target[parts[-1]] = val
+    new_cfg = JarvisConfig(**data)
+    save_config(new_cfg)
+    console.print(f"[green]✔ Config updated: {key} = {val}[/green]")
+
+# Memory sub-commands
+memory_app = typer.Typer(help="Manage lean Markdown memory")
+app.add_typer(memory_app, name="memory")
+
+@memory_app.command("list")
+def memory_list():
+    """List all memory topics and workflow files."""
+    cfg = load_config()
+    from jarvis.memory.store import MemoryStore
+    store = MemoryStore(cfg.memory)
+    console.print(f"[cyan]Memory Directory:[/cyan] {store.memory_dir}")
+    files = list(store.memory_dir.glob("**/*.md"))
+    table = Table(title="Structured Memory Files")
+    table.add_column("Topic / File", style="green")
+    table.add_column("Lines", style="yellow")
+    for f in sorted(files):
+        rel = f.relative_to(store.memory_dir)
+        lines = len(f.read_text(encoding="utf-8").splitlines())
+        table.add_row(str(rel), str(lines))
+    console.print(table)
+
+def main():
+    app()
+
+if __name__ == "__main__":
+    main()

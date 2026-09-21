@@ -1,0 +1,69 @@
+# Jarvis Assistant Configuration
+
+# Response delivery mode: "both" (CLI + Voice), "cli" (Text only), or "voice" (Spoken only)
+output_mode: "both"
+
+# Autonomous mode: If false, prompts for approval on high-stakes tasks via overlay
+autonomous_mode: false
+
+# Model Routing Configuration
+model:
+  # Options:
+  # - "local_only": 100% Free, runs on your RTX 3060 via Ollama (No API keys or billing needed!)
+  # - "tier_fallback": Starts locally, escalates to cloud on high complexity or visual ambiguity
+  # - "cloud_only": Uses Gemini API directly
+  policy: "local_only"
+  
+  # Local models running in Ollama
+  local_text_model: "gemma4:12b"
+  local_vision_model: "qwen2.5vl:7b"
+  
+  # Cloud model (optional, uses free tier key from aistudio.google.com if set)
+  cloud_model: "gemini-2.5-flash"
+  ollama_url: "http://localhost:11434"
+  # gemini_api_key: "AIzaSy..." # Or store in secret vault via `jarvis vault set gemini_api_key`
+
+# Voice Configuration
+voice:
+  enabled: true
+  whisper_model: "base"
+  device: "cuda"
+  compute_type: "float16"
+  tts_voice: "en-US-GuyNeural"
+  tts_rate: "+0%"
+
+# Safety & Confirmation Rules
+safety:
+  prompt_on_high_stakes: true
+  high_stakes_keywords:
+    - "rm -rf"
+    - "delete"
+    - "destroy"
+    - "wipe"
+    - "format"
+    - "sudo"
+    - "passwd"
+    - "shutdown"
+    - "reboot"
+    - "send email"
+    - "payment"
+    - "buy"
+    - "purchase"
+    - "checkout"
+    - "order"
+    - "transfer"
+    - "bank"
+    - "credit card"
+    - "telegram send"
+    - "post to"
+
+# Isolated Browser Settings
+browser:
+  headless: false
+  viewport_width: 1280
+  viewport_height: 800
+  user_data_dir: "~/.jarvis/browser_data"
+
+# Lean Memory Storage Path
+memory:
+  memory_dir: "~/.jarvis/memory"
