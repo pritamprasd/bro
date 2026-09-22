@@ -19,7 +19,7 @@ Jarvis has been upgraded from a CLI tool into an autonomous, proactive, multi-mo
 - **FastAPI + WebSocket Server on `http://127.0.0.1:8765`**:
   - Live token, thought, and action streaming over WebSockets.
   - REST endpoints for tasks, status, audit history, memory editing, and system controls.
-- **Stark Industries / Iron Man HUD Design Aesthetic**:
+- **Jarvis Tactical HUD Design Aesthetic**:
   - Deep space obsidian `#060910`, neon cyan arc reactor accents, glowing glassmorphic cards.
   - **Tabs:** Mission Control, Audit & History, Telemetry & Watchdogs, Memory & Secrets.
   - **Live Hardware Telemetry:** Real-time gauges for RTX 3060 VRAM usage, GPU Temp, 16-thread CPU Load, and 96 GB RAM utilization.

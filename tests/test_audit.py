@@ -47,3 +47,49 @@ def test_audit_manager_lifecycle():
         assert "Open calculator and compute 5 * 5" in md
         assert "desktop_click" in md
         assert "Result is 25" in md
+
+        # Verify html export
+        html_doc = am.export_run_html(run.run_id)
+        assert "<!DOCTYPE html>" in html_doc
+        assert "Open calculator and compute 5 * 5" in html_doc
+        assert "desktop_click" in html_doc
+        assert "Result is 25" in html_doc
+        assert "STEP 1" in html_doc
+
+        # Verify json export
+        json_doc = am.export_run_json(run.run_id)
+        assert "Open calculator and compute 5 * 5" in json_doc
+        assert "desktop_click" in json_doc
+
+
+def test_download_report_endpoints():
+    from fastapi.testclient import TestClient
+    from jarvis.ui.server import app, audit
+    
+    # Create a dummy run if none exists
+    run = audit.start_run("Test Download Functionality")
+    audit.complete_run("Download completed successfully", status="success")
+    
+    client = TestClient(app)
+    
+    # Test markdown download
+    res_md = client.get(f"/api/history/{run.run_id}/download?format=md")
+    assert res_md.status_code == 200
+    assert "attachment;" in res_md.headers.get("content-disposition", "")
+    assert ".md" in res_md.headers.get("content-disposition", "")
+    assert "Test Download Functionality" in res_md.text
+
+    # Test html download
+    res_html = client.get(f"/api/history/{run.run_id}/download?format=html")
+    assert res_html.status_code == 200
+    assert "attachment;" in res_html.headers.get("content-disposition", "")
+    assert ".html" in res_html.headers.get("content-disposition", "")
+    assert "<!DOCTYPE html>" in res_html.text
+
+    # Test json download
+    res_json = client.get(f"/api/history/{run.run_id}/download?format=json")
+    assert res_json.status_code == 200
+    assert "attachment;" in res_json.headers.get("content-disposition", "")
+    assert ".json" in res_json.headers.get("content-disposition", "")
+    assert run.run_id in res_json.text
+

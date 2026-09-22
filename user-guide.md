@@ -62,7 +62,7 @@ Jarvis operates on an asynchronous **Perception-Reasoning-Action (ReAct)** cogni
 
 ### Runtime Processes When Jarvis is Running (`jarvis start`):
 When you run `jarvis start`, a centralized **Process Supervisor** (`jarvis/core/supervisor.py`) coordinates two background processes:
-1. **`ui_server` (FastAPI + Uvicorn on port 8765):** Serves the Stark Industries HUD dashboard and manages WebSocket streaming, hardware telemetry, audit runs, and model switching.
+1. **`ui_server` (FastAPI + Uvicorn on port 8765):** Serves the Jarvis Tactical HUD dashboard and manages WebSocket streaming, hardware telemetry, audit runs, and model switching.
 2. **`worker` daemon:** Listens for the global <kbd>Alt</kbd> + <kbd>J</kbd> desktop hotkey, runs the Two-Way Telegram polling bot, and manages hardware sentinels.
 
 ---
@@ -236,6 +236,18 @@ voice:
 * **Chat & Greetings:** If you say *"Hello"*, *"Who are you?"*, or ask general questions, Jarvis recognizes this as a conversational intent and speaks back as your AI butler.
 * **Header Toggle:** Click **🔊 Voice Reply: ON / OFF** or the mode pills in the top header to cycle modes instantly.
 
+### Edge-TTS Neural Voice Persona & Speed Rate Controls:
+You can dynamically customize Jarvis's spoken voice persona and playback speed directly from the Web HUD:
+* **Header Controls Capsule:**
+  - **Voice Dropdown (`VOICE:`):** Switch between curated neural voices (British male `en-GB-RyanNeural`, American male `en-US-GuyNeural`, American female `en-US-JennyNeural`, Sonia, Christopher, etc.) or any installed Edge-TTS language voice.
+  - **Speech Speed Slider (`SPD:`):** Interactive range slider from **0.50x (Slow)** to **2.00x (Hyper)** with real-time numeric multiplier badge (`1.00x` = `+0%`, `1.25x` = `+25%`, `1.50x` = `+50%`, etc.). Dragging adjusts speed on the fly.
+  - **Instant Voice & Speed Preview (`🔊 Test`):** Click to hear a vocal greeting synthesized at the exact voice persona and speed currently selected.
+* **Audio-Only HUD & Model Selection:**
+  - Dedicated speed sliders and badges are also integrated into the continuous Audio-Only Mission Control HUD and under Tab 2 (**Model Selection** -> **Card 4: Voice Persona & Speech Speed**).
+  - A convenient **Reset** button in the Model Selection tab returns voice speed to the standard `1.00x (+0%)` default with one click.
+* **Instant Hot-Swap & Configuration Persistence:**
+  - Changing voice or speed immediately updates runtime TTS and writes to `config.yaml` (`tts_voice` and `tts_rate`), broadcasting updates across all open browsers and devices without requiring a server restart.
+
 ---
 
 ## 7. Daily Brief
@@ -251,17 +263,44 @@ The Daily Brief delivers a spoken and visual summary of workstation readiness, m
 
 ---
 
-## 8. Selecting Local Models
+## 8. Selecting AI Execution Engine (Local LLM vs Cloud Gemini 3.8 Flash vs Hybrid)
 
-You can select which local models to use directly from the **Model Selection** tab in the Web HUD:
+Jarvis Mark 1 supports flexible, zero-friction AI execution across local hardware and cloud intelligence:
 
-1. Click **🤖 Model Selection** in the Web HUD.
-2. The dashboard dynamically lists all models installed in your local Ollama library (`gemma4:12b`, `qwen2.5vl:7b`, `llama3.2:3b`, etc.).
-3. Choose your preferred models for:
+```
+                  ┌──────────────────────────────────────────────┐
+                  │          AI Execution Engine Policy          │
+                  └───────┬──────────────┬──────────────┬────────┘
+                          │              │              │
+           ┌──────────────▼────┐   ┌─────▼────────┐   ┌─▼──────────────────┐
+           │ 🖥️ Local LLM Only  │   │ ☁️ Cloud Only │   │  ⚡ Hybrid Fallback │
+           │ (RTX 3060 / Ollama│   │ (Gemini 3.8  │   │  (Local first,     │
+           │  100% Private, $0)│   │  Flash API)  │   │   auto-escalates)  │
+           └───────────────────┘   └──────────────┘   └────────────────────┘
+```
+
+### 1. Instant 1-Click Header Capsule
+In the top navigation controls bar, you can instantly toggle the active AI backend without leaving your mission:
+* **🖥️ Local LLM:** Direct offline execution pinned to your RTX 3060 via Ollama (`gemma4:12b`, `qwen2.5vl:7b`).
+* **☁️ Gemini 3.8:** Ultra-fast multimodal reasoning via Google AI Studio Free Tier API (`gemini-2.5-flash`).
+* **⚡ Hybrid:** Executes locally first; seamlessly escalates to Cloud Gemini Flash if local models encounter errors or low confidence.
+
+The active engine is displayed in real time in the **Mission Control Header Badge** (`🖥️ LOCAL LLM` vs `☁️ GEMINI 3.8 FLASH` vs `⚡ HYBRID FALLBACK`) and broadcast to all connected web clients and mobile devices.
+
+### 2. Primary AI Routing Policy Hero Switcher (Model Selection Tab)
+Under Tab 2 (**Model Selection**):
+1. **Interactive Hero Cards:** Click any of the 3 large visual policy cards to switch execution strategy on the fly.
+2. **Cloud Gemini Model Target:** Choose between:
+   - `gemini-2.5-flash`: Gemini 3.8 / 2.5 Flash (Google AI Studio Free Tier, default)
+   - `gemini-2.0-flash`: Fast multimodal reasoning
+   - `gemini-1.5-flash`: Standard lightweight reasoning
+   - `gemini-2.5-pro`: Deep reasoning & coding
+3. **Gemini API Key:** Enter or update your Google AI Studio API key directly from the UI with password masking and visibility toggle. If left blank, Jarvis automatically falls back to the `GEMINI_API_KEY` system environment variable.
+4. **Local Subsystem Model Assignments:**
    - **Text & Reasoning Model** (Default: `gemma4:12b`)
    - **Vision UI Grounding Model** (Default: `qwen2.5vl:7b`)
    - **Tier-0 Fast Classifier Model** (Default: `llama3.2:3b`)
-4. Click **Save Model Preferences**.
+5. Click **Save Model Preferences** to persist changes across reboots in `config.yaml`.
 
 ---
 
@@ -311,7 +350,12 @@ In the **🎞️ Audit & History** tab:
    - Clean parameter key-value tags.
    - Action badges and observation output.
 5. **Full-Resolution Screenshot Lightbox:** Click any step screenshot to open a high-res 1080p lightbox viewer with zoom.
-6. **Markdown Report Export:** One-click **📥 Export Markdown Report** button to download a complete markdown summary of any mission.
+6. **Multi-Format Mission Report Download & Export:**
+   - **Markdown Document (`.md`):** Complete, portable markdown report with goal, status, duration, final outcome, and step timeline.
+   - **Interactive HTML Report (`.html`):** Standalone, styled executive report with dark glassmorphic layout, KPI badges, parameter code blocks, and print-to-PDF styles (<kbd>Ctrl+P</kbd>).
+   - **Raw Audit JSON (`.json`):** Full serialized execution history for programmatic parsing.
+   - **Copy to Clipboard:** One-click copy of the formatted Markdown report to your system clipboard.
+   - **Direct Downloads:** Native browser attachments (`/api/history/{run_id}/download?format=md|html|json`) ensuring 100% reliability across all desktop and mobile browsers.
 
 ---
 
@@ -463,7 +507,7 @@ Each output type in the ReAct execution loop is rendered with distinct styling:
 
 ## 18. World-Class Glassmorphic HUD Design & Layout Architecture
 
-Jarvis Mark 1 features an uncompromising, futuristic glassmorphic design system modeled after Stark Industries tactical interfaces.
+Jarvis Mark 1 features an uncompromising, futuristic glassmorphic design system modeled after advanced tactical HUD interfaces.
 
 ### Core Layout Architecture
 1. **Floating Symmetrical Glass Header:**

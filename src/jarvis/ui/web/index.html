@@ -289,12 +289,12 @@
       gap: 0.25rem;
       font-family: 'JetBrains Mono', monospace;
     }
-    .desktop-selector-wrapper {
+    .desktop-selector-wrapper, .voice-selector-wrapper, .backend-selector-wrapper {
       display: flex;
       align-items: center;
       gap: 0.45rem;
     }
-    #desktop-select-dropdown {
+    #desktop-select-dropdown, #voice-select-dropdown, #audio-hud-voice-select, #sel-cloud-model {
       height: 28px;
       background: rgba(6, 12, 26, 0.85);
       color: var(--neon-cyan);
@@ -306,6 +306,135 @@
       cursor: pointer;
       outline: none;
       box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.5);
+      max-width: 220px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    #desktop-select-dropdown:hover, #voice-select-dropdown:hover, #audio-hud-voice-select:hover, #sel-cloud-model:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+    }
+    .voice-selector-label, .backend-selector-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    #voice-select-dropdown option, #audio-hud-voice-select option, #sel-voice-model option, #sel-cloud-model option {
+      background: #090e17;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    #voice-select-dropdown optgroup, #audio-hud-voice-select optgroup, #sel-voice-model optgroup, #sel-cloud-model optgroup {
+      background: #050811;
+      color: var(--neon-cyan);
+      font-weight: bold;
+    }
+    .policy-hero-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .policy-hero-card {
+      background: rgba(8, 16, 32, 0.65);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 1.1rem;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .policy-hero-card:hover {
+      border-color: rgba(0, 240, 255, 0.45);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 240, 255, 0.15);
+    }
+    .policy-hero-card.active {
+      border: 1px solid var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.08);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.22);
+    }
+    .policy-hero-card.active::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    }
+    .voice-speed-control {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .voice-speed-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 6px;
+      padding: 0.1rem 0.35rem;
+      min-width: 38px;
+      text-align: center;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      background: rgba(0, 240, 255, 0.25);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      vertical-align: middle;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    input[type="range"]:hover {
+      background: rgba(0, 240, 255, 0.45);
+      box-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 6px var(--neon-cyan);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 10px var(--neon-cyan), 0 0 4px #ffffff;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 6px var(--neon-cyan);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 10px var(--neon-cyan), 0 0 4px #ffffff;
     }
 
     .top-actions {
@@ -929,6 +1058,62 @@
       border-color: var(--neon-cyan);
       background: rgba(0, 240, 255, 0.1);
       box-shadow: 0 0 18px rgba(0, 240, 255, 0.22);
+    }
+    /* Report Download Group & Menu */
+    .report-download-group {
+      position: relative;
+      display: inline-flex;
+      align-items: stretch;
+    }
+    .report-dropdown-toggle {
+      padding: 0 0.5rem !important;
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    .report-main-btn {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    .report-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 230px;
+      background: rgba(6, 12, 26, 0.96);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--panel-border);
+      border-top: 1px solid rgba(0, 240, 255, 0.4);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 16px rgba(0, 240, 255, 0.18);
+      z-index: 1000;
+      padding: 0.4rem 0;
+      display: none;
+    }
+    .report-dropdown-menu.show {
+      display: block;
+      animation: fadeInDown 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .report-dropdown-item {
+      padding: 0.6rem 0.95rem;
+      font-size: 0.78rem;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-weight: 500;
+    }
+    .report-dropdown-item:hover {
+      background: rgba(0, 240, 255, 0.15);
+      color: #ffffff;
+    }
+    .report-dropdown-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 0.35rem 0;
     }
     .history-filmstrip {
       display: flex;
@@ -1829,8 +2014,8 @@
       filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.2));
     }
 
-    /* Desktop / Display Selector in Header (Glassmorphic) */
-    .desktop-selector-wrapper {
+    /* Desktop / Display, Voice & AI Backend Selector in Header (Glassmorphic) */
+    .desktop-selector-wrapper, .voice-selector-wrapper, .backend-selector-wrapper {
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -1892,7 +2077,96 @@
     }
     .display-preview-thumbnail:hover {
       transform: scale(1.01);
-      box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+
+    /* Mobile & Tablet Responsiveness (Smartphones & Remote Browsers) */
+    @media (max-width: 992px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.75rem 1rem;
+        gap: 0.65rem;
+      }
+      .logo-group {
+        justify-content: space-between;
+        width: 100%;
+      }
+      .header-center-controls {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: space-between;
+        padding: 0.35rem 0.65rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .top-actions {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+      }
+      .tab-bar {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 0.35rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .container {
+        padding: 1rem 0.75rem 5.5rem 0.75rem;
+      }
+      .hud-grid {
+        grid-template-columns: 1fr;
+      }
+      .input-box {
+        gap: 0.4rem;
+      }
+      .input-box input {
+        font-size: 0.88rem;
+        padding: 0 0.85rem;
+      }
+      .display-card-grid {
+        grid-template-columns: 1fr;
+      }
+      .telemetry-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .header-center-controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        border-radius: 16px;
+      }
+      .header-divider {
+        display: none;
+      }
+      .mode-segmented {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .mode-pill {
+        flex: 1;
+        justify-content: center;
+        padding: 0.35rem 0.45rem;
+        font-size: 0.7rem;
+      }
+      .desktop-selector-wrapper, .voice-selector-wrapper, .backend-selector-wrapper {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .btn {
+        font-size: 0.75rem;
+        padding: 0 0.65rem;
+      }
+      .telemetry-grid {
+        grid-template-columns: 1fr;
+      }
+      .terminal {
+        height: 280px;
+      }
+      .terminal-controls-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
     }
   </style>
 </head>
@@ -1936,6 +2210,40 @@
         </select>
         <button class="btn btn-cyan btn-sm" onclick="previewActiveDesktop()" title="Inspect what Jarvis sees on this desktop"><i data-lucide="eye" class="hud-icon-xs"></i> Inspect</button>
       </div>
+
+      <div class="header-divider"></div>
+
+      <!-- Voice Selector in Header -->
+      <div class="voice-selector-wrapper" title="Select Jarvis speech synthesis voice persona and speed">
+        <span class="voice-selector-label"><i data-lucide="mic" class="hud-icon-xs text-cyan"></i> VOICE:</span>
+        <select id="voice-select-dropdown" onchange="onVoiceSelectChange(this.value)">
+          <option value="en-GB-RyanNeural">Ryan (British Male)</option>
+        </select>
+        <button class="btn btn-cyan btn-sm btn-voice-preview" id="btn-voice-preview" onclick="previewSelectedVoice()" title="Preview selected speech voice"><i data-lucide="volume-2" class="hud-icon-xs"></i> Test</button>
+        <div class="voice-speed-control" title="Adjust voice speed (0.5x to 2.0x)">
+          <span class="voice-selector-label" style="font-size: 0.65rem;"><i data-lucide="gauge" class="hud-icon-xs text-cyan"></i> SPD:</span>
+          <input type="range" id="voice-speed-slider" min="0.5" max="2.0" step="0.05" value="1.0" oninput="onVoiceSpeedInput(this.value)" onchange="onVoiceSpeedChange(this.value)" style="width: 65px;">
+          <span class="voice-speed-badge" id="voice-speed-val">1.00x</span>
+        </div>
+      </div>
+
+      <div class="header-divider"></div>
+
+      <!-- AI Brain / Backend Engine Selector (Local LLM vs Cloud Gemini 3.8 Flash) -->
+      <div class="backend-selector-wrapper" title="Select AI Execution Engine: Local Ollama (RTX 3060) vs Cloud Gemini 3.8 Flash">
+        <span class="backend-selector-label"><i data-lucide="cpu" class="hud-icon-xs text-cyan"></i> AI:</span>
+        <div class="mode-segmented" id="backend-policy-segmented">
+          <button class="mode-pill active" id="btn-engine-local" onclick="quickSetModelPolicy('local_only')" title="Local RTX 3060 / Ollama (Offline, 100% Private, Zero Cost)">
+            <i data-lucide="hard-drive" class="hud-icon-xs"></i> Local LLM
+          </button>
+          <button class="mode-pill" id="btn-engine-cloud" onclick="quickSetModelPolicy('cloud_only')" title="Cloud Google Gemini 3.8 / 2.5 Flash API">
+            <i data-lucide="cloud-lightning" class="hud-icon-xs"></i> Gemini 3.8
+          </button>
+          <button class="mode-pill" id="btn-engine-hybrid" onclick="quickSetModelPolicy('tier_fallback')" title="Hybrid: Local first, fallback to Cloud Gemini">
+            <i data-lucide="shuffle" class="hud-icon-xs"></i> Hybrid
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Right Header Actions Tray -->
@@ -1968,6 +2276,7 @@
           <div class="card-header">
             <div class="card-title"><i data-lucide="crosshair" class="hud-icon text-cyan"></i> Mission Control</div>
             <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span id="current-engine-badge" onclick="switchTab('models')" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 12px; font-weight: bold; font-family: 'JetBrains Mono', monospace; border: 1px solid var(--neon-cyan); background: rgba(0, 229, 255, 0.1); color: var(--neon-cyan); cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;" title="Active AI Engine (click to configure in Model Selection)"><i data-lucide="cpu" class="hud-icon-xs"></i> <span id="current-engine-text">LOCAL LLM</span></span>
               <span id="current-mode-badge" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 12px; font-weight: bold; font-family: 'JetBrains Mono', monospace; border: 1px solid var(--neon-cyan); background: rgba(0, 229, 255, 0.1); color: var(--neon-cyan);">⚡ AUDIO + CHAT</span>
               <span style="font-size: 0.8rem; color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;" id="active-task-label">IDLE</span>
             </div>
@@ -1983,6 +2292,18 @@
                 </span>
               </div>
               <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="voice-selector-wrapper" style="border: 1px solid rgba(0, 240, 255, 0.25); background: rgba(6, 12, 26, 0.7); padding: 0.2rem 0.5rem; border-radius: 14px;" title="Change voice persona and speed">
+                  <span class="voice-selector-label" style="font-size: 0.68rem;"><i data-lucide="mic" class="hud-icon-xs text-cyan"></i> VOICE:</span>
+                  <select id="audio-hud-voice-select" onchange="onVoiceSelectChange(this.value)" style="height: 24px; font-size: 0.7rem; max-width: 130px;">
+                    <option value="en-GB-RyanNeural">Ryan (British Male)</option>
+                  </select>
+                  <button class="btn btn-cyan btn-sm" onclick="previewSelectedVoice(document.getElementById('audio-hud-voice-select').value)" title="Test voice" style="height: 24px; padding: 0 0.4rem; font-size: 0.7rem;"><i data-lucide="volume-2" class="hud-icon-xs"></i></button>
+                  <div class="voice-speed-control" title="Adjust voice speed">
+                    <span class="voice-selector-label" style="font-size: 0.65rem;"><i data-lucide="gauge" class="hud-icon-xs text-cyan"></i></span>
+                    <input type="range" id="audio-hud-speed-slider" min="0.5" max="2.0" step="0.05" value="1.0" oninput="onVoiceSpeedInput(this.value)" onchange="onVoiceSpeedChange(this.value)" style="width: 55px;">
+                    <span class="voice-speed-badge" id="audio-hud-speed-val" style="min-width: 32px; font-size: 0.65rem; padding: 0.08rem 0.25rem;">1.00x</span>
+                  </div>
+                </div>
                 <label class="handsfree-toggle" title="When active, microphone automatically re-arms after Jarvis speaks">
                   <input type="checkbox" id="handsfree-checkbox" checked onchange="toggleHandsFreeLoop(this.checked)">
                   <span class="toggle-slider"></span>
@@ -2111,7 +2432,7 @@
           <div class="terminal" id="terminal-logs">
             <div class="log-line" style="color: var(--neon-cyan);">[SYSTEM] Jarvis Mark 1 Tactical HUD Initialized.</div>
             <div class="log-line" style="color: var(--text-muted);">[SYSTEM] Local Ollama Engine connected. Models pinned in RAM/VRAM.</div>
-            <div class="log-line" style="color: var(--text-muted);">[SYSTEM] WebSocket stream active on ws://127.0.0.1:8765/ws</div>
+            <div class="log-line" style="color: var(--text-muted);">[SYSTEM] WebSocket telemetry bridge active.</div>
           </div>
 
           <!-- Terminal Controls Bar (Font Sizing & Stream Status) -->
@@ -2318,12 +2639,93 @@
     <div id="tab-models" class="tab-content">
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><i data-lucide="cpu" class="hud-icon-sm text-cyan"></i> Local Ollama Model Configuration</div>
+          <div>
+            <div class="card-title"><i data-lucide="cpu" class="hud-icon-sm text-cyan"></i> AI Intelligence Architecture & Execution Engine</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+              Seamlessly switch between Local GPU execution (RTX 3060 / Ollama), Cloud Gemini 3.8 Flash, or Hybrid Escalation.
+            </p>
+          </div>
           <button class="btn btn-cyan" onclick="loadModels()"><i data-lucide="refresh-cw" class="hud-icon-xs"></i> Refresh Models</button>
         </div>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-          Select which local models from your RTX 3060 / Ollama library Jarvis Mark 1 should utilize for each subsystem.
-        </p>
+
+        <!-- Primary AI Routing Policy Hero Switcher -->
+        <div style="margin: 1.25rem 0 1.75rem 0; background: rgba(5, 11, 24, 0.7); border: 1px solid var(--panel-border); border-radius: 12px; padding: 1.25rem; box-shadow: var(--glass-shadow);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="font-weight: 700; color: #ffffff; font-size: 0.92rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="zap" class="hud-icon-xs text-cyan"></i> Primary AI Brain Routing Policy
+            </div>
+            <span class="badge" id="policy-active-badge" style="background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">LOCAL_ONLY</span>
+          </div>
+
+          <div class="policy-hero-grid">
+            <div class="policy-hero-card active" id="card-policy-local_only" onclick="setAIBackendPolicy('local_only')">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <div style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i data-lucide="hard-drive" class="hud-icon-xs text-cyan"></i> Local LLM (RTX 3060)
+                </div>
+                <span class="status-dot dot-green" id="dot-policy-local"></span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;">
+                100% Offline & private Ollama models (Gemma 4 12B, Qwen 2.5-VL 7B). Zero API cost.
+              </div>
+            </div>
+
+            <div class="policy-hero-card" id="card-policy-cloud_only" onclick="setAIBackendPolicy('cloud_only')">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <div style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i data-lucide="cloud-lightning" class="hud-icon-xs text-cyan"></i> Cloud Gemini 3.8 Flash
+                </div>
+                <span class="status-dot dot-gray" id="dot-policy-cloud"></span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;">
+                Ultra-fast multimodal reasoning via Google AI Studio Free Tier API ($0 cost).
+              </div>
+            </div>
+
+            <div class="policy-hero-card" id="card-policy-tier_fallback" onclick="setAIBackendPolicy('tier_fallback')">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <div style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i data-lucide="shuffle" class="hud-icon-xs text-cyan"></i> Hybrid Fallback Tier
+                </div>
+                <span class="status-dot dot-gray" id="dot-policy-hybrid"></span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;">
+                Executes locally on RTX 3060; automatically escalates to Gemini Flash if local fails.
+              </div>
+            </div>
+          </div>
+
+          <!-- Cloud Gemini Settings Row -->
+          <div id="cloud-gemini-config-box" style="background: rgba(3, 8, 18, 0.75); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 8px; padding: 0.85rem 1rem; display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 280px;">
+              <i data-lucide="sparkles" class="hud-icon-sm text-cyan"></i>
+              <div style="flex: 1;">
+                <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Cloud Gemini Model</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Selected for Cloud / Hybrid mode</div>
+              </div>
+              <select id="sel-cloud-model" style="min-width: 220px;" onchange="onCloudModelChange(this.value)">
+                <option value="gemini-2.5-flash">Gemini 3.8 / 2.5 Flash (Free Tier)</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+              </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 280px;">
+              <i data-lucide="key" class="hud-icon-sm text-cyan"></i>
+              <div style="flex: 1;">
+                <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Gemini API Key</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);"><a href="https://aistudio.google.com" target="_blank" style="color: var(--neon-cyan); text-decoration: underline;">Get free key at aistudio.google.com</a></div>
+              </div>
+              <input type="password" id="input-gemini-api-key" placeholder="AIzaSy... (leave blank to keep current)" style="height: 28px; background: rgba(6,12,26,0.85); color: #ffffff; border: 1px solid rgba(0,240,255,0.35); border-radius: 14px; font-size: 0.74rem; padding: 0 0.65rem; font-family: 'JetBrains Mono', monospace; width: 170px;">
+              <button class="btn btn-sm" onclick="toggleApiKeyVisibility()" style="background: rgba(255,255,255,0.08); padding: 0.2rem 0.5rem; font-size: 0.7rem;" title="Toggle API key visibility"><i data-lucide="eye" class="hud-icon-xs"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color: #ffffff; font-size: 0.9rem; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+          <i data-lucide="hard-drive" class="hud-icon-xs text-cyan"></i> Local Ollama Model Assignments (RTX 3060 Subsystems)
+        </h4>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
           <div class="step-card">
@@ -2343,6 +2745,26 @@
             <p style="font-size: 0.8rem; color: var(--text-muted);">Sub-100ms intent classification before invoking heavier models.</p>
             <select id="sel-tier0-model"></select>
           </div>
+
+          <div class="step-card">
+            <h4 style="color: var(--neon-cyan); display: flex; align-items: center; gap: 0.4rem;"><i data-lucide="mic" class="hud-icon-xs"></i> 4. Voice Persona & Speech Speed</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Edge-TTS neural voice personality and playback speed rate for Jarvis spoken responses.</p>
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+              <select id="sel-voice-model" style="flex: 1;" onchange="onVoiceSelectChange(this.value)"></select>
+              <button class="btn btn-cyan btn-sm" onclick="previewSelectedVoice(document.getElementById('sel-voice-model').value)" title="Test this voice"><i data-lucide="volume-2" class="hud-icon-xs"></i> Test</button>
+            </div>
+            <div style="background: rgba(4, 9, 20, 0.6); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 8px; padding: 0.55rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.45rem;">
+                <i data-lucide="gauge" class="hud-icon-xs text-cyan"></i>
+                <span style="font-size: 0.76rem; font-weight: 700; color: #ffffff;">Rate:</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.55rem; flex: 1; justify-content: flex-end;">
+                <input type="range" id="models-tab-speed-slider" min="0.5" max="2.0" step="0.05" value="1.0" oninput="onVoiceSpeedInput(this.value)" onchange="onVoiceSpeedChange(this.value)" style="width: 110px;">
+                <span class="voice-speed-badge" id="models-tab-speed-val">1.00x</span>
+                <button class="btn btn-sm" onclick="resetVoiceSpeed()" style="background: rgba(255,255,255,0.08); font-size: 0.68rem; padding: 0.2rem 0.45rem;" title="Reset speed to default 1.0x">Reset</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <button class="btn btn-cyan" style="margin-top: 1.5rem; padding: 0.75rem 2rem;" onclick="saveModelSelection()"><i data-lucide="save" class="hud-icon-xs"></i> Save Model Preferences</button>
@@ -2354,8 +2776,30 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title"><i data-lucide="history" class="hud-icon-sm text-cyan"></i> Audit Trail & Mission Intelligence</div>
-          <div style="display: flex; gap: 0.5rem;">
-            <button class="btn btn-cyan" onclick="exportCurrentRunMarkdown()" id="btn-export-md" style="display: none;"><i data-lucide="download" class="hud-icon-xs"></i> Export Markdown Report</button>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="report-download-group" id="header-report-download-group">
+              <button class="btn btn-cyan report-main-btn" onclick="downloadMissionReport(null, 'md')" id="btn-export-md" title="Download report for selected mission">
+                <i data-lucide="download" class="hud-icon-xs"></i> Download Report
+              </button>
+              <button class="btn btn-cyan report-dropdown-toggle" onclick="toggleReportDropdown(event)" title="Choose report format">
+                <i data-lucide="chevron-down" class="hud-icon-xs"></i>
+              </button>
+              <div class="report-dropdown-menu" id="report-dropdown-menu">
+                <div class="report-dropdown-item" onclick="downloadMissionReport(null, 'md'); closeReportDropdown();">
+                  <i data-lucide="file-text" class="hud-icon-xs text-cyan"></i> Markdown Document (.md)
+                </div>
+                <div class="report-dropdown-item" onclick="downloadMissionReport(null, 'html'); closeReportDropdown();">
+                  <i data-lucide="globe" class="hud-icon-xs text-green"></i> Interactive HTML Report (.html)
+                </div>
+                <div class="report-dropdown-item" onclick="downloadMissionReport(null, 'json'); closeReportDropdown();">
+                  <i data-lucide="code" class="hud-icon-xs text-amber"></i> Raw Audit JSON (.json)
+                </div>
+                <div class="report-dropdown-divider"></div>
+                <div class="report-dropdown-item" onclick="copyMissionMarkdown(); closeReportDropdown();">
+                  <i data-lucide="copy" class="hud-icon-xs text-cyan"></i> Copy Markdown to Clipboard
+                </div>
+              </div>
+            </div>
             <button class="btn btn-cyan" onclick="loadHistory()"><i data-lucide="refresh-cw" class="hud-icon-xs"></i> Refresh Analytics</button>
           </div>
         </div>
@@ -2548,7 +2992,7 @@
               <h3>Runtime Processes:</h3>
               <p>When running <code>jarvis start</code>, a master <b>Process Supervisor</b> manages two background daemons:</p>
               <ul>
-                <li><b><code>ui_server</code> (FastAPI + Uvicorn on :8765):</b> Powers this Stark HUD dashboard, WebSocket live streaming, telemetry polling, and audit storage.</li>
+                <li><b><code>ui_server</code> (FastAPI + Uvicorn on :8765):</b> Powers this Jarvis HUD dashboard, WebSocket live streaming, telemetry polling, and audit storage.</li>
                 <li><b><code>worker</code> daemon:</b> Listens for the global <kbd>Alt</kbd> + <kbd>J</kbd> desktop hotkey, polls the Telegram bot, and triggers proactive sentinel watchdogs.</li>
               </ul>
             </div>
@@ -2787,7 +3231,7 @@ uv run jarvis vault list<button class="copy-btn" onclick="copySnippet('uv run ja
 
               <h3>Dual Delivery Targets:</h3>
               <ul>
-                <li><b>Web HUD Dialog Modal:</b> Translucent Stark Industries HUD popup with interactive zoom, raw code viewer toggle, and instant clipboard copy.</li>
+                <li><b>Web HUD Dialog Modal:</b> Translucent Jarvis HUD popup with interactive zoom, raw code viewer toggle, and instant clipboard copy.</li>
                 <li><b>Native X11 Desktop Window:</b> Clean desktop window powered by Python Tkinter & Pillow with smooth image scaling and resolution tags.</li>
               </ul>
 
@@ -2898,7 +3342,7 @@ desktop:
           <span id="media-modal-icon"><i data-lucide="bar-chart-2" class="hud-icon-md text-cyan"></i></span>
           <div>
             <h3 style="color: #ffffff; font-size: 1.05rem; font-weight: 600;" id="media-modal-title">System Visualization</h3>
-            <div style="font-size: 0.75rem; color: var(--text-muted);" id="media-modal-caption">Stark Industries Visual Analysis Unit</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);" id="media-modal-caption">Jarvis Tactical Visual Analysis Unit</div>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -2942,7 +3386,10 @@ desktop:
       if (target) target.classList.add('active');
       if (name === 'displays') loadDesktopMonitors();
       if (name === 'history') loadHistory();
-      if (name === 'models') loadModels();
+      if (name === 'models') {
+        loadModels();
+        loadVoices();
+      }
       if (name === 'errors') loadErrors();
       if (name === 'memory') loadMemory();
       setTimeout(renderIcons, 60);
@@ -3160,6 +3607,25 @@ desktop:
               syncConversationModeUI(msg.data.conversation_mode, true);
             }
           }
+          if (msg.event === 'model_policy_changed') {
+            if (msg.data.policy) {
+              syncPolicyUI(msg.data.policy, msg.data.cloud_model, true);
+            }
+          }
+          if (msg.event === 'voice_changed') {
+            if (msg.data.tts_voice && msg.data.tts_voice !== currentActiveVoice) {
+              currentActiveVoice = msg.data.tts_voice;
+              ['voice-select-dropdown', 'audio-hud-voice-select', 'sel-voice-model'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.value !== currentActiveVoice) el.value = currentActiveVoice;
+              });
+            }
+            if (msg.data.tts_rate && msg.data.tts_rate !== currentActiveRate) {
+              currentActiveRate = msg.data.tts_rate;
+              const mult = parseRateToMultiplier(currentActiveRate);
+              syncSpeedUI(mult, true);
+            }
+          }
           if (msg.event === 'task_finish') {
             appendLog('result', '✔ ' + msg.data.result);
             document.getElementById('active-task-label').innerText = 'COMPLETED';
@@ -3261,7 +3727,7 @@ desktop:
       const btnToggle = document.getElementById('btn-toggle-raw');
 
       title.innerText = data.title || 'Visual Observation';
-      caption.innerText = data.caption || 'Stark Industries Visual Analysis Unit';
+      caption.innerText = data.caption || 'Jarvis Tactical Visual Analysis Unit';
       rawCode.innerText = data.content || '';
       rawCode.style.display = 'none';
       container.style.display = 'flex';
@@ -3403,7 +3869,7 @@ desktop:
     Actuators --> Chrome["🌐 Dual Browser (Everyday CDP + Sandbox)"]
     Actuators --> Python["🐍 Python Runner & Data Crunch"]
     Actuators --> Visuals["📊 Visual Media (Web Dialog + System Window)"]
-    Visuals --> HUD["🖥️ Stark Industries Mark 1 HUD"]`;
+    Visuals --> HUD["🖥️ Jarvis Mark 1 Tactical HUD"]`;
       showVisualMediaModal({
         media_type: 'diagram',
         content: diag,
@@ -3530,6 +3996,175 @@ desktop:
       openLightbox(previewUrl, `Main Desktop Display ${currentMainScreenIndex} Perception Preview`);
     }
 
+    // Edge-TTS Voice Persona & Speed Rate Management
+    let availableVoices = [];
+    let currentActiveVoice = 'en-GB-RyanNeural';
+    let currentActiveRate = '+2%';
+    let currentSpeedMultiplier = 1.0;
+
+    function parseRateToMultiplier(rateStr) {
+      if (!rateStr) return 1.0;
+      const num = parseInt(rateStr);
+      if (isNaN(num)) return 1.0;
+      return Math.max(0.5, Math.min(2.0, Math.round((1.0 + num / 100) * 100) / 100));
+    }
+
+    function multiplierToRateStr(mult) {
+      const pct = Math.round((mult - 1.0) * 100);
+      return pct >= 0 ? `+${pct}%` : `${pct}%`;
+    }
+
+    function syncSpeedUI(mult, updateSliders = true) {
+      currentSpeedMultiplier = mult;
+      const formatted = mult.toFixed(2) + 'x';
+      ['voice-speed-val', 'audio-hud-speed-val', 'models-tab-speed-val'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = formatted;
+      });
+      if (updateSliders) {
+        ['voice-speed-slider', 'audio-hud-speed-slider', 'models-tab-speed-slider'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && Math.abs(parseFloat(el.value) - mult) > 0.01) {
+            el.value = mult;
+          }
+        });
+      }
+    }
+
+    function onVoiceSpeedInput(value) {
+      const mult = parseFloat(value) || 1.0;
+      syncSpeedUI(mult, false);
+      ['voice-speed-slider', 'audio-hud-speed-slider', 'models-tab-speed-slider'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.value !== value) el.value = value;
+      });
+    }
+
+    async function onVoiceSpeedChange(value) {
+      const mult = parseFloat(value) || 1.0;
+      syncSpeedUI(mult, true);
+      const rateStr = multiplierToRateStr(mult);
+      currentActiveRate = rateStr;
+
+      try {
+        const res = await fetch('/api/voice/select', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rate: rateStr })
+        });
+        const data = await res.json();
+        if (data.current_rate) {
+          currentActiveRate = data.current_rate;
+        }
+        appendLog('step', `⚡ Jarvis vocal speed updated to: ${mult.toFixed(2)}x (${rateStr}).`);
+      } catch (e) {
+        console.error("Failed to update voice speed:", e);
+      }
+    }
+
+    function resetVoiceSpeed() {
+      onVoiceSpeedInput("1.0");
+      onVoiceSpeedChange("1.0");
+    }
+
+    async function loadVoices() {
+      try {
+        const res = await fetch('/api/voice/voices');
+        const data = await res.json();
+        availableVoices = data.voices || [];
+        currentActiveVoice = data.current_voice || 'en-GB-RyanNeural';
+        currentActiveRate = data.current_rate || '+2%';
+
+        populateVoiceDropdown('voice-select-dropdown', availableVoices, currentActiveVoice);
+        populateVoiceDropdown('audio-hud-voice-select', availableVoices, currentActiveVoice);
+        populateVoiceDropdown('sel-voice-model', availableVoices, currentActiveVoice);
+
+        const mult = parseRateToMultiplier(currentActiveRate);
+        syncSpeedUI(mult, true);
+      } catch (e) {
+        console.error("Failed to load available voices:", e);
+      }
+    }
+
+    function populateVoiceDropdown(elementId, voices, selectedVoice) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.innerHTML = '';
+
+      const recGroup = document.createElement('optgroup');
+      recGroup.label = '⭐ RECOMMENDED PERSONAS';
+
+      const otherGroup = document.createElement('optgroup');
+      otherGroup.label = '🌐 ALL VOICES';
+
+      voices.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.short_name;
+        const genderBadge = v.gender ? ` [${v.gender}]` : '';
+        const localeBadge = v.locale ? ` (${v.locale})` : '';
+        opt.innerText = `${v.name}${genderBadge}${localeBadge}`;
+        if (v.short_name === selectedVoice) {
+          opt.selected = true;
+        }
+        if (v.recommended) {
+          recGroup.appendChild(opt);
+        } else {
+          otherGroup.appendChild(opt);
+        }
+      });
+
+      if (recGroup.children.length > 0) el.appendChild(recGroup);
+      if (otherGroup.children.length > 0) el.appendChild(otherGroup);
+      el.value = selectedVoice;
+    }
+
+    async function onVoiceSelectChange(voiceId) {
+      if (!voiceId) return;
+      try {
+        const res = await fetch('/api/voice/select', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ voice: voiceId })
+        });
+        const data = await res.json();
+        currentActiveVoice = data.current_voice;
+
+        // Synchronize all voice dropdowns
+        ['voice-select-dropdown', 'audio-hud-voice-select', 'sel-voice-model'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.value !== currentActiveVoice) el.value = currentActiveVoice;
+        });
+
+        const voiceObj = availableVoices.find(v => v.short_name === voiceId);
+        const voiceName = voiceObj ? voiceObj.name : voiceId;
+        appendLog('step', `🎙️ Jarvis vocal persona switched to: ${voiceName} (${voiceId}).`);
+      } catch (e) {
+        console.error("Failed to update voice:", e);
+        alert("Failed to update voice: " + e);
+      }
+    }
+
+    async function previewSelectedVoice(voiceId) {
+      const voice = voiceId || currentActiveVoice || (document.getElementById('voice-select-dropdown') ? document.getElementById('voice-select-dropdown').value : 'en-GB-RyanNeural');
+      const voiceObj = availableVoices.find(v => v.short_name === voice);
+      const voiceName = voiceObj ? voiceObj.name : voice;
+      
+      appendLog('thought', `🔊 Previewing voice persona: ${voiceName} at ${currentSpeedMultiplier.toFixed(2)}x speed...`);
+      try {
+        await fetch('/api/voice/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            voice: voice,
+            rate: currentActiveRate,
+            text: `Greetings. This is Jarvis neural speech synthesis preview, operating at ${currentSpeedMultiplier.toFixed(2)} times speed.`
+          })
+        });
+      } catch (e) {
+        console.error("Failed to preview voice:", e);
+      }
+    }
+
     function showFileRequestModal(desc, exp) {
       document.getElementById('modal-req-desc').innerText = desc;
       document.getElementById('modal-req-exp').innerText = exp ? ("Expected filename: " + exp) : "";
@@ -3613,7 +4248,7 @@ desktop:
     function syncConversationModeUI(mode, logChange = false) {
       const modeChanged = (currentConversationMode !== mode);
       currentConversationMode = mode;
-      document.querySelectorAll('.mode-pill').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('#conversation-mode-segmented .mode-pill').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById('btn-mode-' + mode.replace('+', '_'));
       if (activeBtn) activeBtn.classList.add('active');
 
@@ -3890,7 +4525,141 @@ desktop:
       }
     }
 
-    // Load Local Models
+    // AI Intelligence Architecture & Model Routing Policy
+    let currentModelPolicy = 'local_only';
+    let currentCloudModel = 'gemini-2.5-flash';
+
+    function getPolicyLabel(policy) {
+      if (policy === 'cloud_only') return 'CLOUD GEMINI 3.8 FLASH';
+      if (policy === 'tier_fallback') return 'HYBRID (LOCAL + GEMINI)';
+      return 'LOCAL LLM';
+    }
+
+    function syncPolicyUI(policy, cloudModel = null, logChange = false) {
+      const policyChanged = (currentModelPolicy !== policy);
+      currentModelPolicy = policy || currentModelPolicy;
+      if (cloudModel) currentCloudModel = cloudModel;
+
+      // Update Header segmented pills
+      document.querySelectorAll('#backend-policy-segmented .mode-pill').forEach(btn => btn.classList.remove('active'));
+      let activeHeaderBtn = null;
+      if (currentModelPolicy === 'local_only') activeHeaderBtn = document.getElementById('btn-engine-local');
+      else if (currentModelPolicy === 'cloud_only') activeHeaderBtn = document.getElementById('btn-engine-cloud');
+      else if (currentModelPolicy === 'tier_fallback') activeHeaderBtn = document.getElementById('btn-engine-hybrid');
+      if (activeHeaderBtn) activeHeaderBtn.classList.add('active');
+
+      // Update Mission Control Header Badge
+      const engineBadge = document.getElementById('current-engine-badge');
+      const engineText = document.getElementById('current-engine-text');
+      if (engineBadge && engineText) {
+        if (currentModelPolicy === 'cloud_only') {
+          engineText.innerText = 'GEMINI 3.8 FLASH';
+          engineBadge.style.borderColor = 'var(--neon-cyan)';
+          engineBadge.style.color = '#ffffff';
+          engineBadge.style.background = 'rgba(0, 240, 255, 0.2)';
+        } else if (currentModelPolicy === 'tier_fallback') {
+          engineText.innerText = 'HYBRID FALLBACK';
+          engineBadge.style.borderColor = '#cba6f7';
+          engineBadge.style.color = '#cba6f7';
+          engineBadge.style.background = 'rgba(203, 166, 247, 0.15)';
+        } else {
+          engineText.innerText = 'LOCAL LLM';
+          engineBadge.style.borderColor = 'rgba(0, 240, 255, 0.4)';
+          engineBadge.style.color = 'var(--neon-cyan)';
+          engineBadge.style.background = 'rgba(0, 229, 255, 0.1)';
+        }
+      }
+
+      // Update Tab 2 Model Selection Hero Switcher
+      const activeBadge = document.getElementById('policy-active-badge');
+      if (activeBadge) {
+        activeBadge.innerText = (currentModelPolicy || 'LOCAL_ONLY').toUpperCase();
+        if (currentModelPolicy === 'cloud_only') {
+          activeBadge.style.borderColor = 'var(--neon-cyan)';
+          activeBadge.style.color = 'var(--neon-cyan)';
+        } else if (currentModelPolicy === 'tier_fallback') {
+          activeBadge.style.borderColor = '#cba6f7';
+          activeBadge.style.color = '#cba6f7';
+        } else {
+          activeBadge.style.borderColor = 'var(--neon-cyan)';
+          activeBadge.style.color = 'var(--neon-cyan)';
+        }
+      }
+
+      // Hero Cards
+      ['local_only', 'cloud_only', 'tier_fallback'].forEach(p => {
+        const card = document.getElementById('card-policy-' + p);
+        if (card) {
+          if (p === currentModelPolicy) card.classList.add('active');
+          else card.classList.remove('active');
+        }
+      });
+
+      const dotLocal = document.getElementById('dot-policy-local');
+      const dotCloud = document.getElementById('dot-policy-cloud');
+      const dotHybrid = document.getElementById('dot-policy-hybrid');
+      if (dotLocal) dotLocal.className = 'status-dot ' + (currentModelPolicy === 'local_only' ? 'dot-green' : 'dot-gray');
+      if (dotCloud) dotCloud.className = 'status-dot ' + (currentModelPolicy === 'cloud_only' ? 'dot-green' : 'dot-gray');
+      if (dotHybrid) dotHybrid.className = 'status-dot ' + (currentModelPolicy === 'tier_fallback' ? 'dot-green' : 'dot-gray');
+
+      // Update Cloud Model Select dropdown
+      const selCloud = document.getElementById('sel-cloud-model');
+      if (selCloud && currentCloudModel && selCloud.value !== currentCloudModel) {
+        selCloud.value = currentCloudModel;
+      }
+
+      if (policyChanged && logChange) {
+        appendLog('step', `🤖 AI Brain Engine: ${getPolicyLabel(currentModelPolicy)}`);
+      }
+      renderIcons();
+    }
+
+    async function setAIBackendPolicy(policy) {
+      if (currentModelPolicy === policy) return;
+      syncPolicyUI(policy, currentCloudModel, true);
+      try {
+        const selCloud = document.getElementById('sel-cloud-model');
+        const cloudModel = selCloud ? selCloud.value : currentCloudModel;
+        const res = await fetch('/api/models/policy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ policy: policy, cloud_model: cloudModel })
+        });
+        const data = await res.json();
+        if (data && data.policy) {
+          syncPolicyUI(data.policy, data.cloud_model, false);
+        }
+      } catch(e) {
+        console.warn("Failed to set AI backend policy:", e);
+      }
+    }
+
+    function quickSetModelPolicy(policy) {
+      setAIBackendPolicy(policy);
+    }
+
+    async function onCloudModelChange(modelId) {
+      currentCloudModel = modelId;
+      appendLog('step', `☁️ Cloud Model Target: ${modelId}`);
+      if (currentModelPolicy === 'cloud_only' || currentModelPolicy === 'tier_fallback') {
+        try {
+          await fetch('/api/models/policy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ policy: currentModelPolicy, cloud_model: modelId })
+          });
+        } catch(e) {}
+      }
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById('input-gemini-api-key');
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+      }
+    }
+
+    // Load Local & Cloud Models
     async function loadModels() {
       try {
         const res = await fetch('/api/models');
@@ -3898,35 +4667,80 @@ desktop:
         const selText = document.getElementById('sel-text-model');
         const selVision = document.getElementById('sel-vision-model');
         const selTier0 = document.getElementById('sel-tier0-model');
+        const selCloud = document.getElementById('sel-cloud-model');
 
-        selText.innerHTML = '';
-        selVision.innerHTML = '';
-        selTier0.innerHTML = '';
+        if (selText && selVision && selTier0 && data.models) {
+          selText.innerHTML = '';
+          selVision.innerHTML = '';
+          selTier0.innerHTML = '';
 
-        data.models.forEach(m => {
-          selText.add(new Option(`${m.name} (${m.size})`, m.name));
-          selVision.add(new Option(`${m.name} (${m.size})`, m.name));
-          selTier0.add(new Option(`${m.name} (${m.size})`, m.name));
-        });
+          data.models.forEach(m => {
+            selText.add(new Option(`${m.name} (${m.size})`, m.name));
+            selVision.add(new Option(`${m.name} (${m.size})`, m.name));
+            selTier0.add(new Option(`${m.name} (${m.size})`, m.name));
+          });
 
-        selText.value = data.current.local_text_model;
-        selVision.value = data.current.local_vision_model;
-        selTier0.value = data.current.tier0_model;
-      } catch(e) {}
+          if (data.current.local_text_model) selText.value = data.current.local_text_model;
+          if (data.current.local_vision_model) selVision.value = data.current.local_vision_model;
+          if (data.current.tier0_model) selTier0.value = data.current.tier0_model;
+        }
+
+        if (selCloud && data.cloud_models) {
+          selCloud.innerHTML = '';
+          data.cloud_models.forEach(cm => {
+            const opt = new Option(cm.name, cm.id);
+            selCloud.add(opt);
+          });
+          if (data.current.cloud_model) {
+            selCloud.value = data.current.cloud_model;
+            currentCloudModel = data.current.cloud_model;
+          }
+        }
+
+        if (data.current && data.current.policy) {
+          syncPolicyUI(data.current.policy, data.current.cloud_model, false);
+        }
+
+        const apiKeyInput = document.getElementById('input-gemini-api-key');
+        if (apiKeyInput && data.current.has_gemini_api_key) {
+          apiKeyInput.placeholder = '•••••••••••••••• (API Key Active)';
+        }
+      } catch(e) {
+        console.warn("Failed to load models:", e);
+      }
     }
 
     async function saveModelSelection() {
+      const apiKeyInput = document.getElementById('input-gemini-api-key');
+      const apiKeyVal = apiKeyInput ? apiKeyInput.value.trim() : '';
       const payload = {
-        local_text_model: document.getElementById('sel-text-model').value,
-        local_vision_model: document.getElementById('sel-vision-model').value,
-        tier0_model: document.getElementById('sel-tier0-model').value,
+        policy: currentModelPolicy,
+        local_text_model: document.getElementById('sel-text-model') ? document.getElementById('sel-text-model').value : undefined,
+        local_vision_model: document.getElementById('sel-vision-model') ? document.getElementById('sel-vision-model').value : undefined,
+        tier0_model: document.getElementById('sel-tier0-model') ? document.getElementById('sel-tier0-model').value : undefined,
+        cloud_model: document.getElementById('sel-cloud-model') ? document.getElementById('sel-cloud-model').value : currentCloudModel,
       };
-      await fetch('/api/models/select', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      alert('Local model selections updated and saved!');
+      if (apiKeyVal) {
+        payload.gemini_api_key = apiKeyVal;
+      }
+      try {
+        const res = await fetch('/api/models/select', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.current && data.current.policy) {
+          syncPolicyUI(data.current.policy, data.current.cloud_model, true);
+        }
+        if (apiKeyVal && apiKeyInput) {
+          apiKeyInput.value = '';
+          apiKeyInput.placeholder = '•••••••••••••••• (API Key Active)';
+        }
+        alert('AI Model & Routing configuration saved successfully!');
+      } catch(e) {
+        alert('Failed to save model configuration: ' + e);
+      }
     }
 
     // Load Errors
@@ -4117,7 +4931,10 @@ desktop:
         div.className = 'history-item' + (r.run_id === selectedRunId ? ' selected' : '');
         const dur = (r.start_time && r.end_time) ? `${Math.round(r.end_time - r.start_time)}s` : '';
         div.innerHTML = `
-          <div style="font-weight: 700; font-size: 0.85rem; color: var(--neon-cyan);">${r.goal.substring(0, 38)}...</div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+            <div style="font-weight: 700; font-size: 0.85rem; color: var(--neon-cyan); line-height: 1.3;">${r.goal.substring(0, 36)}...</div>
+            <button class="btn btn-sm" style="background: rgba(0, 240, 255, 0.12); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.3); font-size: 0.68rem; padding: 0.15rem 0.45rem; flex-shrink: 0;" onclick="event.stopPropagation(); downloadMissionReport('${r.run_id}', 'md')" title="Direct download Markdown report"><i data-lucide="download" class="hud-icon-xs"></i> .md</button>
+          </div>
           <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">
             Status: <b style="color: ${r.status==='success'?'var(--neon-green)':'var(--neon-red)'};">${r.status.toUpperCase()}</b> • Steps: ${r.steps ? r.steps.length : 0} ${dur ? '• ' + dur : ''}
           </div>
@@ -4128,24 +4945,72 @@ desktop:
       });
     }
 
-    async function exportCurrentRunMarkdown() {
-      if (!selectedRunId) return;
+    // Mission Report Download & Export
+    function downloadMissionReport(runId = null, format = 'md') {
+      const targetRunId = runId || selectedRunId || (cachedRuns && cachedRuns.length ? cachedRuns[0].run_id : null);
+      if (!targetRunId) {
+        alert("No mission selected to download. Please select a mission from the list.");
+        return;
+      }
+
+      // Method: Direct browser download via server attachment endpoint.
+      // 100% reliable across all browsers & mobile devices, avoids blob revocation issues,
+      // and provides clean OS file naming.
+      const downloadUrl = `/api/history/${encodeURIComponent(targetRunId)}/download?format=${encodeURIComponent(format)}`;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', '');
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+
+      setTimeout(() => {
+        if (link.parentNode) link.parentNode.removeChild(link);
+      }, 1500);
+
+      appendLog('step', `📥 Downloaded mission report (${format.toUpperCase()}) for: ${targetRunId}`);
+    }
+
+    // Backward-compatible alias for existing callers
+    function exportCurrentRunMarkdown(runId = null) {
+      downloadMissionReport(runId, 'md');
+    }
+
+    async function copyMissionMarkdown(runId = null) {
+      const targetRunId = runId || selectedRunId || (cachedRuns && cachedRuns.length ? cachedRuns[0].run_id : null);
+      if (!targetRunId) {
+        alert("No mission selected to copy.");
+        return;
+      }
       try {
-        const res = await fetch(`/api/history/${selectedRunId}/markdown`);
+        const res = await fetch(`/api/history/${encodeURIComponent(targetRunId)}/markdown`);
         const data = await res.json();
-        const blob = new Blob([data.markdown], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `jarvis_mission_${selectedRunId}.md`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        if (data && data.markdown) {
+          await navigator.clipboard.writeText(data.markdown);
+          appendLog('step', `📋 Copied mission report Markdown for ${targetRunId} to clipboard`);
+          alert("Mission Markdown report copied to clipboard!");
+        }
       } catch(e) {
-        alert("Failed to export markdown: " + e);
+        alert("Failed to copy markdown: " + e);
       }
     }
+
+    function toggleReportDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('report-dropdown-menu');
+      if (menu) menu.classList.toggle('show');
+    }
+
+    function closeReportDropdown() {
+      const menu = document.getElementById('report-dropdown-menu');
+      if (menu) menu.classList.remove('show');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.report-download-group')) {
+        closeReportDropdown();
+      }
+    });
 
     function renderHomepageRecentFeed(runs) {
       const container = document.getElementById('homepage-recent-feed');
@@ -4235,9 +5100,22 @@ desktop:
         const duration = (data.start_time && data.end_time) ? `${Math.round(data.end_time - data.start_time)}s` : 'In Progress';
         viewer.innerHTML = `
           <div style="margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
-              <h3 style="color: #ffffff; font-size: 1.05rem;">Goal: "${data.goal}"</h3>
-              <button class="btn btn-cyan" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; flex-shrink: 0;" onclick="exportCurrentRunMarkdown()"><i data-lucide="download" class="hud-icon-xs"></i> Download Report</button>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+              <h3 style="color: #ffffff; font-size: 1.05rem; flex: 1; min-width: 250px;">Goal: "${data.goal}"</h3>
+              <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+                <button class="btn btn-cyan btn-sm" onclick="downloadMissionReport('${data.run_id}', 'md')" title="Download Markdown Summary (.md)">
+                  <i data-lucide="download" class="hud-icon-xs"></i> Markdown (.md)
+                </button>
+                <button class="btn btn-sm" style="background: rgba(0, 240, 255, 0.12); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.35); font-size: 0.72rem; padding: 0.25rem 0.55rem;" onclick="downloadMissionReport('${data.run_id}', 'html')" title="Download Standalone HTML Report (.html)">
+                  <i data-lucide="globe" class="hud-icon-xs"></i> HTML Report
+                </button>
+                <button class="btn btn-sm" style="background: rgba(255, 255, 255, 0.08); font-size: 0.72rem; padding: 0.25rem 0.55rem;" onclick="downloadMissionReport('${data.run_id}', 'json')" title="Download Raw JSON Data">
+                  <i data-lucide="code" class="hud-icon-xs"></i> JSON
+                </button>
+                <button class="btn btn-sm" style="background: rgba(255, 255, 255, 0.08); font-size: 0.72rem; padding: 0.25rem 0.55rem;" onclick="copyMissionMarkdown('${data.run_id}')" title="Copy Markdown to Clipboard">
+                  <i data-lucide="copy" class="hud-icon-xs"></i> Copy
+                </button>
+              </div>
             </div>
             <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">
               <span style="color: var(--neon-cyan); font-weight: 600;">ID: ${data.run_id}</span> • Status: <b style="color: ${data.status==='success'?'var(--neon-green)':'var(--neon-red)'};">${data.status.toUpperCase()}</b> • Duration: ${duration} • Steps: ${data.steps ? data.steps.length : 0}
@@ -4365,6 +5243,21 @@ desktop:
           currentMainScreenIndex = data.desktop_screen_index;
           loadDesktopMonitors();
         }
+        if (data.tts_voice && data.tts_voice !== currentActiveVoice) {
+          currentActiveVoice = data.tts_voice;
+          ['voice-select-dropdown', 'audio-hud-voice-select', 'sel-voice-model'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.value !== currentActiveVoice) el.value = currentActiveVoice;
+          });
+        }
+        if (data.tts_rate && data.tts_rate !== currentActiveRate) {
+          currentActiveRate = data.tts_rate;
+          const mult = parseRateToMultiplier(currentActiveRate);
+          syncSpeedUI(mult, true);
+        }
+        if (data.policy && data.policy !== currentModelPolicy) {
+          syncPolicyUI(data.policy, data.cloud_model, false);
+        }
       } catch(e) {}
       loadErrors();
     }
@@ -4374,14 +5267,20 @@ desktop:
     // Initial history load for homepage feed and charts
     loadHistory();
     loadDesktopMonitors();
+    loadVoices();
+    loadModels();
     applyTerminalFontSize();
 
     document.addEventListener('DOMContentLoaded', () => {
       applyTerminalFontSize();
+      loadVoices();
+      loadModels();
       renderIcons();
     });
     window.addEventListener('load', () => {
       applyTerminalFontSize();
+      loadVoices();
+      loadModels();
       renderIcons();
     });
     setTimeout(renderIcons, 200);

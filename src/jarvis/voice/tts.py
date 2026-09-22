@@ -74,14 +74,52 @@ class TextToSpeech:
 
     def _clean_for_speech(self, text: str) -> str:
         import re
-        # Remove code blocks
+        if not text:
+            return ""
+
+        # 1. Replace multi-line code blocks
         text = re.sub(r"```[\s\S]*?```", " Code snippet omitted. ", text)
-        # Remove inline code
-        text = re.sub(r"`.*?`", " ", text)
-        # Remove markdown urls [title](url) -> title
+
+        # 2. Extract inline code (keep text inside backticks, e.g. `cat` -> cat)
+        text = re.sub(r"`([^`]+)`", r"\1", text)
+
+        # 3. Images and links: ![alt](url) -> alt, [title](url) -> title
+        text = re.sub(r"!\[(.*?)\]\(.*?\)", r"\1", text)
         text = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", text)
-        # Remove headers #
-        text = re.sub(r"#+\s*", "", text)
-        # Remove bullet points
-        text = re.sub(r"^[\s*-]+", "", text, flags=re.MULTILINE)
+
+        # 4. Remove HTML tags but keep text: <b>text</b> -> text
+        text = re.sub(r"<[^>]+>", " ", text)
+
+        # 5. Bold & Italics: ***text***, **text**, *text*, __text__, _text_
+        text = re.sub(r"(\*{3}|_{3})(.*?)\1", r"\2", text)
+        text = re.sub(r"(\*{2}|_{2})(.*?)\1", r"\2", text)
+        text = re.sub(r"(\*|_)(.*?)\1", r"\2", text)
+
+        # 6. Strikethrough: ~~text~~ -> text
+        text = re.sub(r"~~(.*?)~~", r"\1", text)
+
+        # 7. Horizontal rules: ---, ***, ___
+        text = re.sub(r"^\s*[-*_]{3,}\s*$", "", text, flags=re.MULTILINE)
+
+        # 8. Headers: # Heading -> Heading
+        text = re.sub(r"^\s*#{1,6}\s*", "", text, flags=re.MULTILINE)
+
+        # 9. Blockquotes: > quote -> quote
+        text = re.sub(r"^\s*>\s*", "", text, flags=re.MULTILINE)
+
+        # 10. Table separator rows: |---|---|
+        text = re.sub(r"^\s*\|?[-:| ]+\|?\s*$", "", text, flags=re.MULTILINE)
+        # Table cell pipes: replace with space
+        text = re.sub(r"\|", " ", text)
+
+        # 11. Bullet points and numbered lists
+        text = re.sub(r"^\s*[-*+]\s+", "", text, flags=re.MULTILINE)
+        text = re.sub(r"^\s*\d+\.\s+", "", text, flags=re.MULTILINE)
+
+        # 12. Remove any remaining stray formatting symbols (asterisks, underscores, backticks, tildes)
+        text = re.sub(r"[*_`~]", "", text)
+
+        # 13. Collapse multiple whitespace into a single space
+        text = re.sub(r"\s+", " ", text)
+
         return text.strip()

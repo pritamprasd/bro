@@ -1,6 +1,7 @@
 """Audit Trail & Session Recording for full action replay and filmstrips."""
 
 import base64
+import html
 import json
 import os
 import re
@@ -261,4 +262,243 @@ class AuditManager:
             md.append("")
 
         return "\n".join(md)
+
+    def export_run_json(self, run_id: str) -> str:
+        """Export raw run data formatted as JSON."""
+        data = self.get_run(run_id)
+        if not data:
+            return json.dumps({"error": f"Run not found: {run_id}"}, indent=2)
+        return json.dumps(data, indent=2)
+
+    def export_run_html(self, run_id: str) -> str:
+        """Export a self-contained, standalone HTML executive report."""
+        data = self.get_run(run_id)
+        if not data:
+            return f"<html><body><h1>Run Not Found: {html.escape(run_id)}</h1></body></html>"
+
+        start_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(data.get("start_time", time.time())))
+        dur = "N/A"
+        if data.get("start_time") and data.get("end_time"):
+            dur = f"{round(data['end_time'] - data['start_time'], 1)}s"
+
+        goal_esc = html.escape(data.get("goal", "Mission"))
+        status = data.get("status", "unknown").upper()
+        status_color = "#00ff9d" if status == "SUCCESS" else ("#ff3860" if status in ("FAILED", "TIMEOUT") else "#00f0ff")
+        result_esc = html.escape(data.get("result", "No final outcome recorded."))
+
+        step_cards = []
+        for s in data.get("steps", []):
+            s_num = s.get("step_num", 0)
+            act = html.escape(s.get("action", ""))
+            thought = html.escape(s.get("thought", ""))
+            obs = html.escape(s.get("observation", ""))
+            params_str = html.escape(json.dumps(s.get("params", {}), indent=2))
+            succ = s.get("success", True)
+            step_badge_color = "#00ff9d" if succ else "#ff3860"
+            step_status_text = "SUCCESS" if succ else "FAILED"
+
+            shot_html = ""
+            if s.get("screenshot_file"):
+                shot_path = f"/api/history/{run_id}/{s.get('screenshot_file')}"
+                shot_html = f'''
+                <div style="margin-top: 0.75rem;">
+                    <span style="font-size: 0.75rem; color: #94a3b8;">Screenshot Observation:</span>
+                    <div style="margin-top: 0.35rem;">
+                        <a href="{shot_path}" target="_blank" style="color: #00f0ff; text-decoration: underline; font-size: 0.82rem;">View Full 1080p Screenshot ({html.escape(s.get("screenshot_file"))})</a>
+                    </div>
+                </div>
+                '''
+
+            step_cards.append(f'''
+            <div class="step-card">
+                <div class="step-header">
+                    <span class="step-num">STEP {s_num}</span>
+                    <span class="step-action">{act}</span>
+                    <span class="step-status" style="border-color: {step_badge_color}; color: {step_badge_color};">{step_status_text}</span>
+                </div>
+                <div class="step-body">
+                    <div class="field-label">Thought & Planning</div>
+                    <div class="field-value" style="font-style: italic;">"{thought}"</div>
+
+                    <div class="field-label" style="margin-top: 0.75rem;">Action Parameters</div>
+                    <pre><code>{params_str}</code></pre>
+
+                    <div class="field-label" style="margin-top: 0.75rem;">Observation & Outcome</div>
+                    <div class="field-value">{obs}</div>
+
+                    {shot_html}
+                </div>
+            </div>
+            ''')
+
+        steps_html = "\n".join(step_cards) if step_cards else '<p style="color: #94a3b8;">No execution steps recorded for this mission.</p>'
+
+        return f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jarvis Mission Report - {goal_esc}</title>
+  <style>
+    :root {{
+      --bg: #050814;
+      --card-bg: rgba(11, 19, 38, 0.9);
+      --border: rgba(0, 240, 255, 0.22);
+      --cyan: #00f0ff;
+      --green: #00ff9d;
+      --amber: #ffb703;
+      --red: #ff3860;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }}
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      padding: 2.5rem 1.5rem;
+    }}
+    .container {{ max-width: 920px; margin: 0 auto; }}
+    .header {{
+      background: linear-gradient(135deg, rgba(6, 14, 30, 0.95), rgba(3, 7, 18, 0.95));
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--cyan);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }}
+    .brand {{
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      font-family: monospace;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }}
+    .goal {{ font-size: 1.45rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; line-height: 1.3; }}
+    .kpi-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1.25rem;
+    }}
+    .kpi-card {{
+      background: rgba(4, 9, 20, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }}
+    .kpi-label {{ font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }}
+    .kpi-val {{ font-size: 1.05rem; font-weight: 700; color: #ffffff; margin-top: 0.25rem; font-family: monospace; }}
+    .outcome-box {{
+      background: rgba(0, 240, 255, 0.08);
+      border-left: 4px solid var(--cyan);
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }}
+    .outcome-title {{ font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; color: var(--cyan); text-transform: uppercase; }}
+    .outcome-text {{ font-size: 1.05rem; color: #ffffff; margin-top: 0.4rem; font-weight: 500; }}
+    .section-title {{ font-size: 1.15rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }}
+    .step-card {{
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }}
+    .step-header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      background: rgba(4, 9, 22, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }}
+    .step-num {{ font-size: 0.75rem; font-weight: 700; font-family: monospace; color: var(--cyan); }}
+    .step-action {{ font-size: 0.9rem; font-weight: 700; color: #ffffff; font-family: monospace; flex: 1; }}
+    .step-status {{ font-size: 0.7rem; font-weight: 700; font-family: monospace; border: 1px solid; border-radius: 4px; padding: 0.15rem 0.5rem; }}
+    .step-body {{ padding: 1.25rem; }}
+    .field-label {{ font-size: 0.72rem; color: var(--muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }}
+    .field-value {{ font-size: 0.92rem; color: #e2e8f0; margin-top: 0.25rem; }}
+    pre {{
+      background: #02040a;
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-top: 0.35rem;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      color: #a6e3a1;
+      font-family: "JetBrains Mono", Consolas, monospace;
+    }}
+    .footer {{
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 1.5rem;
+    }}
+    @media print {{
+      body {{ background: #ffffff; color: #0f172a; padding: 1rem; }}
+      .header, .step-card, .outcome-box, .kpi-card {{
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+      }}
+      .goal, .step-action, .outcome-text {{ color: #0f172a !important; }}
+      pre {{ background: #f8fafc !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important; }}
+    }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">⚡ JARVIS MARK 1 // MISSION AUDIT REPORT</div>
+      <div class="goal">"{goal_esc}"</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Status</div>
+          <div class="kpi-val" style="color: {status_color};">{status}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Duration</div>
+          <div class="kpi-val">{dur}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Execution Steps</div>
+          <div class="kpi-val">{len(data.get("steps", []))}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Timestamp</div>
+          <div class="kpi-val" style="font-size: 0.85rem;">{start_str}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="outcome-box">
+      <div class="outcome-title">Final Mission Outcome</div>
+      <div class="outcome-text">{result_esc}</div>
+    </div>
+
+    <div class="section-title">
+      <span>Execution Steps Timeline</span>
+    </div>
+    {steps_html}
+
+    <div class="footer">
+      Generated automatically by Jarvis Mark 1 Tactical Assistant • Run ID: {html.escape(run_id)}
+    </div>
+  </div>
+</body>
+</html>'''
 

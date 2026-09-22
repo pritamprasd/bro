@@ -13,6 +13,18 @@ from jarvis.config import JarvisConfig, load_config
 
 PID_FILE = Path.home() / ".jarvis" / "supervisor.pid"
 
+def get_lan_ip() -> str:
+    """Find primary local LAN IPv4 address for remote/mobile access."""
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"
+    finally:
+        s.close()
+
 class Supervisor:
     def __init__(self, config: Optional[JarvisConfig] = None):
         self.config = config or load_config()
@@ -61,12 +73,17 @@ class Supervisor:
         proc_worker = subprocess.Popen(cmd_worker, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
         pids["worker"] = proc_worker.pid
 
-        # Save PIDs
+        lan_ip = get_lan_ip()
+        web_url = f"http://localhost:{self.config.web_ui.port}"
+        network_url = f"http://{lan_ip}:{self.config.web_ui.port}"
         state = {
             "main_pid": proc_ui.pid,
             "pids": pids,
             "start_time": time.time(),
-            "web_url": f"http://{self.config.web_ui.host}:{self.config.web_ui.port}",
+            "web_url": web_url,
+            "network_url": network_url,
+            "host": self.config.web_ui.host,
+            "port": self.config.web_ui.port,
         }
         with open(self.pid_file, "w") as f:
             json.dump(state, f)
@@ -76,7 +93,8 @@ class Supervisor:
 
         return {
             "status": "started",
-            "web_url": state["web_url"],
+            "web_url": web_url,
+            "network_url": network_url,
             "pids": pids,
         }
 

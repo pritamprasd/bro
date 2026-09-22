@@ -42,7 +42,7 @@ Jarvis runs on a **Perception-Reasoning-Action (ReAct)** loop powered by a tiere
 
 ### Runtime Background Processes (`jarvis start`):
 When you execute `uv run jarvis start`, the central **Process Supervisor** (`jarvis/core/supervisor.py`) manages two background processes:
-1. **`ui_server` (FastAPI + Uvicorn on port 8765):** Serves the Stark Industries HUD dashboard and manages WebSocket streaming, telemetry, audit runs, and model selection.
+1. **`ui_server` (FastAPI + Uvicorn on port 8765):** Serves the Jarvis Tactical HUD dashboard and manages WebSocket streaming, telemetry, audit runs, and model selection.
 2. **`worker` daemon:** Listens for the global <kbd>Alt</kbd> + <kbd>J</kbd> desktop hotkey, runs the Two-Way Telegram polling bot, and monitors hardware sentinels.
 
 ---

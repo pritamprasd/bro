@@ -82,7 +82,7 @@ class WatchdogsConfig(BaseModel):
     cron: CronConfig = Field(default_factory=CronConfig)
 
 class WebUIConfig(BaseModel):
-    host: str = "127.0.0.1"
+    host: str = "0.0.0.0"
     port: int = 8765
 
 class SpotlightConfig(BaseModel):

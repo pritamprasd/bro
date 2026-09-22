@@ -98,7 +98,9 @@ def start():
         console.print("[yellow]Jarvis is already running.[/yellow]")
     else:
         console.print("[bold green]✔ Jarvis Mark 1 System Online![/bold green]")
-        console.print(f"[cyan]Web HUD Dashboard:[/cyan] [bold underline]{res['web_url']}[/bold underline]")
+        console.print(f"[cyan]Local HUD Dashboard:[/cyan]   [bold underline]{res.get('web_url', 'http://localhost:8765')}[/bold underline]")
+        if res.get("network_url"):
+            console.print(f"[cyan]Mobile / Network HUD:[/cyan] [bold underline]{res.get('network_url')}[/bold underline]")
         console.print("[dim]Spotlight Bar active: Press Alt+J anywhere on desktop.[/dim]")
 
 @app.command()
@@ -117,7 +119,9 @@ def status():
     stat = supervisor.status()
     if stat.get("running"):
         console.print("[bold green]● Jarvis System Status: ONLINE[/bold green]")
-        console.print(f"  Web HUD: {stat.get('web_url')}")
+        console.print(f"  Local HUD:   {stat.get('web_url')}")
+        if stat.get("network_url"):
+            console.print(f"  Mobile / Network HUD: {stat.get('network_url')}")
         pids = stat.get("pids", {})
         for k, v in pids.items():
             console.print(f"  • {k}: PID {v}")

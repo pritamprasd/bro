@@ -43,7 +43,7 @@ class SystemWindowManager:
             screen_width = root.winfo_screenwidth()
             screen_height = root.winfo_screenheight()
 
-            # Stark HUD Header Frame
+            # Jarvis Tactical HUD Header Frame
             header_frame = tk.Frame(root, bg="#060910", pady=10, padx=15)
             header_frame.pack(fill="x")
 

@@ -6,7 +6,7 @@ model:
   tier0_enabled: true
   tier0_model: llama3.2:3b
   local_text_model: gemma4:12b
-  local_vision_model: qwen2.5vl:7b
+  local_vision_model: qwen2.5-vl:7b
   cloud_model: gemini-2.5-flash
   ollama_url: http://localhost:11434
   keep_alive: -1
@@ -71,7 +71,7 @@ watchdogs:
     enabled: false
     briefing_time: 08:30
 web_ui:
-  host: 127.0.0.1
+  host: 0.0.0.0
   port: 8765
 spotlight:
   enabled: true

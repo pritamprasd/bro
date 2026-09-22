@@ -15,7 +15,7 @@ This plan implements all four requirements for **JARVIS // MARK 1**:
 > 1. **Zero External Charting Libraries**: All charts (Actuator breakdown donut, duration sparklines, success ratio bars) are rendered natively using lightweight SVG & CSS inside the HUD dashboard to guarantee instant offline rendering without CDN latency or privacy leaks.
 > 2. **Dual-Mode File Supply Modal**: When Jarvis invokes `request_file`, the HUD modal allows either (a) dragging & dropping / picking a file to upload to `~/.jarvis/attachments/`, OR (b) pasting an existing absolute filesystem path (e.g., `/home/pritam/data.csv`), plus a "File Unavailable / Cancel" button to safely continue if the file cannot be supplied.
 > 3. **Live Watchdog Sentinels Grid on Homepage**: Provides real-time visual status badges for Thermal/VRAM Sentinel, Download Organizer, CDP Everyday Chrome (:9222), Tier-0 Router, Global Spotlight (<kbd>Alt</kbd>+<kbd>J</kbd>), and Telegram Remote.
-> 4. **In-UI Interactive User Guide**: Features a searchable sidebar navigation covering all 12 operational topics, styled in Stark Obsidian/Neon Cyan, with copy-code buttons and 1-click test action buttons.
+> 4. **In-UI Interactive User Guide**: Features a searchable sidebar navigation covering all 12 operational topics, styled in Jarvis Obsidian/Neon Cyan, with copy-code buttons and 1-click test action buttons.
 
 ---
 

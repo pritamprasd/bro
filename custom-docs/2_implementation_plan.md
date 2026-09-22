@@ -8,7 +8,7 @@ This plan details the Phase 2 upgrade for Jarvis, turning it from a CLI tool int
 
 > [!IMPORTANT]
 > **Key Architecture Decisions for Phase 2:**
-> 1. **Decoupled Graphical UI:** A standalone, high-performance web dashboard running on `http://127.0.0.1:8765` built with a **Stark Industries / Iron Man HUD design aesthetic** (deep obsidian, neon cyan accents, glassmorphic panels). Communicates with Jarvis via WebSockets for real-time thought streaming, step logs, hardware telemetry, and run history inspection.
+> 1. **Decoupled Graphical UI:** A standalone, high-performance web dashboard running on `http://127.0.0.1:8765` built with a **Jarvis Tactical HUD design aesthetic** (deep obsidian, neon cyan accents, glassmorphic panels). Communicates with Jarvis via WebSockets for real-time thought streaming, step logs, hardware telemetry, and run history inspection.
 > 2. **System Lifecycle (Master ON / Kill-Switch):** A centralized process supervisor (`jarvis/core/supervisor.py`) tracking PID files in `~/.jarvis/`. Commands `jarvis start` and `jarvis stop` (or the one-click UI Kill Switch) cleanly bring up or terminate all background daemons (UI server, Hotkey listener, Telegram bot, Watchdogs).
 > 3. **Hardware & Latency Strategy:**
 >    - **Persistent Keep-Alive:** Locks `gemma4:12b` and `qwen2.5vl:7b` in GPU VRAM/RAM with `keep_alive: -1`, eliminating the 1–2 minute HDD cold-start penalty.
@@ -114,7 +114,7 @@ graph TD
     - `/api/system/kill` & `/api/system/start` (lifecycle controls)
     - `/api/vault` & `/api/memory` (inspect and edit notes and keys)
 - **`src/jarvis/ui/web/`**:
-  - Standalone single-page frontend (HTML5/CSS3/Vanilla JS) inspired by **Stark Industries / Iron Man HUD**:
+  - Standalone single-page frontend (HTML5/CSS3/Vanilla JS) inspired by **Jarvis Tactical HUD**:
     - Cyberpunk dark palette (`#080c14`, `#00e5ff`, `#102a43`, glassmorphism backdrop filters).
     - **Command Center:** Real-time chat, speech input button, live log streaming terminal, action badges.
     - **Visual Audit Inspector:** Browse past execution runs with interactive filmstrip, before/after screenshot diffs, and timing.
@@ -206,7 +206,7 @@ graph TD
 ### Manual Verification
 1. **Web UI Dashboard**:
    - Boot dashboard via `uv run jarvis start`.
-   - Open `http://127.0.0.1:8765` in browser. Verify Stark HUD styling, telemetry gauges, and WebSocket live log streaming.
+   - Open `http://127.0.0.1:8765` in browser. Verify Jarvis HUD styling, telemetry gauges, and WebSocket live log streaming.
 2. **Kill Switch & Master ON Switch**:
    - Click "Kill Switch" on the dashboard. Verify all background daemons terminate cleanly.
    - Run `jarvis start` and verify clean reboot.

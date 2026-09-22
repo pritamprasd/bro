@@ -3,6 +3,7 @@ import base64
 import io
 import json
 import os
+import re
 import shutil
 import threading
 from pathlib import Path
@@ -82,10 +83,28 @@ class MemoryUpdateRequest(BaseModel):
 class DesktopSelectRequest(BaseModel):
     screen_index: int
 
+class ModelPolicyRequest(BaseModel):
+    policy: Literal["local_only", "cloud_only", "tier_fallback"]
+    cloud_model: Optional[str] = None
+
 class ModelSelectionRequest(BaseModel):
+    policy: Optional[str] = None
     local_text_model: Optional[str] = None
     local_vision_model: Optional[str] = None
     tier0_model: Optional[str] = None
+    cloud_model: Optional[str] = None
+    gemini_api_key: Optional[str] = None
+
+class VoiceSelectionRequest(BaseModel):
+    voice: Optional[str] = None
+    rate: Optional[str] = None
+    pitch: Optional[str] = None
+
+class VoicePreviewRequest(BaseModel):
+    voice: Optional[str] = None
+    rate: Optional[str] = None
+    pitch: Optional[str] = None
+    text: Optional[str] = None
 
 async def broadcast_ws(event: str, data: Any):
     payload = json.dumps({"event": event, "data": data})
@@ -140,6 +159,10 @@ async def get_status():
         "cron_brief_active": current_cfg.watchdogs.cron.enabled,
         "voice_reply_on_chat": current_cfg.voice.voice_reply_on_chat,
         "always_voice_response": current_cfg.voice.always_voice_response,
+        "tts_voice": current_cfg.voice.tts_voice,
+        "tts_rate": current_cfg.voice.tts_rate,
+        "cloud_model": current_cfg.model.cloud_model,
+        "has_gemini_api_key": bool(current_cfg.model.gemini_api_key or os.getenv("GEMINI_API_KEY")),
         "desktop_screen_index": getattr(current_cfg.desktop, "screen_index", 1),
     }
 
@@ -286,6 +309,38 @@ async def get_run_markdown(run_id: str):
     md = audit.export_run_markdown(run_id)
     return {"markdown": md, "run_id": run_id}
 
+@app.get("/api/history/{run_id}/download")
+async def download_run_report(run_id: str, format: str = "md"):
+    """Direct browser attachment download endpoint for mission audit reports (markdown, html, json)."""
+    details = audit.get_run(run_id)
+    if not details:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    fmt = format.lower().strip()
+    safe_slug = re.sub(r"[^a-zA-Z0-9_-]", "_", details.get("goal", "mission")[:25]).strip("_")
+
+    if fmt == "html":
+        content = audit.export_run_html(run_id)
+        filename = f"jarvis_report_{run_id}_{safe_slug}.html"
+        media_type = "text/html"
+    elif fmt == "json":
+        content = audit.export_run_json(run_id)
+        filename = f"jarvis_report_{run_id}_{safe_slug}.json"
+        media_type = "application/json"
+    else:
+        content = audit.export_run_markdown(run_id)
+        filename = f"jarvis_report_{run_id}_{safe_slug}.md"
+        media_type = "text/markdown"
+
+    return Response(
+        content=content,
+        media_type=f"{media_type}; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+    )
+
 @app.get("/api/history/{run_id}/screenshot/{filename}")
 async def get_run_screenshot(run_id: str, filename: str):
     path = audit.base_dir / run_id / "screenshots" / filename
@@ -428,28 +483,68 @@ async def list_available_models():
     except Exception as e:
         error_tracker.log_error("OllamaConnectionError", str(e))
 
+    has_key = bool(config.model.gemini_api_key or os.getenv("GEMINI_API_KEY"))
+    cloud_models = [
+        {"id": "gemini-2.5-flash", "name": "Gemini 3.8 / 2.5 Flash (Free Tier)", "recommended": True},
+        {"id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash (Fast Reasoning)", "recommended": False},
+        {"id": "gemini-1.5-flash", "name": "Gemini 1.5 Flash (Standard)", "recommended": False},
+        {"id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro (Deep Reasoning)", "recommended": False},
+    ]
+
     return {
         "models": models,
+        "cloud_models": cloud_models,
         "current": {
+            "policy": config.model.policy,
             "local_text_model": config.model.local_text_model,
             "local_vision_model": config.model.local_vision_model,
             "tier0_model": config.model.tier0_model,
             "tier0_enabled": config.model.tier0_enabled,
+            "cloud_model": config.model.cloud_model,
+            "has_gemini_api_key": has_key,
         },
     }
 
 @app.post("/api/models/select")
 async def select_models(req: ModelSelectionRequest):
-    """Update selected local models in configuration."""
+    """Update selected models and routing policy in configuration."""
     global config
+    if req.policy:
+        config.model.policy = req.policy
     if req.local_text_model:
         config.model.local_text_model = req.local_text_model
     if req.local_vision_model:
         config.model.local_vision_model = req.local_vision_model
     if req.tier0_model:
         config.model.tier0_model = req.tier0_model
+    if req.cloud_model:
+        config.model.cloud_model = req.cloud_model
+    if req.gemini_api_key is not None:
+        val = req.gemini_api_key.strip()
+        config.model.gemini_api_key = val if val else None
     save_config(config)
+    await broadcast_ws("model_policy_changed", {
+        "policy": config.model.policy,
+        "cloud_model": config.model.cloud_model,
+        "local_text_model": config.model.local_text_model,
+        "local_vision_model": config.model.local_vision_model,
+        "tier0_model": config.model.tier0_model,
+    })
     return {"status": "updated", "current": config.model.model_dump()}
+
+@app.post("/api/models/policy")
+async def set_model_policy(req: ModelPolicyRequest):
+    """Quick-switch between Local LLM, Cloud Gemini 3.8 Flash, or Hybrid."""
+    global config
+    config.model.policy = req.policy
+    if req.cloud_model:
+        config.model.cloud_model = req.cloud_model
+    save_config(config)
+    await broadcast_ws("model_policy_changed", {
+        "policy": config.model.policy,
+        "cloud_model": config.model.cloud_model,
+    })
+    return {"status": "updated", "policy": config.model.policy, "cloud_model": config.model.cloud_model}
 
 @app.get("/api/errors")
 async def get_system_errors():
@@ -484,6 +579,115 @@ async def toggle_voice_setting(mode: str = "reply_on_chat"):
         "voice_enabled": config.voice.enabled,
         "always_voice_response": config.voice.always_voice_response,
         "voice_reply_on_chat": config.voice.voice_reply_on_chat,
+    }
+
+cached_voices: Optional[List[Dict[str, Any]]] = None
+
+CURATED_VOICES: List[Dict[str, Any]] = [
+    {"short_name": "en-GB-RyanNeural", "name": "British English - Ryan (Jarvis Butler Default)", "gender": "Male", "locale": "en-GB", "recommended": True},
+    {"short_name": "en-GB-SoniaNeural", "name": "British English - Sonia", "gender": "Female", "locale": "en-GB", "recommended": True},
+    {"short_name": "en-GB-ThomasNeural", "name": "British English - Thomas (Classic British)", "gender": "Male", "locale": "en-GB", "recommended": False},
+    {"short_name": "en-GB-LibbyNeural", "name": "British English - Libby", "gender": "Female", "locale": "en-GB", "recommended": False},
+    {"short_name": "en-US-GuyNeural", "name": "US English - Guy (Natural Assistant)", "gender": "Male", "locale": "en-US", "recommended": True},
+    {"short_name": "en-US-JennyNeural", "name": "US English - Jenny (Natural Assistant)", "gender": "Female", "locale": "en-US", "recommended": True},
+    {"short_name": "en-US-ChristopherNeural", "name": "US English - Christopher (Tactical / Deep)", "gender": "Male", "locale": "en-US", "recommended": True},
+    {"short_name": "en-US-AriaNeural", "name": "US English - Aria (Expressive)", "gender": "Female", "locale": "en-US", "recommended": False},
+    {"short_name": "en-US-EricNeural", "name": "US English - Eric", "gender": "Male", "locale": "en-US", "recommended": False},
+    {"short_name": "en-US-RogerNeural", "name": "US English - Roger (Deep)", "gender": "Male", "locale": "en-US", "recommended": False},
+    {"short_name": "en-AU-WilliamMultilingualNeural", "name": "Australian English - William", "gender": "Male", "locale": "en-AU", "recommended": False},
+    {"short_name": "en-AU-NatashaNeural", "name": "Australian English - Natasha", "gender": "Female", "locale": "en-AU", "recommended": False},
+    {"short_name": "en-CA-LiamNeural", "name": "Canadian English - Liam", "gender": "Male", "locale": "en-CA", "recommended": False},
+    {"short_name": "en-CA-ClaraNeural", "name": "Canadian English - Clara", "gender": "Female", "locale": "en-CA", "recommended": False},
+    {"short_name": "en-IN-PrabhatNeural", "name": "Indian English - Prabhat", "gender": "Male", "locale": "en-IN", "recommended": False},
+    {"short_name": "en-IN-NeerjaNeural", "name": "Indian English - Neerja", "gender": "Female", "locale": "en-IN", "recommended": False},
+    {"short_name": "en-IE-ConnorNeural", "name": "Irish English - Connor", "gender": "Male", "locale": "en-IE", "recommended": False},
+]
+
+@app.get("/api/voice/voices")
+async def get_available_voices():
+    """List available Edge-TTS neural voices with current selection."""
+    global cached_voices
+    voices_list = cached_voices
+    if not voices_list:
+        try:
+            import edge_tts
+            raw_voices = await edge_tts.list_voices()
+            en_voices = []
+            other_voices = []
+            rec_ids = {"en-GB-RyanNeural", "en-GB-SoniaNeural", "en-US-GuyNeural", "en-US-JennyNeural", "en-US-ChristopherNeural"}
+            for v in raw_voices:
+                s_name = v.get("ShortName", "")
+                locale = v.get("Locale", "")
+                gender = v.get("Gender", "Unknown")
+                f_name = v.get("FriendlyName", s_name)
+                clean_name = f_name.replace("Microsoft ", "").replace(" Online (Natural)", "").replace(" (Preview)", "")
+                item = {
+                    "short_name": s_name,
+                    "name": clean_name,
+                    "gender": gender,
+                    "locale": locale,
+                    "recommended": s_name in rec_ids or "Ryan" in s_name or "Guy" in s_name or "Jenny" in s_name,
+                }
+                if locale.startswith("en-"):
+                    en_voices.append(item)
+                else:
+                    other_voices.append(item)
+            en_voices.sort(key=lambda x: (not x["recommended"], x["short_name"]))
+            voices_list = en_voices + other_voices
+            cached_voices = voices_list
+        except Exception as e:
+            print(f"[Voice Warning] Failed to fetch online voices: {e}")
+            voices_list = CURATED_VOICES
+
+    return {
+        "voices": voices_list,
+        "current_voice": config.voice.tts_voice,
+        "current_rate": config.voice.tts_rate,
+        "current_pitch": config.voice.tts_pitch,
+        "voice_enabled": config.voice.enabled,
+    }
+
+@app.post("/api/voice/select")
+async def select_voice(req: VoiceSelectionRequest):
+    """Set the active speech synthesis voice and/or speed rate."""
+    global config, tts
+    if req.voice:
+        config.voice.tts_voice = req.voice
+    if req.rate is not None:
+        config.voice.tts_rate = req.rate
+    if req.pitch is not None:
+        config.voice.tts_pitch = req.pitch
+    save_config(config)
+    tts = TextToSpeech(config.voice)
+    await broadcast_ws("voice_changed", {
+        "tts_voice": config.voice.tts_voice,
+        "tts_rate": config.voice.tts_rate,
+        "tts_pitch": config.voice.tts_pitch,
+    })
+    return {
+        "status": "updated",
+        "current_voice": config.voice.tts_voice,
+        "current_rate": config.voice.tts_rate,
+        "current_pitch": config.voice.tts_pitch,
+    }
+
+@app.post("/api/voice/preview")
+async def preview_voice(req: VoicePreviewRequest):
+    """Synthesize and play sample speech for voice testing."""
+    voice_to_test = req.voice or config.voice.tts_voice
+    rate_to_test = req.rate or config.voice.tts_rate
+    sample_text = req.text or "Greetings. Jarvis neural speech synthesis is online and operational."
+    temp_cfg = config.voice.model_copy()
+    temp_cfg.tts_voice = voice_to_test
+    temp_cfg.tts_rate = rate_to_test
+    temp_cfg.enabled = True
+    test_tts = TextToSpeech(temp_cfg)
+    test_tts.speak(sample_text, blocking=False)
+    return {
+        "status": "playing",
+        "voice": voice_to_test,
+        "rate": rate_to_test,
+        "text": sample_text,
     }
 
 @app.post("/api/settings/conversation-mode")
