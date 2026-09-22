@@ -101,4 +101,25 @@ def test_agent_desktop_switch_monitor():
     assert "Switched to display 2" in res
     assert agent.desktop.screen_index == 2
 
+def test_agent_tier0_conversational_fast_path():
+    from jarvis.models.tier0 import IntentClassification
+    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": True})
+    agent = JarvisAgent(config)
+
+    # Tier-0 classifies and provides a direct response
+    agent.tier0.classify = MagicMock(return_value=IntentClassification(
+        intent="CONVERSATION",
+        summary="Greeting",
+        can_execute_directly=True,
+        direct_response="Hello! I am Jarvis, standing by.",
+        elapsed_ms=45.0,
+    ))
+
+    # Heavy router should NEVER be called
+    agent.router.generate_text = MagicMock()
+
+    result = agent.run_task("Hello Jarvis")
+    assert result == "Hello! I am Jarvis, standing by."
+    agent.router.generate_text.assert_not_called()
+
 

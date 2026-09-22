@@ -16,6 +16,7 @@ class TextToSpeech:
         self.pitch = config.tts_pitch
         self.volume = getattr(config, "tts_volume", 100)
         self.enabled = config.enabled
+        self._playback_lock = threading.Lock()
 
     def speak(self, text: str, blocking: bool = False) -> None:
         """Synthesize and play audio response."""
@@ -33,22 +34,23 @@ class TextToSpeech:
             threading.Thread(target=self._speak_sync, args=(clean_text,), daemon=True).start()
 
     def _speak_sync(self, text: str) -> None:
-        try:
+        with self._playback_lock:
             try:
-                loop = asyncio.get_running_loop()
-            except RuntimeError:
-                loop = None
+                try:
+                    loop = asyncio.get_running_loop()
+                except RuntimeError:
+                    loop = None
 
-            if loop and loop.is_running():
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                    future = executor.submit(asyncio.run, self._generate_and_play(text))
-                    future.result()
-            else:
-                asyncio.run(self._generate_and_play(text))
-        except Exception as e:
-            # Non-fatal audio playback error
-            pass
+                if loop and loop.is_running():
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                        future = executor.submit(asyncio.run, self._generate_and_play(text))
+                        future.result()
+                else:
+                    asyncio.run(self._generate_and_play(text))
+            except Exception as e:
+                # Non-fatal audio playback error
+                pass
 
     async def _generate_and_play(self, text: str) -> None:
         import edge_tts

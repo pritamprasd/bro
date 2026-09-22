@@ -4201,15 +4201,54 @@ desktop:
               syncSpeedUI(mult, true);
             }
           }
+          if (msg.event === 'pre_response') {
+            const preText = (typeof msg.data === 'object' && msg.data.text) ? msg.data.text : msg.data;
+            if (preText) {
+              if (currentConversationMode === 'audio_only') {
+                const jarvisSub = document.getElementById('sub-jarvis-text');
+                if (jarvisSub) jarvisSub.innerText = `"${preText}"`;
+                updateVoiceVisualizerState('speaking', 'ACKNOWLEDGING...');
+              }
+              appendLog('thought', `💬 [JARVIS] ${preText}`);
+            }
+          }
+          if (msg.event === 'task_response' || msg.event === 'response') {
+            const respText = (typeof msg.data === 'object' && msg.data.text) ? msg.data.text : msg.data;
+            if (respText) {
+              lastBroadcastResponse = respText;
+              if (currentConversationMode === 'audio_only') {
+                const jarvisSub = document.getElementById('sub-jarvis-text');
+                if (jarvisSub) jarvisSub.innerText = `"${respText}"`;
+                updateVoiceVisualizerState('speaking', 'JARVIS SPEAKING...');
+              }
+              appendLog('result', '✔ ' + respText);
+            }
+          }
+          if (msg.event === 'response_chunk') {
+            const chunk = (typeof msg.data === 'object' && msg.data.chunk) ? msg.data.chunk : msg.data;
+            const accum = (typeof msg.data === 'object' && msg.data.accumulated) ? msg.data.accumulated : chunk;
+            if (currentConversationMode === 'audio_only') {
+              const jarvisSub = document.getElementById('sub-jarvis-text');
+              if (jarvisSub && accum) jarvisSub.innerText = `"${accum}"`;
+              updateVoiceVisualizerState('speaking', 'JARVIS STREAMING...');
+            }
+          }
           if (msg.event === 'task_finish') {
             isTaskExecuting = false;
-            appendLog('result', '✔ ' + msg.data.result);
+            const resultText = msg.data.result;
+            if (resultText && resultText !== lastBroadcastResponse) {
+              appendLog('result', '✔ ' + resultText);
+            }
+            lastBroadcastResponse = '';
             document.getElementById('active-task-label').innerText = 'COMPLETED';
             hideMissionProgress();
             loadHistory();
 
             if (currentConversationMode === 'audio_only') {
-              document.getElementById('sub-jarvis-text').innerText = `"${msg.data.result}"`;
+              if (resultText) {
+                const jarvisSub = document.getElementById('sub-jarvis-text');
+                if (jarvisSub) jarvisSub.innerText = `"${resultText}"`;
+              }
               updateVoiceVisualizerState('speaking', 'JARVIS REPLY COMPLETED');
             }
 
@@ -4803,6 +4842,7 @@ desktop:
     let recognition = null;
     let isRecording = false;
     let isTaskExecuting = false;
+    let lastBroadcastResponse = '';
     let shouldKeepListening = false;
     let recognitionRestartTimeout = null;
     let currentConversationMode = 'audio+chat';

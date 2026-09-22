@@ -15,6 +15,7 @@ class ModelConfig(BaseModel):
     policy: Literal["local_only", "tier_fallback", "cloud_only"] = "local_only"
     tier0_enabled: bool = True
     tier0_model: str = "llama3.2:3b"
+    tier0_timeout: float = 5.0
     local_text_model: str = "gemma4:12b"
     local_vision_model: str = "qwen2.5vl:7b"
     cloud_model: str = "gemini-2.5-flash"

@@ -117,6 +117,8 @@ class VoicePreviewRequest(BaseModel):
     volume: Optional[int] = None
     text: Optional[str] = None
 
+main_event_loop: Optional[asyncio.AbstractEventLoop] = None
+
 async def broadcast_ws(event: str, data: Any):
     payload = json.dumps({"event": event, "data": data})
     for ws in list(active_websockets):
@@ -128,15 +130,23 @@ async def broadcast_ws(event: str, data: Any):
 
 def sync_broadcast(event: str, data: Any):
     """Bridge for synchronous agent calls to push updates to WebSockets."""
+    global main_event_loop
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
+        loop = main_event_loop
+        if not loop or loop.is_closed():
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = None
+        if loop and loop.is_running():
             asyncio.run_coroutine_threadsafe(broadcast_ws(event, data), loop)
     except Exception:
         pass
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    global main_event_loop
+    main_event_loop = asyncio.get_running_loop()
     await websocket.accept()
     active_websockets.append(websocket)
     try:
@@ -230,6 +240,7 @@ async def run_task(req: TaskRequest):
     orig_thought = agent.console.thought
     orig_action = agent.console.action
     orig_step = agent.console.step
+    orig_response = agent.console.response
 
     def ws_thought(text: str):
         orig_thought(text)
@@ -238,17 +249,29 @@ async def run_task(req: TaskRequest):
     def ws_action(act: str, detail: str):
         orig_action(act, detail)
         sync_broadcast("action", {"actuator": act, "detail": detail})
+        if act == "pre_response":
+            sync_broadcast("pre_response", {"text": detail, "conversation_mode": run_config.conversation_mode})
 
     def ws_step(num: int, total: int, desc: str):
         orig_step(num, total, desc)
         sync_broadcast("step", {"step": num, "total": total, "desc": desc})
 
+    def ws_response(text: str):
+        orig_response(text)
+        sync_broadcast("task_response", {
+            "text": text,
+            "conversation_mode": run_config.conversation_mode
+        })
+
     agent.console.thought = ws_thought
     agent.console.action = ws_action
     agent.console.step = ws_step
+    agent.console.response = ws_response
 
     # Run in thread pool so server remains responsive
-    loop = asyncio.get_event_loop()
+    global main_event_loop
+    loop = asyncio.get_running_loop()
+    main_event_loop = loop
     await broadcast_ws("task_start", {"goal": req.goal, "file_paths": req.file_paths, "conversation_mode": run_config.conversation_mode})
     result = await loop.run_in_executor(None, agent.run_task, req.goal, req.file_paths)
     await broadcast_ws("task_finish", {

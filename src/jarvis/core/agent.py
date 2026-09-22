@@ -119,15 +119,33 @@ class JarvisAgent:
         # 0. Start Audit Run
         self.audit.start_run(user_goal)
 
-        # 1. Tier-0 Fast Classification (sub-100ms)
-        tier0_result = self.tier0.classify(user_goal)
-        self.console.thought(f"[Tier-0 Intent: {tier0_result.intent}] {tier0_result.summary} ({tier0_result.elapsed_ms}ms)")
-
-        # 2. On-demand lean memory loading
+        # 1. On-demand lean memory loading
         relevant_memory = self.memory.get_relevant_memory(user_goal)
         system_instructions = SYSTEM_PROMPT
         if relevant_memory:
             system_instructions += f"\n\nContext & Relevant Memory:\n{relevant_memory}"
+
+        # 2. Tier-0 Fast Classification & Instant Response (sub-100ms)
+        tier0_result = self.tier0.classify(user_goal, relevant_memory=relevant_memory)
+        self.console.thought(f"[Tier-0 Intent: {tier0_result.intent}] {tier0_result.summary} ({tier0_result.elapsed_ms}ms)")
+
+        # Fast path: Tier-0 direct response for conversational queries (greetings, QA, explanations)
+        if tier0_result.intent == "CONVERSATION":
+            direct_ans = tier0_result.direct_response
+            if not direct_ans:
+                direct_ans = self.tier0.respond_direct(user_goal, relevant_memory=relevant_memory)
+            if direct_ans:
+                self.console.thought(f"[Tier-0 Instant Response via {self.tier0.model_name}] Sub-second response active")
+                self._deliver_output(direct_ans, is_conversation=True)
+                self.audit.complete_run(direct_ans, status="success")
+                return direct_ans
+
+        # 3. Acoustic Pre-Response Acknowledgment (fills silence while LLM processes)
+        if self.config.conversation_mode in ["audio_only", "audio+chat"] and self.config.voice.enabled:
+            from jarvis.voice.pre_responses import get_random_pre_response
+            pre_ack = get_random_pre_response()
+            self.console.action("pre_response", pre_ack)
+            self.tts.speak(pre_ack, blocking=False)
 
         messages = [
             ChatMessage(role="user", content=f"Goal: {user_goal}"),
