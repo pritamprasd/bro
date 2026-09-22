@@ -465,7 +465,8 @@ class JarvisAgent:
         if self.config.conversation_mode == "audio_only":
             self.console.response(text)
             if self.config.voice.enabled:
-                self.tts.speak(text)
+                self.console.action("voice", "Speaking response...")
+                self.tts.speak(text, blocking=True)
             return
 
         # Default / audio+chat mode
@@ -478,4 +479,5 @@ class JarvisAgent:
             or (self.config.voice.voice_reply_on_chat and is_conversation)
         )
         if should_speak and self.config.voice.enabled:
-            self.tts.speak(text)
+            self.console.action("voice", "Speaking response...")
+            self.tts.speak(text, blocking=True)

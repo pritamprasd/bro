@@ -12,16 +12,21 @@ class GeminiProvider(BaseLLMProvider):
         api_key: Optional[str] = None,
         model_name: str = "gemini-2.5-flash",
     ):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         self.model_name = model_name
         self.client = None
 
-        if self.api_key:
-            try:
-                from google import genai
+        try:
+            from google import genai
+            if self.api_key:
                 self.client = genai.Client(api_key=self.api_key)
-            except Exception as e:
-                print(f"[Warning] Could not initialize Google GenAI Client: {e}")
+            else:
+                # Attempt to initialize using Google Cloud Application Default Credentials (ADC / gcloud login)
+                adc_path = os.path.expanduser("~/.config/gcloud/application_default_credentials.json")
+                if os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or os.path.exists(adc_path):
+                    self.client = genai.Client()
+        except Exception as e:
+            print(f"[Warning] Could not initialize Google GenAI Client: {e}")
 
     def is_available(self) -> bool:
         return self.client is not None

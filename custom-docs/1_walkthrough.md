@@ -7,7 +7,7 @@ Jarvis is a personal AI assistant built for Linux X11 workstations with an NVIDI
 ## What Was Built
 
 ### 1. Unified Configuration & Project Architecture
-- **Package Manager:** Configured with `uv` for ultra-fast package management and dependency isolation in `/home/pritam/code/ai/jarvis`.
+- **Package Manager:** Configured with `uv` for ultra-fast package management and dependency isolation in `~/code/ai/jarvis`.
 - **`config.yaml` & `jarvis/config.py`:** Pydantic schema supporting:
   - `model.policy`: `"local_only"` ($0, no cloud/billing needed), `"tier_fallback"`, or `"cloud_only"`.
   - `output_mode`: `"both"` (CLI + Voice), `"cli"` (Text only), or `"voice"` (Spoken only).

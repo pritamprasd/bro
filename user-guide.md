@@ -197,7 +197,7 @@ If you ask Jarvis to perform a task requiring a file that you forgot to attach (
 1. **Interactive Prompt Modal Appears:** Execution pauses safely.
 2. **Supply Options:**
    - **Option 1:** Pick or drop the required file to upload.
-   - **Option 2:** Enter an existing local file path on your system (e.g. `/home/pritam/finances/proj.xlsx`).
+   - **Option 2:** Enter an existing local file path on your system (e.g. `~/finances/proj.xlsx`).
    - **Option 3:** Click **File Unavailable / Skip** to gracefully let Jarvis know the file cannot be provided so it can try an alternative plan.
 3. Once supplied, Jarvis immediately resumes execution with the file loaded into context.
 
@@ -319,7 +319,7 @@ Jarvis captures your physical X11 display (1920×1080) in <20ms using `mss` and 
 Jarvis can execute background Python scripts, data processing algorithms, and Telegram messages via `requests`. Passwords and API tokens in the secret vault are automatically injected as environment variables.
 
 ### "Watch & Learn" Macro Recorder
-Whenever Jarvis executes a multi-step workflow, it compiles the action sequence into a clean, deterministic Python script in `~/.jarvis/memory/workflows/<name>.py`. Subsequent runs execute in <0.5 seconds without LLM visual grounding.
+Whenever Jarvis executes a multi-step workflow, it compiles the action sequence into a clean, deterministic Python script in `~/ai-memory/jarvis/workflows/<name>.py`. Subsequent runs execute in <0.5 seconds without LLM visual grounding.
 
 ---
 
@@ -371,7 +371,7 @@ Jarvis Mark 1 tracks all system exceptions, model connection failures, timeouts,
 
 ## 13. Lean Memory & Vault Secrets
 
-* **Structured Memory:** Files are stored in `~/.jarvis/memory/`:
+* **Structured Memory:** Files are stored in `~/ai-memory/jarvis/` (omitted from git commit, configurable via the Web UI in the **Memory & Secrets** tab):
   - `preferences.md`: Personal guidelines and persona rules.
   - `system.md`: Linux workstation hardware details.
   - `contacts.md`: People and messaging handles.

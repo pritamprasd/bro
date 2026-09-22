@@ -13,7 +13,7 @@ This plan implements all four requirements for **JARVIS // MARK 1**:
 > [!IMPORTANT]
 > **Key Experience Design Elements:**
 > 1. **Zero External Charting Libraries**: All charts (Actuator breakdown donut, duration sparklines, success ratio bars) are rendered natively using lightweight SVG & CSS inside the HUD dashboard to guarantee instant offline rendering without CDN latency or privacy leaks.
-> 2. **Dual-Mode File Supply Modal**: When Jarvis invokes `request_file`, the HUD modal allows either (a) dragging & dropping / picking a file to upload to `~/.jarvis/attachments/`, OR (b) pasting an existing absolute filesystem path (e.g., `/home/pritam/data.csv`), plus a "File Unavailable / Cancel" button to safely continue if the file cannot be supplied.
+> 2. **Dual-Mode File Supply Modal**: When Jarvis invokes `request_file`, the HUD modal allows either (a) dragging & dropping / picking a file to upload to `~/.jarvis/attachments/`, OR (b) pasting an existing absolute filesystem path (e.g., `~/data.csv`), plus a "File Unavailable / Cancel" button to safely continue if the file cannot be supplied.
 > 3. **Live Watchdog Sentinels Grid on Homepage**: Provides real-time visual status badges for Thermal/VRAM Sentinel, Download Organizer, CDP Everyday Chrome (:9222), Tier-0 Router, Global Spotlight (<kbd>Alt</kbd>+<kbd>J</kbd>), and Telegram Remote.
 > 4. **In-UI Interactive User Guide**: Features a searchable sidebar navigation covering all 12 operational topics, styled in Jarvis Obsidian/Neon Cyan, with copy-code buttons and 1-click test action buttons.
 
@@ -23,13 +23,13 @@ This plan implements all four requirements for **JARVIS // MARK 1**:
 
 ### Component 1: Core Audit Analytics & Hardware Sentinel
 
-#### [MODIFY] [audit.py](file:///home/pritam/code/ai/jarvis/src/jarvis/core/audit.py)
+#### [MODIFY] [audit.py](src/jarvis/core/audit.py)
 - Extend `AuditManager.get_analytics()`:
   - Add total steps executed, average steps per run, fastest and longest execution times.
   - Return recent run summaries (`recent_timeline`) with formatted timestamps, step counts, duration, and status for instant charting.
   - Include actuator percentage distribution.
 
-#### [MODIFY] [sentinel.py](file:///home/pritam/code/ai/jarvis/src/jarvis/watchdogs/sentinel.py)
+#### [MODIFY] [sentinel.py](src/jarvis/watchdogs/sentinel.py)
 - Enhance `HardwareSentinel.get_hardware_metrics()`:
   - Add multi-disk metrics: Root partition (`/`) and Secondary Storage (`/mnt/HDD-500GB/` if present) with used GB, free GB, total GB, and percent used.
 
@@ -37,7 +37,7 @@ This plan implements all four requirements for **JARVIS // MARK 1**:
 
 ### Component 2: Backend API & WebSocket Server
 
-#### [MODIFY] [server.py](file:///home/pritam/code/ai/jarvis/src/jarvis/ui/server.py)
+#### [MODIFY] [server.py](src/jarvis/ui/server.py)
 - Allow `/api/supply-file` to accept `Optional[str]` for `file_path`, handling cancellation gracefully (`file_request_event.set()`, sets `last_supplied_file = None` and notifies WebSocket).
 - Add endpoint `/api/guide` to serve the full markdown content and section index of `user-guide.md`.
 - Add endpoint `/api/history/{run_id}/markdown` to export any mission audit trail as a formatted markdown summary.
@@ -47,7 +47,7 @@ This plan implements all four requirements for **JARVIS // MARK 1**:
 
 ### Component 3: Tactical Web HUD & Visual Analytics
 
-#### [MODIFY] [index.html](file:///home/pritam/code/ai/jarvis/src/jarvis/ui/web/index.html)
+#### [MODIFY] [index.html](src/jarvis/ui/web/index.html)
 - **Homepage (Command Center) Enhancements:**
   - **Watchdogs Matrix Card**: Real-time status cards for Thermal Sentinel, Download Auto-Organizer, CDP Chrome, Tier-0 Router, Spotlight Daemon, and Telegram Bot.
   - **Multi-Disk Storage Health**: Real-time meters for NVMe (`/`) and HDD (`/mnt/HDD-500GB/`).
@@ -73,10 +73,10 @@ This plan implements all four requirements for **JARVIS // MARK 1**:
 
 ### Component 4: Documentation & Test Suite
 
-#### [MODIFY] [tests/test_audit.py](file:///home/pritam/code/ai/jarvis/tests/test_audit.py)
+#### [MODIFY] [tests/test_audit.py](tests/test_audit.py)
 - Add unit tests for extended `get_analytics()` metrics (total steps, actuator distribution, timeline items).
 
-#### [MODIFY] [README.md](file:///home/pritam/code/ai/jarvis/README.md) & [user-guide.md](file:///home/pritam/code/ai/jarvis/user-guide.md)
+#### [MODIFY] [README.md](README.md) & [user-guide.md](user-guide.md)
 - Document file attachment usage (`-f` in CLI, Web UI drop bar).
 - Document on-demand file requesting mechanism.
 - Document Audit Trail charts and Command Center widgets.

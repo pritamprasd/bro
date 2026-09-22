@@ -31,3 +31,28 @@ def test_save_and_retrieve_custom_workflow():
         mem = store.get_relevant_memory("Run the data processing routine")
         assert "workflows/data_processing.md" in mem
         assert "Custom data processing with pandas" in mem
+
+def test_default_memory_dir_in_config():
+    from jarvis.config import DEFAULT_MEMORY_DIR
+    config = MemoryConfig()
+    assert str(DEFAULT_MEMORY_DIR) in config.memory_dir or "ai-memory/jarvis" in config.memory_dir
+
+def test_memory_store_migration_from_legacy():
+    import pathlib
+    with tempfile.TemporaryDirectory() as tmp_legacy:
+        legacy_path = pathlib.Path(tmp_legacy)
+        (legacy_path / "workflows").mkdir(parents=True)
+        (legacy_path / "preferences.md").write_text("# User Preferences\n- Name: Alice\n", encoding="utf-8")
+        (legacy_path / "workflows" / "custom.md").write_text("# Custom Routine\nDo things", encoding="utf-8")
+
+        with tempfile.TemporaryDirectory() as tmp_new:
+            new_path = pathlib.Path(tmp_new) / "jarvis_mem"
+            config = MemoryConfig(memory_dir=str(new_path))
+            store = MemoryStore(config)
+
+            # Manually invoke legacy migration to simulate legacy ~/.jarvis/memory
+            store._migrate_legacy_memory(legacy_path)
+
+            assert (new_path / "preferences.md").exists()
+            assert (new_path / "workflows" / "custom.md").exists()
+            assert "Custom Routine" in (new_path / "workflows" / "custom.md").read_text(encoding="utf-8")

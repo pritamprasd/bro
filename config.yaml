@@ -1,5 +1,5 @@
-conversation_mode: audio+chat
-output_mode: both
+conversation_mode: audio_only
+output_mode: voice
 autonomous_mode: false
 model:
   policy: local_only
@@ -19,7 +19,8 @@ voice:
   tts_voice: en-GB-RyanNeural
   tts_rate: +2%
   tts_pitch: -4Hz
-  always_voice_response: false
+  tts_volume: 75
+  always_voice_response: true
   voice_reply_on_chat: true
 safety:
   prompt_on_high_stakes: true
@@ -51,15 +52,15 @@ browser:
   user_data_dir: ~/.jarvis/browser_data
   cdp_port: 9222
 memory:
-  memory_dir: ~/.jarvis/memory
+  memory_dir: ~/ai-memory/jarvis
 watchdogs:
   sentinel:
-    enabled: true
+    enabled: false
     check_interval_seconds: 30
     gpu_temp_threshold: 80
     disk_threshold_percent: 90
   organizer:
-    enabled: false
+    enabled: true
     watch_dir: ~/Downloads
     rules:
       pdf: ~/Documents/PDFs

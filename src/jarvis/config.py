@@ -7,6 +7,7 @@ import yaml
 from pydantic import BaseModel, Field
 
 DEFAULT_CONFIG_DIR = Path.home() / ".jarvis"
+DEFAULT_MEMORY_DIR = Path.home() / "ai-memory" / "jarvis"
 DEFAULT_CONFIG_PATH = DEFAULT_CONFIG_DIR / "config.yaml"
 LOCAL_CONFIG_PATH = Path("config.yaml")
 
@@ -29,6 +30,7 @@ class VoiceConfig(BaseModel):
     tts_voice: str = "en-GB-RyanNeural"  # Iron Man JARVIS British voice
     tts_rate: str = "+2%"
     tts_pitch: str = "-4Hz"
+    tts_volume: int = 100  # 0 to 100%
     always_voice_response: bool = False
     voice_reply_on_chat: bool = True
 
@@ -51,7 +53,7 @@ class BrowserConfig(BaseModel):
     cdp_port: int = 9222
 
 class MemoryConfig(BaseModel):
-    memory_dir: str = str(DEFAULT_CONFIG_DIR / "memory")
+    memory_dir: str = str(DEFAULT_MEMORY_DIR)
 
 class SentinelConfig(BaseModel):
     enabled: bool = True

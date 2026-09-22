@@ -69,10 +69,10 @@ graph TD
 
 ## Proposed Changes
 
-We will create the project using `uv` with a modular Python package structure in `/home/pritam/code/ai/jarvis`.
+We will create the project using `uv` with a modular Python package structure in `~/code/ai/jarvis`.
 
 ```
-/home/pritam/code/ai/jarvis/
+~/code/ai/jarvis/
 ├── pyproject.toml
 ├── config.yaml
 ├── .env.example

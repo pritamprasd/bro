@@ -135,6 +135,41 @@ class AuditManager:
                 return None
         return None
 
+    def backup_and_clear(self, backup_dir: Optional[Path] = None) -> Dict[str, Any]:
+        """Backup all runs to ~/ai-memory/jarvis/backups/audit_backup_<timestamp>/ and clear audit history."""
+        import shutil
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        if backup_dir is None:
+            backup_root = Path.home() / "ai-memory" / "jarvis" / "backups"
+            backup_dir = backup_root / f"audit_backup_{timestamp}"
+        else:
+            backup_dir = Path(backup_dir).expanduser()
+
+        backup_dir.mkdir(parents=True, exist_ok=True)
+        backed_up_count = 0
+
+        if self.base_dir.exists():
+            for item in list(self.base_dir.iterdir()):
+                try:
+                    if item.is_dir():
+                        shutil.copytree(item, backup_dir / item.name, dirs_exist_ok=True)
+                        shutil.rmtree(item)
+                        backed_up_count += 1
+                    elif item.is_file():
+                        shutil.copy2(item, backup_dir / item.name)
+                        item.unlink()
+                except Exception:
+                    pass
+
+        self.current_run = None
+        self.current_run_dir = None
+        return {
+            "status": "cleared",
+            "backup_dir": str(backup_dir),
+            "backed_up_runs": backed_up_count,
+            "cleared_runs": backed_up_count,
+        }
+
     def get_analytics(self) -> Dict[str, Any]:
         """Compute human-friendly analytics and actuator breakdown across past runs."""
         runs = self.list_recent_runs(limit=100)

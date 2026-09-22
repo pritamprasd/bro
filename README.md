@@ -58,7 +58,7 @@ When you execute `uv run jarvis start`, the central **Process Supervisor** (`jar
 | **Interactive Voice** | 4 communication channels: Web HUD mic button, Spotlight Bar, CLI `jarvis voice`, and Telegram voice notes. |
 | **Everyday Chrome CDP** | Connects to your logged-in everyday browser tabs on port 9222 to bypass 2FA and CAPTCHAs. |
 | **Daily brief** | On-demand system briefing (`jarvis brief` or HUD button) spoken via the Iron Man British voice (`en-GB-RyanNeural`). |
-| **Macro Recorder** | Compiles multi-step visual workflows into deterministic Python scripts in `~/.jarvis/memory/workflows/`. |
+| **Macro Recorder** | Compiles multi-step visual workflows into deterministic Python scripts in `~/ai-memory/jarvis/workflows/`. |
 | **Resource Attachments** | Attach files/datasets upfront via Web HUD or `-f` in CLI. If forgotten, Jarvis prompts on-demand via an interactive modal to supply the file and seamlessly resumes. |
 | **Visual Audit Trail** | Human-readable KPI cards, native SVG Actuator Donut, Latency Bar chart, Success ratio gauge, full-res screenshot lightbox, and 1-click Markdown export. |
 | **Command Center Widgets**| Live Watchdogs Sentinels Matrix, Multi-Disk Storage Health (NVMe `/` & secondary HDD `/mnt/HDD-500GB/`), Recent Missions feed, and Terminal controls. |
@@ -112,7 +112,7 @@ uv run jarvis memory list
 ## 📘 User Guide & In-UI Manual
 
 For detailed walkthroughs on every feature, voice settings, and remote mobile usage, read:
-👉 **[user-guide.md](file:///home/pritam/code/ai/jarvis/user-guide.md)** or open the **📖 System Manual** tab inside the Web HUD at [`http://127.0.0.1:8765`](http://127.0.0.1:8765).
+👉 **[user-guide.md](user-guide.md)** or open the **📖 System Manual** tab inside the Web HUD at [`http://127.0.0.1:8765`](http://127.0.0.1:8765).
 
 ---
 

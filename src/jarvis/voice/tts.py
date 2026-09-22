@@ -14,6 +14,7 @@ class TextToSpeech:
         self.voice = config.tts_voice
         self.rate = config.tts_rate
         self.pitch = config.tts_pitch
+        self.volume = getattr(config, "tts_volume", 100)
         self.enabled = config.enabled
 
     def speak(self, text: str, blocking: bool = False) -> None:
@@ -33,7 +34,18 @@ class TextToSpeech:
 
     def _speak_sync(self, text: str) -> None:
         try:
-            asyncio.run(self._generate_and_play(text))
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = None
+
+            if loop and loop.is_running():
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(asyncio.run, self._generate_and_play(text))
+                    future.result()
+            else:
+                asyncio.run(self._generate_and_play(text))
         except Exception as e:
             # Non-fatal audio playback error
             pass
@@ -45,13 +57,15 @@ class TextToSpeech:
             temp_path = f.name
 
         try:
-            communicate = edge_tts.Communicate(text, self.voice, rate=self.rate, pitch=self.pitch)
+            vol_val = max(0, min(100, int(self.volume)))
+            vol_str = f"{vol_val - 100:+d}%" if vol_val != 100 else "+0%"
+            communicate = edge_tts.Communicate(text, self.voice, rate=self.rate, pitch=self.pitch, volume=vol_str)
             await communicate.save(temp_path)
 
-            # Play using available Linux audio player (ffplay, aplay, or mpv)
+            # Play using available Linux audio player (ffplay, aplay, or mpv) with volume control
             players = [
-                ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", temp_path],
-                ["mpv", "--no-video", "--really-quiet", temp_path],
+                ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", "-volume", str(vol_val), temp_path],
+                ["mpv", "--no-video", "--really-quiet", f"--volume={vol_val}", temp_path],
                 ["aplay", temp_path],
             ]
 

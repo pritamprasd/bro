@@ -7,4 +7,23 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
+
+# Jarvis Runtime & External Storage
+.jarvis/
+ai-memory/
+memory/
+runs/
+attachments/
+
+# Secrets & Environment
+*.vault
+vault.enc
+.env
+*.env
+
+# Caches & Logs
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.log

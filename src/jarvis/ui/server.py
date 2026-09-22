@@ -80,6 +80,9 @@ class MemoryUpdateRequest(BaseModel):
     filename: str
     content: str
 
+class MemoryDirRequest(BaseModel):
+    memory_dir: str
+
 class DesktopSelectRequest(BaseModel):
     screen_index: int
 
@@ -95,15 +98,23 @@ class ModelSelectionRequest(BaseModel):
     cloud_model: Optional[str] = None
     gemini_api_key: Optional[str] = None
 
+class WatchdogToggleRequest(BaseModel):
+    target: str
+
+class AutonomousModeRequest(BaseModel):
+    autonomous_mode: bool
+
 class VoiceSelectionRequest(BaseModel):
     voice: Optional[str] = None
     rate: Optional[str] = None
     pitch: Optional[str] = None
+    volume: Optional[int] = None
 
 class VoicePreviewRequest(BaseModel):
     voice: Optional[str] = None
     rate: Optional[str] = None
     pitch: Optional[str] = None
+    volume: Optional[int] = None
     text: Optional[str] = None
 
 async def broadcast_ws(event: str, data: Any):
@@ -161,6 +172,8 @@ async def get_status():
         "always_voice_response": current_cfg.voice.always_voice_response,
         "tts_voice": current_cfg.voice.tts_voice,
         "tts_rate": current_cfg.voice.tts_rate,
+        "tts_volume": getattr(current_cfg.voice, "tts_volume", 100),
+        "spotlight_enabled": current_cfg.spotlight.enabled,
         "cloud_model": current_cfg.model.cloud_model,
         "has_gemini_api_key": bool(current_cfg.model.gemini_api_key or os.getenv("GEMINI_API_KEY")),
         "desktop_screen_index": getattr(current_cfg.desktop, "screen_index", 1),
@@ -341,6 +354,13 @@ async def download_run_report(run_id: str, format: str = "md"):
         },
     )
 
+@app.post("/api/history/clear")
+async def clear_audit_history():
+    """Backup all mission runs to ~/ai-memory/jarvis/backups/ and reset audit logs/metrics."""
+    result = audit.backup_and_clear()
+    await broadcast_ws("history_cleared", result)
+    return result
+
 @app.get("/api/history/{run_id}/screenshot/{filename}")
 async def get_run_screenshot(run_id: str, filename: str):
     path = audit.base_dir / run_id / "screenshots" / filename
@@ -441,6 +461,91 @@ async def run_organizer():
     moved = organizer.organize_once()
     return {"moved_count": len(moved), "details": moved}
 
+@app.post("/api/watchdogs/toggle")
+async def toggle_watchdog(req: WatchdogToggleRequest):
+    """Toggle a proactive sentinel or automation feature on/off."""
+    global config
+    target = req.target.lower().strip()
+    msg = ""
+    if target == "sentinel":
+        config.watchdogs.sentinel.enabled = not config.watchdogs.sentinel.enabled
+        state = config.watchdogs.sentinel.enabled
+        msg = f"Thermal Sentinel {'enabled' if state else 'disabled'}"
+    elif target == "organizer":
+        config.watchdogs.organizer.enabled = not config.watchdogs.organizer.enabled
+        state = config.watchdogs.organizer.enabled
+        msg = f"Download Auto-Organizer {'enabled' if state else 'disabled'}"
+    elif target == "tier0":
+        config.model.tier0_enabled = not config.model.tier0_enabled
+        state = config.model.tier0_enabled
+        msg = f"Tier-0 Fast Classifier {'enabled' if state else 'disabled'}"
+    elif target == "spotlight":
+        config.spotlight.enabled = not config.spotlight.enabled
+        state = config.spotlight.enabled
+        msg = f"Spotlight Alt+J {'enabled' if state else 'disabled'}"
+    elif target == "cdp":
+        if not cdp_browser.is_cdp_available():
+            await cdp_browser.connect()
+        state = cdp_browser.is_cdp_available()
+        msg = f"Everyday Chrome CDP {'connected (:9222)' if state else 'standby'}"
+    elif target == "telegram":
+        config.watchdogs.cron.enabled = not config.watchdogs.cron.enabled
+        state = config.watchdogs.cron.enabled
+        msg = f"Telegram/Cron Remote {'enabled' if state else 'disabled'}"
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown watchdog target: {target}")
+
+    save_config(config)
+    await broadcast_ws("watchdog_toggled", {
+        "target": target,
+        "state": state,
+        "message": msg,
+    })
+    return {
+        "status": "success",
+        "target": target,
+        "state": state,
+        "message": msg,
+        "config": {
+            "sentinel": config.watchdogs.sentinel.enabled,
+            "organizer": config.watchdogs.organizer.enabled,
+            "tier0": config.model.tier0_enabled,
+            "spotlight": config.spotlight.enabled,
+            "cdp": cdp_browser.is_cdp_available(),
+            "telegram": config.watchdogs.cron.enabled,
+        }
+    }
+
+@app.post("/api/settings/autonomous")
+async def toggle_autonomous_mode(req: AutonomousModeRequest):
+    """Toggle full autonomy vs human approval overlay."""
+    global config
+    config.autonomous_mode = req.autonomous_mode
+    save_config(config)
+    await broadcast_ws("autonomous_mode_changed", {"autonomous_mode": config.autonomous_mode})
+    return {
+        "status": "updated",
+        "autonomous_mode": config.autonomous_mode,
+        "label": "ON (Full Autonomy)" if config.autonomous_mode else "OFF (Approval Overlay Active)",
+    }
+
+@app.post("/api/safety/test-overlay")
+async def test_approval_overlay():
+    """Trigger a preview of the on-screen safety approval overlay."""
+    from jarvis.core.safety import RiskAssessment
+    from jarvis.ui.overlay import ApprovalOverlay
+    overlay = ApprovalOverlay()
+    sample = RiskAssessment(
+        is_high_stakes=True,
+        risk_level="critical",
+        reason="Destructive system file modification detected: Recursive purge of temporary cache & service restart.",
+        action_type="run_bash",
+        action_details="rm -rf /tmp/jarvis_sandbox_test/ && echo 'Safety Gatekeeper Test Action'"
+    )
+    loop = asyncio.get_event_loop()
+    approved = await loop.run_in_executor(None, overlay.request_approval, sample)
+    return {"status": "completed", "approved": approved}
+
 @app.get("/api/vault")
 async def list_vault_keys():
     return {"keys": vault.list_keys()}
@@ -465,6 +570,33 @@ async def update_memory_file(req: MemoryUpdateRequest):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(req.content, encoding="utf-8")
     return {"status": "updated", "filename": req.filename}
+
+@app.get("/api/memory/config")
+async def get_memory_config():
+    return {
+        "memory_dir": config.memory.memory_dir,
+        "resolved_path": str(memory_store.memory_dir),
+        "default_memory_dir": "~/ai-memory/jarvis",
+    }
+
+@app.post("/api/memory/config")
+async def update_memory_config(req: MemoryDirRequest):
+    global memory_store, config
+    new_dir = req.memory_dir.strip()
+    if not new_dir:
+        raise HTTPException(status_code=400, detail="Memory directory path cannot be empty.")
+    
+    config.memory.memory_dir = new_dir
+    save_config(config)
+    
+    # Reinitialize memory store with new path (creates directory and migrates legacy if applicable)
+    memory_store = MemoryStore(config.memory)
+    
+    return {
+        "status": "updated",
+        "memory_dir": config.memory.memory_dir,
+        "resolved_path": str(memory_store.memory_dir),
+    }
 
 @app.get("/api/models")
 async def list_available_models():
@@ -649,7 +781,7 @@ async def get_available_voices():
 
 @app.post("/api/voice/select")
 async def select_voice(req: VoiceSelectionRequest):
-    """Set the active speech synthesis voice and/or speed rate."""
+    """Set the active speech synthesis voice, speed rate, and/or volume."""
     global config, tts
     if req.voice:
         config.voice.tts_voice = req.voice
@@ -657,18 +789,22 @@ async def select_voice(req: VoiceSelectionRequest):
         config.voice.tts_rate = req.rate
     if req.pitch is not None:
         config.voice.tts_pitch = req.pitch
+    if req.volume is not None:
+        config.voice.tts_volume = max(0, min(100, int(req.volume)))
     save_config(config)
     tts = TextToSpeech(config.voice)
     await broadcast_ws("voice_changed", {
         "tts_voice": config.voice.tts_voice,
         "tts_rate": config.voice.tts_rate,
         "tts_pitch": config.voice.tts_pitch,
+        "tts_volume": getattr(config.voice, "tts_volume", 100),
     })
     return {
         "status": "updated",
         "current_voice": config.voice.tts_voice,
         "current_rate": config.voice.tts_rate,
         "current_pitch": config.voice.tts_pitch,
+        "current_volume": getattr(config.voice, "tts_volume", 100),
     }
 
 @app.post("/api/voice/preview")
@@ -676,10 +812,12 @@ async def preview_voice(req: VoicePreviewRequest):
     """Synthesize and play sample speech for voice testing."""
     voice_to_test = req.voice or config.voice.tts_voice
     rate_to_test = req.rate or config.voice.tts_rate
+    vol_to_test = req.volume if req.volume is not None else getattr(config.voice, "tts_volume", 100)
     sample_text = req.text or "Greetings. Jarvis neural speech synthesis is online and operational."
     temp_cfg = config.voice.model_copy()
     temp_cfg.tts_voice = voice_to_test
     temp_cfg.tts_rate = rate_to_test
+    temp_cfg.tts_volume = vol_to_test
     temp_cfg.enabled = True
     test_tts = TextToSpeech(temp_cfg)
     test_tts.speak(sample_text, blocking=False)
@@ -687,6 +825,7 @@ async def preview_voice(req: VoicePreviewRequest):
         "status": "playing",
         "voice": voice_to_test,
         "rate": rate_to_test,
+        "volume": vol_to_test,
         "text": sample_text,
     }
 

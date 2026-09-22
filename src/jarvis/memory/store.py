@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 from jarvis.config import MemoryConfig
 
 DEFAULT_PREFERENCES = """# User Preferences
-- Name: Pritam
+- Name: User
 - System: Linux X11 (AMD Ryzen 7, NVIDIA RTX 3060 12GB)
 - Assistant Persona: Jarvis (Efficient, proactive, helpful, precise)
 - Safety: Confirm high-stakes actions unless autonomous_mode is on
@@ -17,7 +17,7 @@ DEFAULT_SYSTEM_INFO = """# System & Desktop Environment
 - Window Server: X11
 - Primary Shell: /bin/bash
 - GPU: NVIDIA RTX 3060 (12GB VRAM)
-- Default Workspace: /home/pritam/code/ai/jarvis
+- Default Workspace: ~/code/ai/jarvis
 """
 
 DEFAULT_TELEGRAM_WORKFLOW = """# Workflow: Telegram Messaging
@@ -39,6 +39,11 @@ class MemoryStore:
         self.memory_dir.mkdir(parents=True, exist_ok=True)
         self.workflows_dir.mkdir(parents=True, exist_ok=True)
 
+        # Auto-migration: If this target directory is empty, migrate from legacy ~/.jarvis/memory if it exists
+        legacy_dir = Path.home() / ".jarvis" / "memory"
+        if legacy_dir.exists() and legacy_dir.is_dir() and legacy_dir.resolve() != self.memory_dir.resolve():
+            self._migrate_legacy_memory(legacy_dir)
+
         pref_file = self.memory_dir / "preferences.md"
         if not pref_file.exists():
             pref_file.write_text(DEFAULT_PREFERENCES, encoding="utf-8")
@@ -54,6 +59,21 @@ class MemoryStore:
         contacts_file = self.memory_dir / "contacts.md"
         if not contacts_file.exists():
             contacts_file.write_text("# Contacts & Handles\n# Format: - Name: email / handle\n", encoding="utf-8")
+
+    def _migrate_legacy_memory(self, legacy_dir: Path) -> None:
+        """Migrate existing markdown files from legacy directory to new memory directory."""
+        try:
+            for item in legacy_dir.rglob("*.md"):
+                rel_path = item.relative_to(legacy_dir)
+                dest_path = self.memory_dir / rel_path
+                if not dest_path.exists():
+                    dest_path.parent.mkdir(parents=True, exist_ok=True)
+                    text = item.read_text(encoding="utf-8")
+                    text = re.sub(r'Name:\s*[A-Za-z\s]+', 'Name: User', text)
+                    text = re.sub(r'/home/[^/\s]+/code/ai/jarvis', '~/code/ai/jarvis', text)
+                    dest_path.write_text(text, encoding="utf-8")
+        except Exception:
+            pass
 
     def get_relevant_memory(self, prompt: str) -> str:
         """Selectively load ONLY memory files relevant to the current user prompt."""
