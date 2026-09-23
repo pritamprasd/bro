@@ -12,6 +12,7 @@
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     /* ==========================================================================
        JARVIS // MARK 2: HIGH-TECH FUTURISTIC GLASSMORPHIC DESIGN SYSTEM
@@ -3387,6 +3388,8 @@
         class="hud-icon"></i> Memory & Secrets</button>
     <button class="tab-btn" id="tab-btn-settings" onclick="switchTab('settings')"><i data-lucide="settings"
         class="hud-icon text-cyan"></i> Settings</button>
+    <button class="tab-btn" id="tab-btn-resources" onclick="switchTab('resources')"><i data-lucide="layers"
+        class="hud-icon text-cyan"></i> Resources</button>
     <button class="tab-btn" id="tab-btn-guide" onclick="switchTab('guide')"><i data-lucide="book-open"
         class="hud-icon"></i> System Manual</button>
   </div>
@@ -3679,6 +3682,49 @@
             </div>
           </div>
 
+          <!-- Active LLM & Neural Settings Container (Mark 4) -->
+          <div class="card" id="active-llm-settings-card" style="border-left: 3px solid var(--neon-cyan);">
+            <div class="card-header" style="padding-bottom: 0.5rem; margin-bottom: 0.65rem; border-bottom: 1px solid rgba(0, 240, 255, 0.12);">
+              <div class="card-title" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px;">
+                <i data-lucide="cpu" class="hud-icon-xs text-cyan"></i> Active LLM &amp; Neural Matrix
+              </div>
+              <button class="btn btn-sm" onclick="switchTab('settings'); setTimeout(() => showSettingsSection('brain'), 50);"
+                style="background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); color: var(--neon-cyan); font-size: 0.65rem; padding: 0.15rem 0.45rem;">
+                <i data-lucide="sliders" class="hud-icon-xs"></i> Models
+              </button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.75rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(3, 8, 18, 0.65); padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                <span style="color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                  <i data-lucide="zap" class="hud-icon-xs text-amber"></i> Tier-0 Fast Classifier:
+                </span>
+                <span id="active-llm-tier0" style="font-family: 'JetBrains Mono', monospace; color: var(--neon-amber); font-weight: 600;">llama3.2:3b (CPU)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(3, 8, 18, 0.65); padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                <span style="color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                  <i data-lucide="brain" class="hud-icon-xs text-cyan"></i> Reasoning Text LLM:
+                </span>
+                <span id="active-llm-text" style="font-family: 'JetBrains Mono', monospace; color: var(--neon-cyan); font-weight: 600;">gemma4:12b (GPU)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(3, 8, 18, 0.65); padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                <span style="color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                  <i data-lucide="eye" class="hud-icon-xs text-purple"></i> Multimodal Vision:
+                </span>
+                <span id="active-llm-vision" style="font-family: 'JetBrains Mono', monospace; color: var(--neon-purple); font-weight: 600;">qwen2.5vl:7b</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.15rem;">
+                <div style="background: rgba(3, 8, 18, 0.65); padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05); text-align: center;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">Execution Policy</div>
+                  <div id="active-llm-policy" style="font-family: 'JetBrains Mono', monospace; color: #ffffff; font-weight: 700; font-size: 0.72rem; text-transform: uppercase;">LOCAL ONLY</div>
+                </div>
+                <div style="background: rgba(3, 8, 18, 0.65); padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05); text-align: center;">
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">VRAM Keep-Alive</div>
+                  <div id="active-llm-keepalive" style="font-family: 'JetBrains Mono', monospace; color: var(--neon-green); font-weight: 700; font-size: 0.72rem;">PERMANENT (-1)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="card">
             <div class="card-header">
               <div class="card-title"><i data-lucide="gauge" class="hud-icon-sm text-cyan"></i> Hardware Telemetry</div>
@@ -3905,6 +3951,9 @@
             <div style="display: flex; align-items: center; gap: 0.6rem;">
               <button class="btn btn-cyan btn-sm" onclick="openAddEventModal()"><i data-lucide="plus"
                   class="hud-icon-xs"></i> Add Event / Task</button>
+              <button class="btn btn-sm" onclick="promptClearAllCalendar()"
+                style="background: rgba(255, 51, 102, 0.12); border: 1px solid rgba(255, 51, 102, 0.4); color: #ff6b6b;"
+                title="Wipe all tasks from memory"><i data-lucide="trash-2" class="hud-icon-xs"></i> Clear All Tasks</button>
               <button class="btn btn-sm" onclick="loadCalendar()" style="background: rgba(255,255,255,0.08);"><i
                   data-lucide="refresh-cw" class="hud-icon-xs"></i></button>
             </div>
@@ -4418,6 +4467,16 @@
                     <input type="checkbox" id="settings-handsfree-loop" checked
                       onchange="toggleHandsFreeLoop(this.checked)">
                     <span>Hands-Free Continuous Microphone Loop</span>
+                  </label>
+                  <label
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.8rem; color: #ffffff;">
+                    <input type="checkbox" id="settings-genz-greetings-toggle"
+                      onchange="toggleGenZGreetings(this.checked)">
+                    <span style="display: flex; align-items: center; gap: 0.35rem;">
+                      <i data-lucide="sparkles" class="hud-icon-xs text-amber"></i>
+                      <span>Gen-Z Mode (Slang &amp; Salutations)</span>
+                      <span class="badge" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; background: rgba(255, 170, 0, 0.15); border: 1px solid var(--neon-amber); color: var(--neon-amber); font-family: 'JetBrains Mono', monospace;">SLANG</span>
+                    </span>
                   </label>
                   <div style="margin-left: auto; display: flex; align-items: center; gap: 0.6rem;">
                     <button class="btn btn-cyan btn-sm" onclick="setupUbuntuShortcut()" id="btn-setup-shortcut"
@@ -5426,6 +5485,45 @@
       </div>
     </div>
 
+    <!-- TAB: Resources & Technical Design Document (Mark 4) -->
+    <div id="tab-resources" class="tab-content">
+      <div class="card" style="display: flex; flex-direction: column; min-height: 800px;">
+        <div class="card-header" style="flex-wrap: wrap; gap: 0.8rem; border-bottom: 1px solid rgba(0, 240, 255, 0.15); padding-bottom: 0.85rem;">
+          <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+            <div class="card-title" style="margin: 0; font-size: 1rem;">
+              <i data-lucide="layers" class="hud-icon text-cyan"></i>
+              <span>JARVIS Mark 4 // Technical Design Specification</span>
+            </div>
+            <span class="badge" style="background: rgba(0, 240, 255, 0.12); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;">design.md</span>
+            <span class="badge" id="resources-doc-size" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;">Loading...</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <button class="btn btn-sm" onclick="copyDesignDoc()" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan);">
+              <i data-lucide="copy" class="hud-icon-xs"></i> Copy Markdown
+            </button>
+            <a href="/api/docs/design" target="_blank" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+              <i data-lucide="external-link" class="hud-icon-xs"></i> JSON API
+            </a>
+            <button class="btn btn-sm" onclick="loadDesignDocument()" style="background: rgba(255,255,255,0.08);"><i data-lucide="refresh-cw" class="hud-icon-xs"></i></button>
+          </div>
+        </div>
+
+        <div class="manual-layout" style="margin-top: 1rem; display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 1.5rem;">
+          <!-- Left: Table of Contents -->
+          <div class="manual-sidebar" id="resources-toc-list" style="max-height: 750px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.3rem;">
+            <!-- Populated dynamically by buildResourcesTOC() -->
+          </div>
+
+          <!-- Right: Rendered Markdown Content -->
+          <div class="manual-content" style="background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.5rem 2rem; max-height: 750px; overflow-y: auto;">
+            <div id="resources-markdown-viewer" style="line-height: 1.7; color: var(--text-main); font-size: 0.88rem;">
+              <!-- Rendered design.md content -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Interactive Modal for On-Demand Resource Request (Req 1) -->
@@ -5701,6 +5799,51 @@
           onclick="closeAddEventModal()">Cancel</button>
         <button class="btn btn-cyan" onclick="submitNewCalendarEvent()"><i data-lucide="check" class="hud-icon-xs"></i>
           Save to Calendar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Double-Confirmation Clearing All Calendar Tasks (Mark 4) -->
+  <div class="modal-overlay" id="calendar-clear-modal" style="display: none; z-index: 99999;">
+    <div class="modal-card" style="max-width: 480px; border-color: #ff3366; box-shadow: 0 0 35px rgba(255, 51, 102, 0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 51, 102, 0.2); padding-bottom: 0.5rem;">
+        <h3 style="color: #ff3366; display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.95rem; font-family: 'JetBrains Mono', monospace;">
+          <i data-lucide="trash-2" class="hud-icon-sm" style="color: #ff3366;"></i> CLEAR ALL CALENDAR TASKS
+        </h3>
+        <button class="btn btn-sm" onclick="closeClearCalendarModal()" style="background: rgba(255,255,255,0.08); padding: 0.2rem 0.5rem;"><i data-lucide="x" class="hud-icon-xs"></i></button>
+      </div>
+
+      <!-- Step 1: Initial Warning -->
+      <div id="cal-clear-step1">
+        <p style="font-size: 0.85rem; color: #ffffff; line-height: 1.5; margin-bottom: 1rem;">
+          Are you sure you want to clear all scheduled events and tasks from memory (<code style="color: var(--neon-cyan);">calendar.md</code>)?
+        </p>
+        <div style="background: rgba(255, 51, 102, 0.08); border: 1px solid rgba(255, 51, 102, 0.3); border-radius: 6px; padding: 0.6rem 0.8rem; font-size: 0.75rem; color: #ff99aa; margin-bottom: 1.25rem;">
+          ⚠️ This will remove all pending and completed items across all dates.
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+          <button class="btn" style="background: rgba(255,255,255,0.08); color: var(--text-muted);" onclick="closeClearCalendarModal()">Cancel</button>
+          <button class="btn btn-danger" onclick="proceedToClearStep2()">Yes, Proceed to Final Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Final Reconfirmation -->
+      <div id="cal-clear-step2" style="display: none;">
+        <div style="text-align: center; margin-bottom: 1rem;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 51, 102, 0.15); border: 2px solid #ff3366; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
+            <i data-lucide="alert-triangle" style="color: #ff3366; width: 24px; height: 24px;"></i>
+          </div>
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 0.4rem;">FINAL RECONFIRMATION</h4>
+          <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+            This action is <strong>IRREVERSIBLE</strong>. All schedule entries in memory will be permanently erased.
+          </p>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.25rem;">
+          <button class="btn" style="background: rgba(255,255,255,0.08); color: var(--text-muted);" onclick="closeClearCalendarModal()">Abort &amp; Keep Tasks</button>
+          <button class="btn btn-danger" style="background: #ff2a5f; border-color: #ff2a5f; color: #ffffff;" onclick="executeClearCalendar()">
+            <i data-lucide="trash-2" class="hud-icon-xs"></i> Confirm &amp; Clear All Now
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -6048,6 +6191,7 @@
         loadBriefSlots();  // Mark 4: multi-slot schedule manager
       }
       if (name === 'errors') loadErrors();
+      if (name === 'resources') loadDesignDocument();
       if (name === 'memory') {
         loadMemory();
       }
@@ -9763,6 +9907,33 @@
           const chunkBadge = document.getElementById('obsidian-chunk-count');
           if (chunkBadge) chunkBadge.innerText = `${data.rag_chunks} Chunks Indexed`;
         }
+
+        // Update Active Neural & LLM Settings Container (Mark 4)
+        const activeTier0El = document.getElementById('active-llm-tier0');
+        if (activeTier0El) {
+          activeTier0El.innerText = data.tier0_enabled ? `${data.tier0_model || 'llama3.2:3b'} (Active)` : 'Disabled (Direct)';
+          activeTier0El.style.color = data.tier0_enabled ? 'var(--neon-amber)' : 'var(--text-muted)';
+        }
+        const activeTextEl = document.getElementById('active-llm-text');
+        if (activeTextEl) {
+          const selText = document.getElementById('sel-text-model');
+          const txtModel = (selText && selText.value) || data.local_text_model || 'gemma4:12b';
+          activeTextEl.innerText = `${txtModel} (Local)`;
+        }
+        const activeVisionEl = document.getElementById('active-llm-vision');
+        if (activeVisionEl) {
+          const selVis = document.getElementById('sel-vision-model');
+          const visModel = (selVis && selVis.value) || data.local_vision_model || 'qwen2.5vl:7b';
+          activeVisionEl.innerText = visModel;
+        }
+        const activePolEl = document.getElementById('active-llm-policy');
+        if (activePolEl && data.policy) {
+          activePolEl.innerText = data.policy.toUpperCase().replace('_', ' ');
+        }
+        const genzToggle = document.getElementById('settings-genz-greetings-toggle');
+        if (genzToggle && typeof data.gen_z_greetings === 'boolean' && genzToggle.checked !== data.gen_z_greetings) {
+          genzToggle.checked = data.gen_z_greetings;
+        }
       } catch (e) { }
       loadErrors();
     }
@@ -10055,8 +10226,158 @@
     }
 
     // =========================================================================
-    // JARVIS MARK 2: Transparent File Viewer Dialog
+    // JARVIS MARK 4: Calendar Clear with Two-Step Confirmation
     // =========================================================================
+    function promptClearAllCalendar() {
+      const modal = document.getElementById('calendar-clear-modal');
+      const step1 = document.getElementById('cal-clear-step1');
+      const step2 = document.getElementById('cal-clear-step2');
+      if (step1) step1.style.display = 'block';
+      if (step2) step2.style.display = 'none';
+      if (modal) modal.style.display = 'flex';
+      renderIcons();
+    }
+
+    function closeClearCalendarModal() {
+      const modal = document.getElementById('calendar-clear-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function proceedToClearStep2() {
+      const step1 = document.getElementById('cal-clear-step1');
+      const step2 = document.getElementById('cal-clear-step2');
+      if (step1) step1.style.display = 'none';
+      if (step2) step2.style.display = 'block';
+      renderIcons();
+    }
+
+    async function executeClearCalendar() {
+      try {
+        const res = await fetch('/api/calendar', {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          closeClearCalendarModal();
+          playTacticalSfx('success');
+          appendLog('action', '🗑️ Cleared all scheduled events & tasks from memory (calendar.md)');
+          await loadCalendar();
+        } else {
+          alert('Failed to clear calendar events.');
+        }
+      } catch (e) {
+        console.error('Calendar clear error:', e);
+      }
+    }
+
+    // =========================================================================
+    // JARVIS MARK 4: Gen-Z Greetings & Slang Setting
+    // =========================================================================
+    async function toggleGenZGreetings(enabled) {
+      try {
+        const res = await fetch('/api/voice/select', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gen_z_greetings: enabled })
+        });
+        if (res.ok) {
+          playTacticalSfx('toggle');
+          appendLog('action', `⚡ Gen-Z Slang & Greetings: ${enabled ? 'ENABLED' : 'DISABLED'}`);
+        }
+      } catch (e) {
+        console.error('Gen-Z toggle error:', e);
+      }
+    }
+
+    // =========================================================================
+    // JARVIS MARK 4: Resources & Technical Design Document Viewer
+    // =========================================================================
+    let cachedDesignMarkdown = '';
+
+    function renderBasicMarkdownFallback(md) {
+      if (!md) return '';
+      let html = escapeHtml(md);
+      // Code blocks
+      html = html.replace(/```([a-z]*)\n([\s\S]*?)```/g, '<pre style="background:rgba(2,6,14,0.9);border:1px solid rgba(0,240,255,0.2);border-radius:6px;padding:1rem;overflow-x:auto;margin:1rem 0;font-family:\'JetBrains Mono\',monospace;color:#a6e3a1;"><code>$2</code></pre>');
+      // Inline code
+      html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(0,240,255,0.1);color:var(--neon-cyan);padding:0.15rem 0.35rem;border-radius:4px;font-family:\'JetBrains Mono\',monospace;font-size:0.85em;">$1</code>');
+      // Headers
+      html = html.replace(/^### (.*$)/gim, '<h3 style="color:var(--neon-cyan);margin:1.25rem 0 0.5rem 0;font-size:1.05rem;">$1</h3>');
+      html = html.replace(/^## (.*$)/gim, '<h2 style="color:#ffffff;border-bottom:1px solid rgba(0,240,255,0.2);padding-bottom:0.4rem;margin:1.75rem 0 0.75rem 0;font-size:1.2rem;">$1</h2>');
+      html = html.replace(/^# (.*$)/gim, '<h1 style="color:var(--neon-cyan);font-size:1.5rem;margin:0 0 1rem 0;">$1</h1>');
+      // Bullet lists
+      html = html.replace(/^\* (.*$)/gim, '<li style="margin-left:1.5rem;margin-bottom:0.3rem;">$1</li>');
+      html = html.replace(/^- (.*$)/gim, '<li style="margin-left:1.5rem;margin-bottom:0.3rem;">$1</li>');
+      // Bold & Italic
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff;">$1</strong>');
+      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      // Paragraphs
+      html = html.replace(/\n\n+/g, '<br><br>');
+      return html;
+    }
+
+    async function loadDesignDocument() {
+      const container = document.getElementById('resources-markdown-viewer');
+      if (!container) return;
+      try {
+        container.innerHTML = '<div style="display:flex;align-items:center;gap:0.75rem;padding:2rem;color:var(--neon-cyan);"><i data-lucide="loader" class="hud-icon spin"></i> Loading Technical Design Specification (design.md)...</div>';
+        renderIcons();
+        const res = await fetch('/api/docs/design');
+        if (!res.ok) throw new Error('Failed to fetch design document');
+        const data = await res.json();
+        cachedDesignMarkdown = data.content;
+
+        if (typeof marked !== 'undefined' && marked.parse) {
+          container.innerHTML = marked.parse(data.content);
+        } else {
+          container.innerHTML = renderBasicMarkdownFallback(data.content);
+        }
+
+        buildResourcesTOC();
+
+        const sizeBadge = document.getElementById('resources-doc-size');
+        if (sizeBadge) sizeBadge.innerText = `${Math.round(data.size_bytes / 1024 * 10) / 10} KB`;
+
+        renderIcons();
+      } catch (e) {
+        container.innerHTML = `<div style="padding:2rem;color:#ff6b6b;"><i data-lucide="alert-triangle" class="hud-icon-sm"></i> Error loading design specification: ${escapeHtml(e.message)}</div>`;
+        renderIcons();
+      }
+    }
+
+    function buildResourcesTOC() {
+      const toc = document.getElementById('resources-toc-list');
+      const container = document.getElementById('resources-markdown-viewer');
+      if (!toc || !container) return;
+      toc.innerHTML = '<div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;padding-left:0.5rem;letter-spacing:0.8px;">Table of Contents</div>';
+      const headings = container.querySelectorAll('h1, h2, h3');
+      headings.forEach((h, idx) => {
+        const id = 'spec-sec-' + idx;
+        h.id = id;
+        const btn = document.createElement('button');
+        btn.className = 'manual-nav-btn';
+        btn.style.fontSize = h.tagName === 'H1' ? '0.78rem' : h.tagName === 'H2' ? '0.74rem' : '0.7rem';
+        btn.style.padding = h.tagName === 'H3' ? '0.3rem 0.5rem 0.3rem 1.4rem' : h.tagName === 'H2' ? '0.35rem 0.5rem 0.35rem 0.8rem' : '0.4rem 0.5rem';
+        btn.style.textAlign = 'left';
+        btn.innerText = h.innerText.replace(/^#+\s*/, '');
+        btn.onclick = () => {
+          document.querySelectorAll('#resources-toc-list .manual-nav-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        toc.appendChild(btn);
+      });
+      const firstNav = toc.querySelector('.manual-nav-btn');
+      if (firstNav) firstNav.classList.add('active');
+    }
+
+    function copyDesignDoc() {
+      if (cachedDesignMarkdown) {
+        navigator.clipboard.writeText(cachedDesignMarkdown).then(() => {
+          playTacticalSfx('success');
+          alert('design.md technical specification copied to clipboard!');
+        });
+      }
+    }
     let currentViewerContent = '';
 
     function showFileViewerModal(filename, content, path = '') {

@@ -26,7 +26,8 @@ class DesktopActuator(BaseActuator):
 
     def set_screen_index(self, screen_index: int) -> None:
         """Switch the target desktop / monitor for screen capture and mouse actions."""
-        self.monitors = self._sct.monitors
+        if not hasattr(self, "monitors") or not self.monitors:
+            self.monitors = self._sct.monitors
         total = len(self.monitors)
         # 0 is all monitors combined, 1..N are individual displays
         if 0 <= screen_index < total:

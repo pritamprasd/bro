@@ -154,3 +154,13 @@ class CalendarEngine:
             summary += ", ".join(parts[:-1]) + f", and {parts[-1]}."
 
         return summary
+
+    def clear_all_events(self) -> int:
+        """Clear all scheduled events and tasks from the calendar markdown file."""
+        events_count = len(self.get_events())
+        self._ensure_file_exists()
+        self.calendar_file.write_text(
+            "# Jarvis Calendar & Schedule\n\n## Scheduled Events & Deadlines\n",
+            encoding="utf-8",
+        )
+        return events_count

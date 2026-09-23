@@ -26,6 +26,7 @@ voice:
   voice_reply_on_chat: true
   stt_engine: browser
   sfx_enabled: true
+  gen_z_greetings: false
 safety:
   prompt_on_high_stakes: true
   high_stakes_keywords:
@@ -57,7 +58,7 @@ browser:
   cdp_port: 9222
 memory:
   memory_dir: ~/ai-memory/jarvis
-  obsidian_vault_dir: /tmp/tmp5aq9axvq
+  obsidian_vault_dir: /tmp/tmp6ck0_64y
   semantic_search_enabled: true
   embedding_model: nomic-embed-text
 watchdogs:

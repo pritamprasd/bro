@@ -95,12 +95,48 @@ _ACK_REPLIES = [
 ]
 
 
+_GEN_Z_GREETING_REPLIES: List[str] = [
+    "Yo, what's good! Jarvis in the building, no cap.",
+    "Vibe check passed. All systems bussin and ready to slay, boss.",
+    "Sup! Neural core is locked in, highkey ready for whatever you got.",
+    "Ayo, we're live fr fr. What's the move today?",
+    "Main character energy loaded. What are we cookin up?",
+    "Sheesh, workstation is running clean. What's the play?",
+    "Bet. All systems go, let's get this bread.",
+    "Aura points at maximum, ready to assist on god.",
+    "Lowkey ready to crush today's tasks, what's up?",
+]
+
+_GEN_Z_THANKS_REPLIES = [
+    "Say less, anytime!",
+    "No cap, always here for you!",
+    "You already know! Anytime.",
+    "Bet, hit me up whenever.",
+]
+
+_GEN_Z_BYE_REPLIES = [
+    "Peace out! Stay valid.",
+    "Catch you later, stay legendary.",
+    "Signing off. Keep that momentum going.",
+    "Later! Holler if you need anything.",
+]
+
+_GEN_Z_ACK_REPLIES = [
+    "Bet.",
+    "Say less.",
+    "Locked in.",
+    "Heard that, no cap.",
+    "On it, fr fr.",
+]
+
+
 class GreetingMatcher:
     """Zero-network, zero-latency matcher for casual greetings and acknowledgements.
 
     Runs purely on CPU with compiled regexes — no Ollama, no keyring, no I/O.
     Average match time: <1ms.
     """
+    gen_z_enabled: bool = False
 
     @staticmethod
     def _time_bucket() -> str:
@@ -114,8 +150,8 @@ class GreetingMatcher:
         else:
             return "night"
 
-    @staticmethod
-    def match(user_goal: str) -> Optional[str]:
+    @classmethod
+    def match(cls, user_goal: str, gen_z: Optional[bool] = None) -> Optional[str]:
         """Return a ready-made response string if the utterance is a casual greeting,
         or None if the input should be routed to Tier-0 / main LLM.
         """
@@ -124,23 +160,26 @@ class GreetingMatcher:
             return None
 
         norm = text.lower().strip().rstrip(".,!?")
+        use_gen_z = cls.gen_z_enabled if gen_z is None else gen_z
 
         # Thanks
         if re.match(r"^(thanks|thank you|thank you so much|cheers|ty|thx)\b", norm, re.IGNORECASE):
-            return random.choice(_THANKS_REPLIES)
+            return random.choice(_GEN_Z_THANKS_REPLIES if use_gen_z else _THANKS_REPLIES)
 
         # Goodbye
         if re.match(r"^(bye|goodbye|good bye|see you|see ya|later|cya)\b", norm, re.IGNORECASE):
-            return random.choice(_BYE_REPLIES)
+            return random.choice(_GEN_Z_BYE_REPLIES if use_gen_z else _BYE_REPLIES)
 
         # Simple acknowledgements
         if re.match(r"^(ok|okay|got it|understood|alright|sure|cool|great|perfect|nice|awesome)\s*,?\s*(jarvis)?\s*$", norm, re.IGNORECASE):
-            return random.choice(_ACK_REPLIES)
+            return random.choice(_GEN_Z_ACK_REPLIES if use_gen_z else _ACK_REPLIES)
 
         # Greetings / status / wake-up
         for pattern_re in _COMPILED_GREETING_RES:
             if pattern_re.search(norm):
-                bucket = GreetingMatcher._time_bucket()
+                if use_gen_z:
+                    return random.choice(_GEN_Z_GREETING_REPLIES)
+                bucket = cls._time_bucket()
                 # Try time-specific reply, fall back to generic
                 replies = _GREETING_REPLIES.get(bucket, []) or _GREETING_REPLIES["generic"]
                 return random.choice(replies or _GREETING_REPLIES["generic"])

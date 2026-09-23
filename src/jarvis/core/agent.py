@@ -116,7 +116,7 @@ class JarvisAgent:
 
         # 0a. Sub-1ms Hybrid Greeting Fast-Path (pure CPU regex, zero network)
         #     Handles: "Hello", "Good morning", "Thanks", "Bye", etc.
-        greeting_resp = GreetingMatcher.match(user_goal)
+        greeting_resp = GreetingMatcher.match(user_goal, gen_z=self.config.voice.gen_z_greetings)
         if greeting_resp:
             self.console.thought("[GreetingMatcher: <1ms regex] Offline instant response — no LLM needed")
             self._deliver_output(greeting_resp, is_conversation=True)

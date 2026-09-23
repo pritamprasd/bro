@@ -29,11 +29,11 @@ DEFAULT_TELEGRAM_WORKFLOW = """# Workflow: Telegram Messaging
 - Chat ID key in vault: `telegram_chat_id`
 """
 
-DEFAULT_GREETINGS = """# Jarvis Mark 2 Vocal Greetings & Salutations
+DEFAULT_GREETINGS = """# Jarvis Mark 4 Vocal Greetings & Salutations
 
 ## General Greetings
 - Greetings, Sir. All systems armed and operational. What is our objective today?
-- Jarvis Mark 2 online. Neural pathways cleared and ready for your command, Sir.
+- Jarvis Mark 4 online. Neural pathways cleared and ready for your command, Sir.
 - Hello Sir. Hardware telemetry is nominal, standing by for instructions.
 - Good day, Sir. How may I be of service to you today?
 - At your service, Sir. Ready to execute whenever you are.
@@ -48,8 +48,20 @@ DEFAULT_GREETINGS = """# Jarvis Mark 2 Vocal Greetings & Salutations
 - Good afternoon. Telemetry stable, ready for your commands.
 
 ## Evening Greetings
-- Good evening, Sir. Jarvis Mark 2 standing by for your evening workflow.
+- Good evening, Sir. Jarvis Mark 4 standing by for your evening workflow.
 - Good evening. All defensive watchdogs and sentinels remain active. What shall we tackle?
+
+## Gen-Z Greetings & Slang
+- Yo, what's good! Jarvis in the building, no cap.
+- Vibe check passed. All systems bussin and ready to slay, boss.
+- Sup! Neural core is locked in, highkey ready for whatever you got.
+- Ayo, we're live fr fr. What's the move today?
+- Main character energy loaded. What are we cookin up?
+- Sheesh, workstation is running clean. What's the play?
+- Bet. All systems go, let's get this bread.
+- Aura points at maximum, ready to assist on god.
+- Lowkey ready to crush today's tasks, let's do this.
+- Big tech energy activated, what's on your radar?
 """
 
 DEFAULT_CALENDAR = """# Workstation Calendar & Tasks
@@ -145,24 +157,37 @@ class MemoryStore:
         if not local_intents_file.exists():
             local_intents_file.write_text(DEFAULT_LOCAL_INTENTS, encoding="utf-8")
 
-    def get_random_greeting(self) -> str:
-        """Read greetings.md and pick a random greeting line, or return default."""
+    def get_random_greeting(self, gen_z_mode: bool = False) -> str:
+        """Read greetings.md and pick a random greeting line according to gen_z_mode, or return default."""
         import random
         greetings_file = self.memory_dir / "greetings.md"
-        candidates: List[str] = []
+        standard_candidates: List[str] = []
+        genz_candidates: List[str] = []
+        
         if greetings_file.exists():
             try:
+                current_section = ""
                 for line in greetings_file.read_text(encoding="utf-8").splitlines():
-                    line = line.strip()
-                    if line.startswith("- "):
-                        greeting = line[2:].strip().strip('"').strip("'")
+                    line_str = line.strip()
+                    if line_str.startswith("## "):
+                        current_section = line_str.lower()
+                        continue
+                    if line_str.startswith("- "):
+                        greeting = line_str[2:].strip().strip('"').strip("'")
                         if greeting:
-                            candidates.append(greeting)
+                            if "gen-z" in current_section or "slang" in current_section:
+                                genz_candidates.append(greeting)
+                            else:
+                                standard_candidates.append(greeting)
             except Exception:
                 pass
 
-        if candidates:
-            return random.choice(candidates)
+        if gen_z_mode and genz_candidates:
+            return random.choice(genz_candidates)
+        if standard_candidates:
+            return random.choice(standard_candidates)
+        if genz_candidates:
+            return random.choice(genz_candidates)
         return "Hello Sir. All systems operational and standing by for your command."
 
     def _migrate_legacy_memory(self, legacy_dir: Path) -> None:

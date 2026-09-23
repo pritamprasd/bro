@@ -46,6 +46,7 @@ This guide covers everything you need to operate, customize, and communicate wit
 29. [Pronunciation Engine & Natural Speech Normalization](#29-pronunciation-engine)
 30. [Interactive SVG Audit Trail & Mission Velocity Filter](#30-interactive-audit-visuals)
 31. [Architectural Evolution: Mark 1 vs. Mark 2](custom-docs/upgrades_mark1_and_mark2.md)
+32. [Vocal Salutations, Custom Greetings & Gen-Z Mode](#32-vocal-salutations-custom-greetings--gen-z-mode)
 
 ---
 
@@ -747,6 +748,65 @@ The **Audit & History** tab features compact high-density layout with interactiv
 * **Compact KPI Matrix:** 4 streamlined cards showing Total Missions, Success Ratio, Average Step Duration, and the new **Tier-0 Fast Classifier Ratio**.
 * **Interactive Actuator Donut:** Native SVG chart showing desktop, browser, python, and shell action distribution. Clicking any slice or legend item instantly filters the mission list by that actuator type.
 * **Interactive Mission Velocity Bar Chart:** Displays execution durations for the last 10 missions with neon status indicators. Hovering shows full goal details; clicking any bar immediately selects and loads that mission's visual filmstrip replay.
+
+---
+
+## 32. Vocal Salutations, Custom Greetings & Gen-Z Mode
+
+Jarvis Mark 4 features an ultra-responsive, zero-network vocal greeting engine powered by `GreetingMatcher` and the workstation memory file `~/ai-memory/jarvis/greetings.md`.
+
+### How Greetings & Salutations Work
+1. **Sub-Millisecond Regex Fast Path (`GreetingMatcher`):** When you say *"Hello"*, *"Good morning"*, *"Hey Jarvis"*, *"Thanks"*, or *"Goodbye"*, the agent intercepts the utterance in `<1ms` purely on the CPU using compiled regexes—completely bypassing the LLM and avoiding unnecessary GPU compute.
+2. **Contextual Memory File (`greetings.md`):** All vocal greetings and opening salutations are stored in `~/ai-memory/jarvis/greetings.md`. When the Web HUD loads or when the Ubuntu GNOME shortcut (`Super+Shift+J`) is triggered, Jarvis picks a random salutation from this file and speaks it aloud.
+
+### How to Add or Update Salutations
+You can customize Jarvis's greetings by editing `~/ai-memory/jarvis/greetings.md` directly:
+1. Open the file in your preferred editor or in the HUD **Memory & Secrets** tab:
+   ```bash
+   nano ~/ai-memory/jarvis/greetings.md
+   ```
+2. Add your custom salutations under the appropriate section header using markdown bullet points (`- `):
+   ```markdown
+   # Jarvis Mark 4 Vocal Greetings & Salutations
+
+   ## General Greetings
+   - Greetings, Sir. Workstation is armed and ready for your command.
+   - At your service, Sir. Ready to execute whenever you are.
+
+   ## Morning Greetings
+   - Good morning, Sir. All diagnostic systems report optimal status.
+
+   ## Afternoon Greetings
+   - Good afternoon, Sir. Systems standing by for your next directive.
+
+   ## Evening Greetings
+   - Good evening, Sir. Jarvis Mark 4 standing by for your evening workflow.
+
+   ## Gen-Z Greetings & Slang
+   - Yo, what's good! Jarvis in the building, no cap.
+   - Vibe check passed. All systems bussin and ready to slay, boss.
+   - Sup! Neural core is locked in, highkey ready for whatever you got.
+   - Ayo, we're live fr fr. What's the move today?
+   ```
+3. Save the file. Jarvis detects file changes immediately without requiring a restart.
+
+### Enabling or Disabling Gen-Z Mode in Settings
+If you want Jarvis to respond with modern vernacular, snappy slang, and high-energy phrases:
+1. Navigate to the **Settings** tab in the Web HUD (`http://127.0.0.1:8765`).
+2. Open the **Voice & Acoustic Butler** settings group (`Voice`).
+3. Toggle the **Gen-Z Mode (Slang & Dynamic Greetings)** switch to **ON** or **OFF**.
+4. Alternatively, configure `gen_z_greetings: true` in your `config.yaml` under the `voice:` block:
+   ```yaml
+   voice:
+     enabled: true
+     tts_voice: en-GB-RyanNeural
+     gen_z_greetings: true
+   ```
+When Gen-Z mode is active:
+* Vocal greetings use energetic slang ("no cap", "vibe check", "fr fr", "main character energy").
+* Acknowledgments switch to snappy confirmations like *"Bet."*, *"Say less."*, and *"Locked in."*.
+* Farewells become *"Peace out! Stay valid."* or *"Catch you later, stay legendary."*.
+
 
 
 

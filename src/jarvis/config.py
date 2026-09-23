@@ -37,6 +37,7 @@ class VoiceConfig(BaseModel):
     voice_reply_on_chat: bool = True
     stt_engine: Literal["browser", "whisper_local"] = "browser"
     sfx_enabled: bool = True
+    gen_z_greetings: bool = False
 
 class SafetyConfig(BaseModel):
     prompt_on_high_stakes: bool = True

@@ -85,6 +85,11 @@ def test_agent_auto_detect_mermaid_in_finish():
 def test_agent_desktop_switch_monitor():
     config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False}, desktop={"screen_index": 1})
     agent = JarvisAgent(config)
+    agent.desktop.monitors = [
+        {"width": 3840, "height": 1080, "left": 0, "top": 0, "output": "ALL", "name": "Combined Canvas", "is_primary": False},
+        {"width": 1920, "height": 1080, "left": 0, "top": 0, "output": "DP-1", "name": "Display 1", "is_primary": True},
+        {"width": 1920, "height": 1080, "left": 1920, "top": 0, "output": "DP-2", "name": "Display 2", "is_primary": False},
+    ]
     assert agent.desktop.screen_index == 1
 
     # Step 1: switch monitor

@@ -126,6 +126,7 @@ class VoiceSelectionRequest(BaseModel):
     volume: Optional[int] = None
     stt_engine: Optional[Literal["browser", "whisper_local"]] = None
     sfx_enabled: Optional[bool] = None
+    gen_z_greetings: Optional[bool] = None
 
 class ObsidianConfigRequest(BaseModel):
     obsidian_vault_dir: str
@@ -234,6 +235,7 @@ async def get_status():
         "tts_volume": getattr(current_cfg.voice, "tts_volume", 100),
         "stt_engine": getattr(current_cfg.voice, "stt_engine", "browser"),
         "sfx_enabled": getattr(current_cfg.voice, "sfx_enabled", True),
+        "gen_z_greetings": getattr(current_cfg.voice, "gen_z_greetings", False),
         "obsidian_vault_dir": getattr(current_cfg.memory, "obsidian_vault_dir", None),
         "semantic_search_enabled": getattr(current_cfg.memory, "semantic_search_enabled", True),
         "rag_chunks": len(memory_store.rag.chunks) if (hasattr(memory_store, "rag") and memory_store.rag) else 0,
@@ -1002,6 +1004,8 @@ async def select_voice(req: VoiceSelectionRequest):
         config.voice.stt_engine = req.stt_engine
     if req.sfx_enabled is not None:
         config.voice.sfx_enabled = req.sfx_enabled
+    if req.gen_z_greetings is not None:
+        config.voice.gen_z_greetings = req.gen_z_greetings
     save_config(config)
     tts = TextToSpeech(config.voice)
     await broadcast_ws("voice_changed", {
@@ -1011,6 +1015,7 @@ async def select_voice(req: VoiceSelectionRequest):
         "tts_volume": getattr(config.voice, "tts_volume", 100),
         "stt_engine": getattr(config.voice, "stt_engine", "browser"),
         "sfx_enabled": getattr(config.voice, "sfx_enabled", True),
+        "gen_z_greetings": getattr(config.voice, "gen_z_greetings", False),
     })
     return {
         "status": "updated",
@@ -1020,6 +1025,7 @@ async def select_voice(req: VoiceSelectionRequest):
         "current_volume": getattr(config.voice, "tts_volume", 100),
         "stt_engine": getattr(config.voice, "stt_engine", "browser"),
         "sfx_enabled": getattr(config.voice, "sfx_enabled", True),
+        "gen_z_greetings": getattr(config.voice, "gen_z_greetings", False),
     }
 
 @app.post("/api/voice/stop")
@@ -1110,7 +1116,7 @@ async def master_kill():
 @app.get("/api/voice/greeting")
 async def get_voice_greeting():
     """Retrieve a random contextual greeting from greetings.md."""
-    greeting = memory_store.get_random_greeting()
+    greeting = memory_store.get_random_greeting(gen_z_mode=getattr(config.voice, "gen_z_greetings", False))
     return {"greeting": greeting}
 
 @app.get("/api/calendar")
@@ -1138,11 +1144,50 @@ async def toggle_calendar_event(req: CalendarToggleRequest):
     await broadcast_ws("calendar_updated", {"action": "toggle", "identifier": req.identifier})
     return {"status": "success"}
 
+@app.delete("/api/calendar")
+@app.post("/api/calendar/clear")
+async def clear_calendar_events():
+    """Clear all scheduled events and tasks from memory (calendar.md)."""
+    cleared_count = calendar_engine.clear_all_events()
+    await broadcast_ws("calendar_updated", {"action": "clear", "cleared_count": cleared_count})
+    return {"status": "cleared", "cleared_count": cleared_count, "message": "All calendar events cleared from memory."}
+
 @app.get("/api/calendar/today")
 async def get_calendar_today_summary():
     """Get natural language vocal summary for today's schedule."""
     summary = calendar_engine.get_today_summary()
     return {"summary": summary}
+
+@app.get("/api/docs/design")
+@app.get("/api/design")
+async def get_design_document():
+    """Serve the crisp technical design document (design.md) for the Resources tab."""
+    candidates = [
+        Path.cwd() / "design.md",
+        Path(__file__).resolve().parent.parent.parent.parent / "design.md",
+        Path.home() / "code/ai/jarvis/design.md",
+    ]
+    doc_path = None
+    for cand in candidates:
+        if cand.exists():
+            doc_path = cand
+            break
+
+    if not doc_path:
+        raise HTTPException(status_code=404, detail="design.md document not found on workstation.")
+
+    try:
+        content = doc_path.read_text(encoding="utf-8")
+        return {
+            "status": "success",
+            "title": "JARVIS Mark 4 // Comprehensive Technical Design Specification",
+            "filename": doc_path.name,
+            "path": str(doc_path.resolve()),
+            "content": content,
+            "size_bytes": len(content.encode("utf-8")),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read design document: {e}")
 
 @app.post("/api/system/setup-shortcut")
 async def setup_ubuntu_shortcut():
