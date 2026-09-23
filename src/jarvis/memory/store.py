@@ -29,6 +29,70 @@ DEFAULT_TELEGRAM_WORKFLOW = """# Workflow: Telegram Messaging
 - Chat ID key in vault: `telegram_chat_id`
 """
 
+DEFAULT_GREETINGS = """# Jarvis Mark 2 Vocal Greetings & Salutations
+
+## General Greetings
+- Greetings, Sir. All systems armed and operational. What is our objective today?
+- Jarvis Mark 2 online. Neural pathways cleared and ready for your command, Sir.
+- Hello Sir. Hardware telemetry is nominal, standing by for instructions.
+- Good day, Sir. How may I be of service to you today?
+- At your service, Sir. Ready to execute whenever you are.
+
+## Morning Greetings
+- Good morning, Sir. All diagnostic systems report optimal status. How can I assist you?
+- Good morning. Workstation is armed, standing by for today's mission.
+- Good morning, Sir. Coffee status unknown, but neural core is fully operational.
+
+## Afternoon Greetings
+- Good afternoon, Sir. Systems standing by for your next directive.
+- Good afternoon. Telemetry stable, ready for your commands.
+
+## Evening Greetings
+- Good evening, Sir. Jarvis Mark 2 standing by for your evening workflow.
+- Good evening. All defensive watchdogs and sentinels remain active. What shall we tackle?
+"""
+
+DEFAULT_CALENDAR = """# Workstation Calendar & Tasks
+
+## Pending Events & Tasks
+- [ ] 2026-09-24 10:00 - Team standup and sprint demo #meeting
+- [ ] 2026-09-24 14:30 - Deploy Jarvis Mark 2 to staging #task
+- [ ] 2026-09-25 11:00 - Architecture review & security audit #meeting
+- [ ] 2026-09-26 16:00 - Workstation backup and GPU benchmark #maintenance
+
+## Completed Events & Tasks
+- [x] 2026-09-23 18:00 - Jarvis Mark 2 evolution verification #release
+"""
+
+DEFAULT_LOCAL_INTENTS = """# Local Instant Workflows & Fast Utterances
+
+## Pattern: Greeting
+- Triggers: "Hey Jarvis", "Hello Jarvis", "Hi Jarvis", "Greetings Jarvis", "Good morning Jarvis", "Wake up Jarvis", "Are you there Jarvis"
+- Response Templates:
+  - "Hello Sir, how can I assist you today?"
+  - "At your service, Sir. What is your goal?"
+  - "Greetings. All systems operational. How may I help?"
+  - "Online and listening, Sir. What is our objective?"
+
+## Pattern: Current Time
+- Triggers: "What's the time right now?", "Tell me the time", "What time is it", "Current time", "Check time", "Time please", "What is the time"
+- Dynamic Action: time_now
+- Dynamic Response:
+  - "It's {time} in the {period}."
+  - "The time is currently {time}."
+
+## Pattern: Calendar Today
+- Triggers: "How's my calendar look like today", "What is on my schedule today", "Show today's calendar", "Do I have any meetings today", "Check my schedule"
+- Dynamic Action: calendar_today
+- Dynamic Response:
+  - "Today's calendar looks like: {calendar_events}"
+
+## Pattern: Show File Content
+- Triggers: "Show content of {file}", "Display file {file}", "View file {file}", "Read {file} in {path}", "Open and show {file}"
+- Dynamic Action: show_file_content
+- Parameters: file, path
+"""
+
 class MemoryStore:
     def __init__(self, config: MemoryConfig):
         self.config = config
@@ -68,6 +132,38 @@ class MemoryStore:
         contacts_file = self.memory_dir / "contacts.md"
         if not contacts_file.exists():
             contacts_file.write_text("# Contacts & Handles\n# Format: - Name: email / handle\n", encoding="utf-8")
+
+        greetings_file = self.memory_dir / "greetings.md"
+        if not greetings_file.exists():
+            greetings_file.write_text(DEFAULT_GREETINGS, encoding="utf-8")
+
+        calendar_file = self.memory_dir / "calendar.md"
+        if not calendar_file.exists():
+            calendar_file.write_text(DEFAULT_CALENDAR, encoding="utf-8")
+
+        local_intents_file = self.memory_dir / "local_intents.md"
+        if not local_intents_file.exists():
+            local_intents_file.write_text(DEFAULT_LOCAL_INTENTS, encoding="utf-8")
+
+    def get_random_greeting(self) -> str:
+        """Read greetings.md and pick a random greeting line, or return default."""
+        import random
+        greetings_file = self.memory_dir / "greetings.md"
+        candidates: List[str] = []
+        if greetings_file.exists():
+            try:
+                for line in greetings_file.read_text(encoding="utf-8").splitlines():
+                    line = line.strip()
+                    if line.startswith("- "):
+                        greeting = line[2:].strip().strip('"').strip("'")
+                        if greeting:
+                            candidates.append(greeting)
+            except Exception:
+                pass
+
+        if candidates:
+            return random.choice(candidates)
+        return "Hello Sir. All systems operational and standing by for your command."
 
     def _migrate_legacy_memory(self, legacy_dir: Path) -> None:
         """Migrate existing markdown files from legacy directory to new memory directory."""

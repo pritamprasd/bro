@@ -14,8 +14,10 @@ from jarvis.config import JarvisConfig
 from jarvis.core.audit import AuditManager
 from jarvis.core.errors import error_tracker
 from jarvis.core.safety import SafetyClassifier
+from jarvis.memory.calendar_engine import CalendarEngine
 from jarvis.memory.store import MemoryStore
 from jarvis.models.base import ChatMessage, ModelResponse
+from jarvis.models.local_matcher import LocalIntentMatcher
 from jarvis.models.router import ModelRouter
 from jarvis.models.tier0 import Tier0Router
 from jarvis.security.vault import SecretVault
@@ -46,9 +48,10 @@ Available Actions:
 17. `save_workflow(topic, content)`: Save a learned workflow or note to persistent memory.
 18. `request_file(description, expected_filename=None)`: Ask the user to supply a required file, dataset, or image if it was not provided or not found.
 19. `show_media(media_type, content, title="Visual Display", caption=None, target="auto")`: Display a diagram (mermaid), chart (svg or image path), or image to the user in a dialog or desktop system window.
-20. `desktop_switch_monitor(screen_index)`: Switch which desktop monitor Jarvis interacts with (0=all displays combined, 1=display 1, 2=display 2).
-21. `desktop_inspect_screen(screen_index=None)`: Take a high-resolution screenshot of the active desktop monitor, observe active windows, and report visual state.
-22. `finish(result)`: Task is finished. Provide the final response to the user.
+20. `manage_calendar(sub_action, title=None, date=None, time=None, tags=None, identifier=None)`: Manage workstation schedule and tasks (sub_action="add"|"toggle"|"today"|"list").
+21. `desktop_switch_monitor(screen_index)`: Switch which desktop monitor Jarvis interacts with (0=all displays combined, 1=display 1, 2=display 2).
+22. `desktop_inspect_screen(screen_index=None)`: Take a high-resolution screenshot of the active desktop monitor, observe active windows, and report visual state.
+23. `finish(result)`: Task is finished. Provide the final response to the user.
 
 To call an action, output valid JSON in this exact structure:
 ```json
@@ -87,6 +90,8 @@ class JarvisAgent:
         self.shell = ShellActuator()
         self.macro_recorder = MacroRecorder()
         self.memory = MemoryStore(config.memory)
+        self.calendar = CalendarEngine(self.memory.memory_dir / "calendar.md")
+        self.local_matcher = LocalIntentMatcher(self.memory.memory_dir, calendar_engine=self.calendar)
         self.vault = SecretVault()
         self.safety = SafetyClassifier(config.safety)
         self.overlay = ApprovalOverlay()
@@ -96,6 +101,28 @@ class JarvisAgent:
     def run_task(self, user_goal: str, file_paths: Optional[List[str]] = None, max_steps: int = 15) -> str:
         """Execute a user goal through perception, reasoning, and action."""
         self.console.banner()
+
+        # 0. Sub-5ms Local Intent & Templated Offline Fast-Path
+        local_match = self.local_matcher.match_and_execute(user_goal)
+        if local_match:
+            self.console.thought(f"[Local Instant Intent: {local_match['pattern']}] Sub-5ms offline execution")
+            if local_match.get("action_data") and self.show_media_cb:
+                action_data = local_match["action_data"]
+                if action_data.get("action") == "show_file_content":
+                    try:
+                        self.show_media_cb(
+                            "file",
+                            action_data["content"],
+                            title=action_data["file_name"],
+                            caption=f"Path: {action_data['file_path']}",
+                        )
+                    except Exception:
+                        pass
+            resp = local_match["response_text"]
+            self._deliver_output(resp, is_conversation=True)
+            self.audit.start_run(user_goal)
+            self.audit.complete_run(resp, status="success")
+            return resp
 
         # Handle attached resources
         if file_paths:
@@ -421,6 +448,30 @@ class JarvisAgent:
                 caption = params.get("caption")
                 target = params.get("target", "auto")
                 return self.show_media(m_type, content, title, caption, target)
+
+            elif action == "manage_calendar":
+                sub_action = params.get("sub_action", "list")
+                from jarvis.actuators.base import ActionResult
+                if sub_action == "add":
+                    title = params.get("title", "")
+                    dt = params.get("date", "")
+                    tm = params.get("time", "")
+                    tags = params.get("tags")
+                    if not title or not dt:
+                        return ActionResult(success=False, error="Parameters 'title' and 'date' are required to add an event.")
+                    ev = self.calendar.add_event(title, dt, tm, tags)
+                    return ActionResult(success=True, output=f"Added calendar event: {ev['title']} on {ev['date']} {ev['time']}.")
+                elif sub_action == "toggle":
+                    ident = params.get("identifier", "")
+                    completed = params.get("completed")
+                    ok = self.calendar.toggle_event(ident, completed)
+                    return ActionResult(success=ok, output=f"Toggled event '{ident}'." if ok else f"Event '{ident}' not found.")
+                elif sub_action == "today":
+                    summary = self.calendar.get_today_summary()
+                    return ActionResult(success=True, output=summary)
+                else:
+                    events = self.calendar.get_pending_events()
+                    return ActionResult(success=True, output=f"Found {len(events)} pending calendar events: {json.dumps(events)}")
 
             else:
                 from jarvis.actuators.base import ActionResult

@@ -2351,6 +2351,212 @@
         gap: 0.5rem;
       }
     }
+
+    /* JARVIS MARK 2: Calendar & Schedule Styles */
+    .calendar-container {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 1080px) {
+      .calendar-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+    .cal-day-name {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      padding: 0.4rem 0;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
+    }
+    .cal-day-cell {
+      min-height: 95px;
+      background: rgba(3, 8, 18, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 0.45rem;
+      position: relative;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .cal-day-cell:hover {
+      border-color: rgba(0, 240, 255, 0.45);
+      background: rgba(0, 240, 255, 0.05);
+      transform: translateY(-1px);
+    }
+    .cal-day-cell.today {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.28);
+      background: rgba(0, 240, 255, 0.09);
+    }
+    .cal-day-cell.other-month {
+      opacity: 0.35;
+    }
+    .cal-day-number {
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+    .cal-day-cell.today .cal-day-number {
+      color: var(--neon-cyan);
+    }
+    .cal-event-chip {
+      font-size: 0.66rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.28);
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .cal-event-chip:hover {
+      background: rgba(0, 240, 255, 0.25);
+      border-color: var(--neon-cyan);
+    }
+    .cal-event-chip.done {
+      text-decoration: line-through;
+      opacity: 0.55;
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .pending-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      background: rgba(3, 8, 18, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: all 0.2s ease;
+      margin-bottom: 0.5rem;
+    }
+    .pending-item:hover {
+      border-color: rgba(0, 240, 255, 0.4);
+      background: rgba(0, 240, 255, 0.04);
+      transform: translateX(2px);
+    }
+    .tag-pill {
+      font-size: 0.62rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tag-meeting { background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.3); }
+    .tag-task { background: rgba(0, 255, 157, 0.15); color: var(--neon-green); border: 1px solid rgba(0, 255, 157, 0.3); }
+    .tag-release { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .tag-maintenance { background: rgba(255, 171, 0, 0.15); color: var(--neon-amber); border: 1px solid rgba(255, 171, 0, 0.3); }
+    .tag-default { background: rgba(255, 255, 255, 0.1); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+    /* JARVIS MARK 2: Multi-Step Execution Floating Glassmorphic Sidebar */
+    #multi-step-sidebar {
+      position: fixed;
+      right: 20px;
+      top: 75px;
+      width: 350px;
+      max-height: calc(100vh - 100px);
+      background: rgba(4, 9, 20, 0.88);
+      backdrop-filter: blur(22px);
+      border: 1px solid var(--panel-border);
+      border-top: 2px solid var(--neon-cyan);
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 240, 255, 0.15);
+      z-index: 9990;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    }
+    #multi-step-sidebar.collapsed {
+      transform: translateX(calc(100% + 30px));
+      pointer-events: none;
+      opacity: 0;
+    }
+    .multi-step-header {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(3, 8, 18, 0.6);
+    }
+    .multi-step-body {
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      flex: 1;
+    }
+    .step-breadcrumb-card {
+      background: rgba(3, 8, 18, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 0.65rem 0.8rem;
+      font-size: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      transition: border-color 0.2s ease;
+    }
+    .step-breadcrumb-card.active {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.07);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+    }
+    .step-breadcrumb-card.completed {
+      border-color: rgba(0, 255, 157, 0.3);
+    }
+
+    /* JARVIS MARK 2: Transparent File Viewer Dialog */
+    #file-viewer-modal .modal-card {
+      max-width: 880px;
+      width: 90%;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 40px rgba(0, 240, 255, 0.28);
+      background: rgba(3, 8, 18, 0.92);
+      backdrop-filter: blur(20px);
+    }
+    .code-viewer-container {
+      background: rgba(2, 6, 14, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+      max-height: 55vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
@@ -2395,6 +2601,7 @@
   <!-- Navigation Tabs (Streamlined Master Tabs) -->
   <div class="tabs">
     <button class="tab-btn active" id="tab-btn-command" onclick="switchTab('command')"><i data-lucide="terminal" class="hud-icon"></i> Command Center</button>
+    <button class="tab-btn" id="tab-btn-calendar" onclick="switchTab('calendar')"><i data-lucide="calendar" class="hud-icon text-cyan"></i> Calendar</button>
     <button class="tab-btn" id="tab-btn-displays" onclick="switchTab('displays')"><i data-lucide="monitor" class="hud-icon"></i> Main Desktop</button>
     <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')"><i data-lucide="history" class="hud-icon"></i> Audit & History</button>
     <button class="tab-btn" id="tab-btn-errors" onclick="switchTab('errors')"><i data-lucide="alert-triangle" class="hud-icon text-amber"></i> System Alerts <span class="badge" id="error-badge" style="display:none;">0</span></button>
@@ -2763,6 +2970,75 @@
       </div>
     </div>
 
+    <!-- TAB: Calendar & Schedule (Mark 2) -->
+    <div id="tab-calendar" class="tab-content">
+      <div class="calendar-container">
+        
+        <!-- Left: Interactive Monthly Calendar Grid -->
+        <div class="card" style="display: flex; flex-direction: column;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div class="card-title" style="margin: 0;"><i data-lucide="calendar" class="hud-icon text-cyan"></i> Workstation Schedule</div>
+              <div style="display: flex; align-items: center; gap: 0.4rem; background: rgba(3, 8, 18, 0.7); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.2rem 0.4rem;">
+                <button class="btn btn-sm" onclick="prevCalMonth()" style="background: transparent; padding: 0.2rem 0.5rem;"><i data-lucide="chevron-left" class="hud-icon-xs"></i></button>
+                <span id="cal-month-year-label" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #ffffff; min-width: 140px; text-align: center;">Month Year</span>
+                <button class="btn btn-sm" onclick="nextCalMonth()" style="background: transparent; padding: 0.2rem 0.5rem;"><i data-lucide="chevron-right" class="hud-icon-xs"></i></button>
+                <button class="btn btn-sm" onclick="goToTodayCal()" style="background: rgba(0, 240, 255, 0.12); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); font-size: 0.7rem; padding: 0.15rem 0.5rem; margin-left: 0.3rem;">Today</button>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <button class="btn btn-cyan btn-sm" onclick="openAddEventModal()"><i data-lucide="plus" class="hud-icon-xs"></i> Add Event / Task</button>
+              <button class="btn btn-sm" onclick="loadCalendar()" style="background: rgba(255,255,255,0.08);"><i data-lucide="refresh-cw" class="hud-icon-xs"></i></button>
+            </div>
+          </div>
+
+          <!-- Day of Week Headers -->
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 6px;">
+            <div class="cal-day-name">Sun</div>
+            <div class="cal-day-name">Mon</div>
+            <div class="cal-day-name">Tue</div>
+            <div class="cal-day-name">Wed</div>
+            <div class="cal-day-name">Thu</div>
+            <div class="cal-day-name">Fri</div>
+            <div class="cal-day-name">Sat</div>
+          </div>
+
+          <!-- Grid of Day Cells -->
+          <div class="calendar-grid" id="calendar-grid-cells">
+            <!-- Dynamically populated by renderCalendarGrid() -->
+          </div>
+        </div>
+
+        <!-- Right Sidebar: Pending Items & Instant Client Search -->
+        <div class="card" style="display: flex; flex-direction: column; max-height: 800px;">
+          <div class="card-header" style="padding-bottom: 0.75rem;">
+            <div>
+              <div class="card-title"><i data-lucide="check-square" class="hud-icon text-cyan"></i> Pending Tasks</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Synced with <code style="color: var(--neon-cyan);">calendar.md</code></div>
+            </div>
+            <span class="badge" id="pending-count-badge" style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">0 Pending</span>
+          </div>
+
+          <!-- Search Input with Instant Client-Side Filter -->
+          <div style="position: relative; margin-bottom: 0.85rem;">
+            <i data-lucide="search" class="hud-icon-xs text-cyan" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none;"></i>
+            <input type="text" id="calendar-search-input" placeholder="Search tasks, meetings, #tags..." oninput="filterPendingEvents(this.value)" style="width: 100%; background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.55rem 0.75rem 0.55rem 2.2rem; color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; outline: none;">
+          </div>
+
+          <!-- Scrollable List of Pending Items -->
+          <div id="pending-events-list" style="flex: 1; overflow-y: auto; padding-right: 2px;">
+            <!-- Populated dynamically by renderPendingList() -->
+          </div>
+
+          <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; margin-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--text-muted);">
+            <span>Voice Command: <i style="color: var(--neon-cyan);">"How's my calendar today"</i></span>
+            <button class="btn btn-sm" onclick="speakTodayCalendar()" style="background: rgba(0,240,255,0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.2rem 0.5rem;"><i data-lucide="volume-2" class="hud-icon-xs"></i> Recite</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- TAB: Main Desktop / Displays Configuration -->
     <div id="tab-displays" class="tab-content">
       <div class="card">
@@ -3013,7 +3289,8 @@
               <input type="checkbox" id="settings-handsfree-loop" checked onchange="toggleHandsFreeLoop(this.checked)">
               <span>Hands-Free Continuous Microphone Loop</span>
             </label>
-            <div style="margin-left: auto;">
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 0.6rem;">
+              <button class="btn btn-cyan btn-sm" onclick="setupUbuntuShortcut()" id="btn-setup-shortcut" title="Register Super+Shift+J GNOME shortcut to open Jarvis in voice mode"><i data-lucide="command" class="hud-icon-xs"></i> Ubuntu Shortcut (Super+Shift+J)</button>
               <button class="btn btn-warning btn-sm" onclick="triggerBrief()"><i data-lucide="sun" class="hud-icon-xs"></i> Daily Workstation Brief</button>
             </div>
           </div>
@@ -3885,6 +4162,148 @@ desktop:
     </div>
   </div>
 
+  <!-- Modal for Adding Schedule Task / Calendar Event -->
+  <div class="modal-overlay" id="calendar-add-modal" style="display: none; z-index: 99999;">
+    <div class="modal-card" style="max-width: 500px; border-color: var(--neon-cyan); box-shadow: 0 0 35px rgba(0, 240, 255, 0.25);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+        <h3 style="color: var(--neon-cyan); display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.95rem; font-family: 'JetBrains Mono', monospace;">
+          <i data-lucide="calendar-plus" class="hud-icon-sm text-cyan"></i> ADD SCHEDULE EVENT / TASK
+        </h3>
+        <button class="btn btn-sm" onclick="closeAddEventModal()" style="background: rgba(255,255,255,0.08); padding: 0.2rem 0.5rem;"><i data-lucide="x" class="hud-icon-xs"></i></button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.3rem;">Event / Task Title *</label>
+          <input type="text" id="cal-new-title" placeholder="e.g. Architecture review & security audit" style="width: 100%; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.55rem 0.75rem; color: #ffffff; font-size: 0.85rem; outline: none;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.3rem;">Date (YYYY-MM-DD) *</label>
+            <input type="date" id="cal-new-date" style="width: 100%; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.5rem 0.75rem; color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; outline: none;">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.3rem;">Time (HH:MM)</label>
+            <input type="time" id="cal-new-time" style="width: 100%; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.5rem 0.75rem; color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; outline: none;">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.3rem;">Tags (comma-separated)</label>
+          <input type="text" id="cal-new-tags" placeholder="e.g. meeting, release, task" style="width: 100%; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.55rem 0.75rem; color: #ffffff; font-size: 0.82rem; outline: none;">
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.25rem;">
+        <button class="btn" style="background: rgba(255,255,255,0.08); color: var(--text-muted);" onclick="closeAddEventModal()">Cancel</button>
+        <button class="btn btn-cyan" onclick="submitNewCalendarEvent()"><i data-lucide="check" class="hud-icon-xs"></i> Save to Calendar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transparent File Viewer Modal (Mark 2) -->
+  <div class="modal-overlay" id="file-viewer-modal" style="display: none; z-index: 99999;">
+    <div class="modal-card" style="max-width: 860px; width: 92%; border-color: var(--neon-cyan); box-shadow: 0 0 40px rgba(0, 240, 255, 0.3); background: rgba(3, 8, 18, 0.92); backdrop-filter: blur(20px);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <i data-lucide="file-text" class="hud-icon-sm text-cyan"></i>
+          <div>
+            <div id="file-viewer-filename" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; font-size: 0.95rem;">filename.txt</div>
+            <div id="file-viewer-filepath" style="font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">/path/to/file</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="badge" id="file-viewer-lines-badge" style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">0 lines</span>
+          <button class="btn btn-sm" onclick="copyFileViewerContent()" title="Copy content" style="background: rgba(255,255,255,0.08); padding: 0.25rem 0.55rem;"><i data-lucide="copy" class="hud-icon-xs"></i></button>
+          <button class="btn btn-sm" onclick="closeFileViewerModal()" style="background: rgba(255,255,255,0.08); padding: 0.25rem 0.55rem;"><i data-lucide="x" class="hud-icon-xs"></i></button>
+        </div>
+      </div>
+
+      <div class="code-viewer-container" id="file-viewer-content">
+        <!-- Lines injected here -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 0.85rem;">
+        <button class="btn btn-cyan btn-sm" onclick="closeFileViewerModal()">Close Viewer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Step Execution Floating Glassmorphic Sidebar (Mark 2) -->
+  <div id="multi-step-sidebar" class="collapsed">
+    <div class="multi-step-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="cpu" class="hud-icon-sm text-cyan"></i>
+        <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.82rem; color: #ffffff; letter-spacing: 0.5px;">AUTONOMOUS EXECUTION</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <span class="badge" id="multi-step-counter-badge" style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;">IDLE</span>
+        <button class="btn btn-sm" onclick="toggleMultiStepSidebar()" style="background: transparent; padding: 0.15rem 0.4rem; color: var(--text-muted);"><i data-lucide="minimize-2" class="hud-icon-xs"></i></button>
+      </div>
+    </div>
+
+    <div class="multi-step-body">
+      <!-- Step Progress Bar -->
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 0.3rem; font-family: 'JetBrains Mono', monospace;">
+          <span style="color: var(--text-muted);">Step Progress:</span>
+          <span id="multi-step-progress-label" style="color: var(--neon-cyan); font-weight: 700;">0 / 0</span>
+        </div>
+        <div style="width: 100%; height: 6px; background: rgba(3, 8, 18, 0.8); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+          <div id="multi-step-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green)); transition: width 0.3s ease; box-shadow: 0 0 8px var(--neon-cyan);"></div>
+        </div>
+      </div>
+
+      <!-- Actuator Breakdown Chart / Distribution -->
+      <div style="background: rgba(3, 8, 18, 0.65); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 0.65rem;">
+        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+          <span>Actuator Distribution</span>
+          <span id="multi-step-actuator-active" style="color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; text-transform: none;">idle</span>
+        </div>
+        <div id="multi-step-actuator-bar" style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.05); gap: 2px;">
+          <!-- Colored segments injected dynamically -->
+        </div>
+        <div id="multi-step-actuator-legend" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; font-size: 0.66rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Breadcrumbs List of Steps -->
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 0.45rem;">
+        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Execution Breadcrumbs:</div>
+        <div id="multi-step-breadcrumbs" style="display: flex; flex-direction: column; gap: 0.45rem; max-height: 280px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 0.74rem; text-align: center; padding: 1.5rem 0;">Awaiting mission command...</div>
+        </div>
+      </div>
+
+      <!-- Live Telemetry Badges -->
+      <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.65rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;">
+        <div style="background: rgba(3, 8, 18, 0.7); padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">CPU</span>
+          <span id="sidebar-cpu-val" style="color: #ffffff;">--%</span>
+        </div>
+        <div style="background: rgba(3, 8, 18, 0.7); padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">RAM</span>
+          <span id="sidebar-ram-val" style="color: #ffffff;">--%</span>
+        </div>
+        <div style="background: rgba(3, 8, 18, 0.7); padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">GPU</span>
+          <span id="sidebar-gpu-val" style="color: var(--neon-cyan);">--%</span>
+        </div>
+        <div style="background: rgba(3, 8, 18, 0.7); padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">MODE</span>
+          <span id="sidebar-mode-val" style="color: var(--neon-green);">AUTO</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Toggle Button for Multi-Step Sidebar -->
+  <button id="multi-step-toggle-btn" class="btn btn-cyan btn-sm" onclick="toggleMultiStepSidebar()" style="position: fixed; right: 20px; bottom: 20px; z-index: 9980; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; border-radius: 20px; box-shadow: 0 4px 20px rgba(0, 240, 255, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+    <i data-lucide="layers" class="hud-icon-xs"></i> <span id="multi-step-toggle-label">Steps (0)</span>
+  </button>
+
   <script>
     // Global Lucide Icon Renderer
     function renderIcons() {
@@ -3908,6 +4327,7 @@ desktop:
       if (target) target.classList.add('active');
       
       if (name === 'displays') loadDesktopMonitors();
+      if (name === 'calendar') loadCalendar();
       if (name === 'history') loadHistory();
       if (name === 'settings') {
         loadModels();
@@ -4426,6 +4846,9 @@ desktop:
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
+          if (msg.event === 'task_start') {
+            startMultiStepSession(msg.data.goal);
+          }
           if (msg.event === 'thought') {
             appendLog('thought', '💭 ' + msg.data);
             if (currentConversationMode === 'audio_only') {
@@ -4434,6 +4857,7 @@ desktop:
           }
           if (msg.event === 'action') {
             appendLog('action', `⚡ [${msg.data.actuator}] ${msg.data.detail}`);
+            recordActuatorAction(msg.data.actuator, msg.data.detail);
             if (currentConversationMode === 'audio_only') {
               if (msg.data.actuator === 'voice') {
                 updateVoiceVisualizerState('speaking', 'JARVIS SPEAKING (IRON MAN BUTLER)...');
@@ -4445,9 +4869,13 @@ desktop:
           if (msg.event === 'step') {
             appendLog('step', `▶ Step ${msg.data.step}/${msg.data.total}: ${msg.data.desc}`);
             updateMissionProgress(msg.data.step, msg.data.total, msg.data.desc);
+            updateMultiStepSidebar(msg.data.step, msg.data.total, msg.data.desc);
             if (currentConversationMode === 'audio_only') {
               updateVoiceVisualizerState('processing', `STEP ${msg.data.step}/${msg.data.total}`);
             }
+          }
+          if (msg.event === 'calendar_updated') {
+            loadCalendar();
           }
           if (msg.event === 'conversation_mode_changed') {
             if (currentConversationMode !== msg.data.conversation_mode) {
@@ -4514,6 +4942,7 @@ desktop:
             lastBroadcastResponse = '';
             document.getElementById('active-task-label').innerText = 'COMPLETED';
             hideMissionProgress();
+            finishMultiStepSession(resultText);
             loadHistory();
 
             if (currentConversationMode === 'audio_only') {
@@ -4623,6 +5052,11 @@ desktop:
 
       const mediaType = (data.media_type || 'image').toLowerCase();
       badge.innerText = mediaType.toUpperCase();
+
+      if (mediaType === 'file') {
+        showFileViewerModal(data.title, data.content, data.caption);
+        return;
+      }
 
       if (mediaType === 'diagram') {
         icon.innerHTML = '<i data-lucide="git-branch" class="hud-icon-md text-cyan"></i>';
@@ -5545,16 +5979,24 @@ desktop:
       runTask(text);
     }
 
+    let speechFinalTranscript = '';
+    let speechSilenceTimer = null;
+
     function initSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
+        recognition.continuous = true;
+        recognition.interimResults = true;
         recognition.lang = 'en-US';
 
         recognition.onstart = () => {
           isRecording = true;
+          speechFinalTranscript = '';
+          if (speechSilenceTimer) {
+            clearTimeout(speechSilenceTimer);
+            speechSilenceTimer = null;
+          }
           playTacticalSfx('mic_start');
           const micBtn = document.getElementById('mic-btn');
           if (micBtn) {
@@ -5572,17 +6014,41 @@ desktop:
           if (isJarvisSpeaking) {
             stopVoicePlayback();
           }
-          const transcript = event.results[0][0].transcript;
+
+          let interimTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const res = event.results[i];
+            if (res.isFinal) {
+              speechFinalTranscript += res[0].transcript + ' ';
+            } else {
+              interimTranscript += res[0].transcript;
+            }
+          }
+
+          const currentLiveText = (speechFinalTranscript + interimTranscript).trim();
+          if (!currentLiveText) return;
+
+          // Stream words onto screen in real-time
           if (currentConversationMode === 'audio_only') {
-            document.getElementById('sub-user-text').innerText = `"${transcript}"`;
+            const subUser = document.getElementById('sub-user-text');
+            if (subUser) subUser.innerText = `"${currentLiveText}"`;
           } else {
             const goalInput = document.getElementById('goal-input');
-            if (goalInput) goalInput.value = transcript;
+            if (goalInput) goalInput.value = currentLiveText;
           }
-          isTaskExecuting = true;
-          try { recognition.abort(); } catch(e) {}
-          isRecording = false;
-          runTask(transcript);
+
+          // Debounce execution on silence (800ms) to ensure full multi-word utterances are captured
+          if (speechSilenceTimer) clearTimeout(speechSilenceTimer);
+          speechSilenceTimer = setTimeout(() => {
+            const finalUtterance = (speechFinalTranscript + ' ' + interimTranscript).trim();
+            if (finalUtterance && !isTaskExecuting) {
+              isTaskExecuting = true;
+              speechFinalTranscript = '';
+              try { recognition.stop(); } catch(e) {}
+              isRecording = false;
+              runTask(finalUtterance);
+            }
+          }, 800);
         };
 
         recognition.onerror = (event) => {
@@ -6985,6 +7451,529 @@ desktop:
       loadErrors();
     }
 
+    // =========================================================================
+    // JARVIS MARK 2: Interactive Calendar & Schedule Module
+    // =========================================================================
+    let calendarEvents = [];
+    let pendingEvents = [];
+    let currentCalYear = new Date().getFullYear();
+    let currentCalMonth = new Date().getMonth(); // 0-indexed
+
+    const MONTH_NAMES = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    async function loadCalendar() {
+      try {
+        const res = await fetch('/api/calendar');
+        if (!res.ok) return;
+        const data = await res.json();
+        calendarEvents = data.events || [];
+        pendingEvents = data.pending || [];
+        renderCalendarGrid();
+        renderPendingList();
+      } catch (e) {
+        console.error("Failed to load calendar data:", e);
+      }
+    }
+
+    function prevCalMonth() {
+      currentCalMonth--;
+      if (currentCalMonth < 0) {
+        currentCalMonth = 11;
+        currentCalYear--;
+      }
+      renderCalendarGrid();
+    }
+
+    function nextCalMonth() {
+      currentCalMonth++;
+      if (currentCalMonth > 11) {
+        currentCalMonth = 0;
+        currentCalYear++;
+      }
+      renderCalendarGrid();
+    }
+
+    function goToTodayCal() {
+      const now = new Date();
+      currentCalYear = now.getFullYear();
+      currentCalMonth = now.getMonth();
+      renderCalendarGrid();
+    }
+
+    function renderCalendarGrid() {
+      const label = document.getElementById('cal-month-year-label');
+      if (label) label.innerText = `${MONTH_NAMES[currentCalMonth]} ${currentCalYear}`;
+
+      const grid = document.getElementById('calendar-grid-cells');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      // First day of current month (0=Sun, 1=Mon, ..., 6=Sat)
+      const firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
+      // Total days in current month
+      const daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+      // Days in previous month
+      const daysInPrevMonth = new Date(currentCalYear, currentCalMonth, 0).getDate();
+
+      // Prev month filler cells
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const d = daysInPrevMonth - i;
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell other-month';
+        cell.innerHTML = `<div class="cal-day-number">${d}</div>`;
+        grid.appendChild(cell);
+      }
+
+      // Current month days
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${currentCalYear}-${String(currentCalMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isToday = dateStr === todayStr;
+
+        const cell = document.createElement('div');
+        cell.className = `cal-day-cell${isToday ? ' today' : ''}`;
+        cell.onclick = (e) => {
+          if (!e.target.closest('.cal-event-chip')) {
+            openAddEventModal(dateStr);
+          }
+        };
+
+        const dayEvents = calendarEvents.filter(ev => ev.date === dateStr);
+
+        let chipsHtml = '';
+        dayEvents.slice(0, 3).forEach(ev => {
+          const timeLabel = ev.time ? `<span style="color:var(--neon-cyan);">${ev.time}</span> ` : '';
+          const tagClass = (ev.tags && ev.tags.length) ? `tag-${ev.tags[0].toLowerCase()}` : '';
+          chipsHtml += `
+            <div class="cal-event-chip${ev.completed ? ' done' : ''} ${tagClass}" onclick="event.stopPropagation(); toggleCalendarEvent(${ev.id}, ${!ev.completed})" title="${escapeHtml(ev.title)} (${ev.completed ? 'Completed' : 'Pending'})">
+              ${timeLabel}${escapeHtml(ev.title)}
+            </div>
+          `;
+        });
+        if (dayEvents.length > 3) {
+          chipsHtml += `<div style="font-size: 0.62rem; color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">+${dayEvents.length - 3} more</div>`;
+        }
+
+        cell.innerHTML = `
+          <div class="cal-day-number">
+            <span>${d}</span>
+            ${isToday ? '<span style="font-size:0.6rem; color:var(--neon-cyan); text-transform:uppercase;">TODAY</span>' : ''}
+          </div>
+          ${chipsHtml}
+        `;
+        grid.appendChild(cell);
+      }
+
+      // Next month filler cells to complete 35 or 42 grid
+      const totalCellsSoFar = firstDay + daysInMonth;
+      const remaining = (totalCellsSoFar <= 35) ? (35 - totalCellsSoFar) : (42 - totalCellsSoFar);
+      for (let d = 1; d <= remaining; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell other-month';
+        cell.innerHTML = `<div class="cal-day-number">${d}</div>`;
+        grid.appendChild(cell);
+      }
+    }
+
+    function renderPendingList(items = null) {
+      const list = document.getElementById('pending-events-list');
+      const badge = document.getElementById('pending-count-badge');
+      if (!list) return;
+
+      const eventsToShow = items !== null ? items : pendingEvents;
+      if (badge) badge.innerText = `${pendingEvents.length} Pending`;
+
+      if (eventsToShow.length === 0) {
+        list.innerHTML = `
+          <div style="color: var(--text-muted); font-size: 0.78rem; text-align: center; padding: 2.5rem 1rem; font-family: 'JetBrains Mono', monospace;">
+            <i data-lucide="check-circle" class="hud-icon-lg text-green" style="margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto;"></i>
+            All clear! No pending tasks found.
+          </div>
+        `;
+        renderIcons();
+        return;
+      }
+
+      let html = '';
+      eventsToShow.forEach(ev => {
+        let tagPills = '';
+        if (ev.tags && ev.tags.length) {
+          ev.tags.forEach(t => {
+            const cls = `tag-${t.toLowerCase()}`;
+            tagPills += `<span class="tag-pill ${cls}">#${escapeHtml(t)}</span> `;
+          });
+        }
+
+        html += `
+          <div class="pending-item">
+            <input type="checkbox" ${ev.completed ? 'checked' : ''} onchange="toggleCalendarEvent(${ev.id}, this.checked)" style="margin-top: 3px; cursor: pointer; accent-color: var(--neon-cyan);">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 0.82rem; font-weight: 600; color: #ffffff; white-space: normal; line-height: 1.35; margin-bottom: 0.25rem;">
+                ${escapeHtml(ev.title)}
+              </div>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
+                <span style="color: var(--neon-cyan);">${ev.date}${ev.time ? ' ' + ev.time : ''}</span>
+                ${tagPills}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      list.innerHTML = html;
+      renderIcons();
+    }
+
+    function filterPendingEvents(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        renderPendingList(pendingEvents);
+        return;
+      }
+      const filtered = pendingEvents.filter(ev => {
+        const titleMatch = ev.title.toLowerCase().includes(q);
+        const dateMatch = ev.date.toLowerCase().includes(q);
+        const tagMatch = ev.tags && ev.tags.some(t => t.toLowerCase().includes(q));
+        return titleMatch || dateMatch || tagMatch;
+      });
+      renderPendingList(filtered);
+    }
+
+    function openAddEventModal(defaultDate = null) {
+      const modal = document.getElementById('calendar-add-modal');
+      const dateInp = document.getElementById('cal-new-date');
+      const titleInp = document.getElementById('cal-new-title');
+      const timeInp = document.getElementById('cal-new-time');
+      const tagsInp = document.getElementById('cal-new-tags');
+
+      if (titleInp) titleInp.value = '';
+      if (timeInp) timeInp.value = '';
+      if (tagsInp) tagsInp.value = '';
+
+      if (dateInp) {
+        if (defaultDate) {
+          dateInp.value = defaultDate;
+        } else {
+          const now = new Date();
+          dateInp.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        }
+      }
+
+      if (modal) modal.style.display = 'flex';
+      if (titleInp) setTimeout(() => titleInp.focus(), 50);
+      renderIcons();
+    }
+
+    function closeAddEventModal() {
+      const modal = document.getElementById('calendar-add-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function submitNewCalendarEvent() {
+      const title = document.getElementById('cal-new-title').value.trim();
+      const date = document.getElementById('cal-new-date').value.trim();
+      const time = document.getElementById('cal-new-time').value.trim();
+      const rawTags = document.getElementById('cal-new-tags').value.trim();
+      const tags = rawTags ? rawTags.split(',').map(t => t.trim().replace(/^#/, '')).filter(Boolean) : [];
+
+      if (!title || !date) {
+        alert("Please enter both a title and date for the event.");
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, date, time, tags })
+        });
+        if (res.ok) {
+          closeAddEventModal();
+          playTacticalSfx('success');
+          appendLog('action', `📅 Added schedule event: ${title} (${date})`);
+          await loadCalendar();
+        } else {
+          alert("Failed to save calendar event.");
+        }
+      } catch (e) {
+        console.error("Calendar save error:", e);
+      }
+    }
+
+    async function toggleCalendarEvent(id, completed) {
+      try {
+        const res = await fetch('/api/calendar/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: id, completed })
+        });
+        if (res.ok) {
+          playTacticalSfx('toggle');
+          await loadCalendar();
+        }
+      } catch (e) {
+        console.error("Calendar toggle error:", e);
+      }
+    }
+
+    async function speakTodayCalendar() {
+      try {
+        const res = await fetch('/api/calendar/today');
+        const data = await res.json();
+        if (data.summary) {
+          appendLog('thought', `📅 [SCHEDULE SUMMARY] ${data.summary}`);
+          speakVoiceResponse(data.summary);
+          if (currentConversationMode === 'audio_only') {
+            document.getElementById('sub-jarvis-text').innerText = `"${data.summary}"`;
+            updateVoiceVisualizerState('speaking', 'CALENDAR RECITED');
+          }
+        }
+      } catch (e) {
+        console.error("Recite calendar error:", e);
+      }
+    }
+
+    // =========================================================================
+    // JARVIS MARK 2: Transparent File Viewer Dialog
+    // =========================================================================
+    let currentViewerContent = '';
+
+    function showFileViewerModal(filename, content, path = '') {
+      currentViewerContent = content || '';
+      const modal = document.getElementById('file-viewer-modal');
+      const nameEl = document.getElementById('file-viewer-filename');
+      const pathEl = document.getElementById('file-viewer-filepath');
+      const badgeEl = document.getElementById('file-viewer-lines-badge');
+      const codeEl = document.getElementById('file-viewer-content');
+
+      if (nameEl) nameEl.innerText = filename || 'file.txt';
+      if (pathEl) pathEl.innerText = path || filename || '';
+
+      const lines = (content || '').split('\n');
+      if (badgeEl) badgeEl.innerText = `${lines.length} lines`;
+
+      if (codeEl) {
+        let linesHtml = '';
+        lines.forEach((line, idx) => {
+          linesHtml += `
+            <div style="display: flex; gap: 0.85rem; padding: 1px 0;">
+              <span style="color: var(--text-muted); min-width: 38px; text-align: right; user-select: none; opacity: 0.6;">${idx + 1}</span>
+              <span style="flex: 1; white-space: pre-wrap; word-break: break-all;">${escapeHtml(line)}</span>
+            </div>
+          `;
+        });
+        codeEl.innerHTML = linesHtml;
+      }
+
+      if (modal) modal.style.display = 'flex';
+      renderIcons();
+    }
+
+    function closeFileViewerModal() {
+      const modal = document.getElementById('file-viewer-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function copyFileViewerContent() {
+      if (navigator.clipboard && currentViewerContent) {
+        navigator.clipboard.writeText(currentViewerContent).then(() => {
+          appendLog('step', '📋 File content copied to clipboard.');
+          playTacticalSfx('success');
+        });
+      }
+    }
+
+    // =========================================================================
+    // JARVIS MARK 2: Multi-Step Execution Floating Glassmorphic Sidebar
+    // =========================================================================
+    let multiStepState = {
+      active: false,
+      step: 0,
+      total: 0,
+      goal: '',
+      actuators: {},
+      steps: []
+    };
+
+    const ACTUATOR_COLORS = {
+      desktop: '#00e5ff',
+      browser: '#2979ff',
+      shell: '#00ff9d',
+      python: '#a855f7',
+      macro: '#ffab00',
+      memory: '#ff6b6b',
+      voice: '#38bdf8',
+      other: '#94a3b8'
+    };
+
+    function toggleMultiStepSidebar() {
+      const sb = document.getElementById('multi-step-sidebar');
+      if (sb) sb.classList.toggle('collapsed');
+      renderIcons();
+    }
+
+    function showMultiStepSidebar() {
+      const sb = document.getElementById('multi-step-sidebar');
+      if (sb) sb.classList.remove('collapsed');
+      renderIcons();
+    }
+
+    function startMultiStepSession(goal) {
+      multiStepState = {
+        active: true,
+        step: 0,
+        total: 10,
+        goal: goal || 'Autonomous Mission',
+        actuators: {},
+        steps: []
+      };
+      const badge = document.getElementById('multi-step-counter-badge');
+      if (badge) badge.innerText = 'INITIALIZING';
+      const label = document.getElementById('multi-step-progress-label');
+      if (label) label.innerText = '0 / 0';
+      const bar = document.getElementById('multi-step-progress-bar');
+      if (bar) bar.style.width = '0%';
+      const breadcrumbs = document.getElementById('multi-step-breadcrumbs');
+      if (breadcrumbs) breadcrumbs.innerHTML = `<div style="color: var(--neon-cyan); font-size: 0.74rem; font-family: 'JetBrains Mono', monospace; padding: 0.5rem 0;">▶ Goal: ${escapeHtml(goal)}</div>`;
+      showMultiStepSidebar();
+    }
+
+    function updateMultiStepSidebar(step, total, desc) {
+      multiStepState.active = true;
+      multiStepState.step = step;
+      multiStepState.total = total;
+
+      const pct = Math.min(100, Math.round((step / total) * 100));
+      const bar = document.getElementById('multi-step-progress-bar');
+      if (bar) bar.style.width = `${pct}%`;
+
+      const label = document.getElementById('multi-step-progress-label');
+      if (label) label.innerText = `${step} / ${total} (${pct}%)`;
+
+      const badge = document.getElementById('multi-step-counter-badge');
+      if (badge) badge.innerText = `STEP ${step}/${total}`;
+
+      const toggleLabel = document.getElementById('multi-step-toggle-label');
+      if (toggleLabel) toggleLabel.innerText = `Steps (${step}/${total})`;
+
+      // Add to breadcrumb stream
+      const breadcrumbs = document.getElementById('multi-step-breadcrumbs');
+      if (breadcrumbs) {
+        // Mark previous cards as completed
+        breadcrumbs.querySelectorAll('.step-breadcrumb-card').forEach(c => {
+          c.classList.remove('active');
+          c.classList.add('completed');
+        });
+
+        const card = document.createElement('div');
+        card.className = 'step-breadcrumb-card active';
+        const now = new Date().toTimeString().slice(0, 8);
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 700; color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">STEP ${step}</span>
+            <span style="color: var(--text-muted); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace;">${now}</span>
+          </div>
+          <div style="color: #ffffff; line-height: 1.3; font-size: 0.73rem;">${escapeHtml(desc)}</div>
+        `;
+        breadcrumbs.appendChild(card);
+        breadcrumbs.scrollTop = breadcrumbs.scrollHeight;
+      }
+      showMultiStepSidebar();
+    }
+
+    function recordActuatorAction(actuator, detail) {
+      if (!actuator) return;
+      const key = actuator.toLowerCase().split('_')[0] || 'other';
+      multiStepState.actuators[key] = (multiStepState.actuators[key] || 0) + 1;
+
+      const activeLabel = document.getElementById('multi-step-actuator-active');
+      if (activeLabel) activeLabel.innerText = `${actuator}`;
+
+      renderActuatorBreakdown();
+    }
+
+    function renderActuatorBreakdown() {
+      const bar = document.getElementById('multi-step-actuator-bar');
+      const legend = document.getElementById('multi-step-actuator-legend');
+      if (!bar || !legend) return;
+
+      const entries = Object.entries(multiStepState.actuators);
+      const totalCalls = entries.reduce((acc, [, count]) => acc + count, 0);
+
+      if (totalCalls === 0) {
+        bar.innerHTML = '<div style="width: 100%; background: rgba(255,255,255,0.08);"></div>';
+        legend.innerHTML = '<span>No actions dispatched yet</span>';
+        return;
+      }
+
+      let barHtml = '';
+      let legendHtml = '';
+      entries.forEach(([name, count]) => {
+        const pct = Math.round((count / totalCalls) * 100);
+        const col = ACTUATOR_COLORS[name] || ACTUATOR_COLORS.other;
+        barHtml += `<div style="width: ${pct}%; background: ${col};" title="${name}: ${pct}% (${count})"></div>`;
+        legendHtml += `<span style="display: flex; align-items: center; gap: 3px;"><span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${col};"></span>${name}: ${pct}%</span>`;
+      });
+
+      bar.innerHTML = barHtml;
+      legend.innerHTML = legendHtml;
+    }
+
+    function finishMultiStepSession(result) {
+      multiStepState.active = false;
+      const badge = document.getElementById('multi-step-counter-badge');
+      if (badge) badge.innerText = 'FINISHED';
+
+      const bar = document.getElementById('multi-step-progress-bar');
+      if (bar) bar.style.width = '100%';
+
+      const breadcrumbs = document.getElementById('multi-step-breadcrumbs');
+      if (breadcrumbs) {
+        const finCard = document.createElement('div');
+        finCard.className = 'step-breadcrumb-card completed';
+        finCard.style.borderColor = 'var(--neon-green)';
+        finCard.innerHTML = `
+          <div style="color: var(--neon-green); font-weight: 700; font-family: 'JetBrains Mono', monospace;">✔ MISSION COMPLETED</div>
+          <div style="color: #cbd5e1; font-size: 0.72rem; line-height: 1.35;">${escapeHtml(result || 'Task completed successfully.')}</div>
+        `;
+        breadcrumbs.appendChild(finCard);
+        breadcrumbs.scrollTop = breadcrumbs.scrollHeight;
+      }
+    }
+
+    // =========================================================================
+    // JARVIS MARK 2: Ubuntu Keybinding Shortcut Setup
+    // =========================================================================
+    async function setupUbuntuShortcut() {
+      const btn = document.getElementById('btn-setup-shortcut');
+      if (btn) btn.innerHTML = '<i data-lucide="loader" class="hud-icon-xs spin"></i> Configuring...';
+      try {
+        const res = await fetch('/api/system/setup-shortcut', { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'success') {
+          playTacticalSfx('success');
+          appendLog('result', '⌨️ Ubuntu GNOME shortcut Super+Shift+J registered for Jarvis Voice HUD.');
+          alert("Success! Ubuntu shortcut registered.\n\nPress Super+Shift+J anywhere on your desktop to summon Jarvis with auto-greeting in hands-free voice loop.");
+        } else {
+          appendLog('warning', 'Shortcut configuration output: ' + (data.output || data.message));
+          alert("Shortcut setup output:\n" + (data.output || data.message));
+        }
+      } catch (e) {
+        console.error("Failed to setup Ubuntu shortcut:", e);
+        alert("Failed to configure shortcut: " + e.message);
+      } finally {
+        if (btn) {
+          btn.innerHTML = '<i data-lucide="command" class="hud-icon-xs"></i> Ubuntu Shortcut (Super+Shift+J)';
+          renderIcons();
+        }
+      }
+    }
+
     pollStatus();
     setInterval(pollStatus, 5000);
     // Initial history load for homepage feed and charts
@@ -6993,6 +7982,7 @@ desktop:
     loadVoices();
     loadModels();
     loadMemory();
+    loadCalendar();
     applyTerminalFontSize();
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -7000,6 +7990,7 @@ desktop:
       loadVoices();
       loadModels();
       loadMemory();
+      loadCalendar();
       renderIcons();
     });
     window.addEventListener('load', () => {
@@ -7007,7 +7998,40 @@ desktop:
       loadVoices();
       loadModels();
       loadMemory();
+      loadCalendar();
       renderIcons();
+
+      // Check URL parameters for shortcut launcher: ?mode=audio_only&greet=1&loop=1
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqMode = urlParams.get('mode');
+      const reqGreet = urlParams.get('greet');
+      const reqLoop = urlParams.get('loop');
+
+      if (reqMode === 'audio_only' || reqMode === 'audio+chat' || reqMode === 'chat_only') {
+        setConversationMode(reqMode);
+      }
+      if (reqLoop === '1' || reqLoop === 'true') {
+        handsFreeLoopEnabled = true;
+        shouldKeepListening = true;
+        const loopToggle = document.getElementById('settings-handsfree-loop');
+        if (loopToggle) loopToggle.checked = true;
+      }
+      if (reqGreet === '1' || reqGreet === 'true') {
+        fetch('/api/voice/greeting')
+          .then(r => r.json())
+          .then(d => {
+            if (d.greeting) {
+              appendLog('result', '🎙️ [INITIAL GREETING] ' + d.greeting);
+              if (currentConversationMode === 'audio_only') {
+                updateVoiceVisualizerState('speaking', '🔊 ' + d.greeting);
+                const subJarvis = document.getElementById('sub-jarvis-text');
+                if (subJarvis) subJarvis.innerText = `"${d.greeting}"`;
+              }
+              speakVoiceResponse(d.greeting);
+            }
+          })
+          .catch(e => console.warn('Greeting fetch failed:', e));
+      }
     });
     setTimeout(renderIcons, 200);
     setTimeout(renderIcons, 1000);

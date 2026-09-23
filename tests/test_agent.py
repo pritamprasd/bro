@@ -118,7 +118,7 @@ def test_agent_tier0_conversational_fast_path():
     # Heavy router should NEVER be called
     agent.router.generate_text = MagicMock()
 
-    result = agent.run_task("Hello Jarvis")
+    result = agent.run_task("Tell me a fun fact about space")
     assert result == "Hello! I am Jarvis, standing by."
     agent.router.generate_text.assert_not_called()
 

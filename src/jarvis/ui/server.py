@@ -7,7 +7,7 @@ import re
 import shutil
 import threading
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 from fastapi import FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response
@@ -19,6 +19,7 @@ from jarvis.actuators.cdp_browser import CDPBrowserActuator
 from jarvis.config import JarvisConfig, load_config, save_config
 from jarvis.core.audit import AuditManager
 from jarvis.core.errors import error_tracker
+from jarvis.memory.calendar_engine import CalendarEngine
 from jarvis.memory.store import MemoryStore
 from jarvis.security.vault import SecretVault
 from jarvis.voice.tts import TextToSpeech
@@ -43,6 +44,7 @@ cdp_browser = CDPBrowserActuator(port=config.browser.cdp_port)
 organizer = DownloadOrganizer(config.watchdogs.organizer)
 vault = SecretVault()
 memory_store = MemoryStore(config.memory)
+calendar_engine = CalendarEngine(memory_store.memory_dir / "calendar.md")
 tts = TextToSpeech(config.voice)
 cron_engine = CronEngine(config.watchdogs.cron, briefing_callback=lambda b: tts.speak(b))
 
@@ -122,6 +124,16 @@ class VoicePreviewRequest(BaseModel):
     pitch: Optional[str] = None
     volume: Optional[int] = None
     text: Optional[str] = None
+
+class CalendarEventRequest(BaseModel):
+    title: str
+    date: str
+    time: Optional[str] = ""
+    tags: Optional[List[str]] = []
+
+class CalendarToggleRequest(BaseModel):
+    identifier: Union[int, str]
+    completed: Optional[bool] = None
 
 main_event_loop: Optional[asyncio.AbstractEventLoop] = None
 
@@ -620,7 +632,7 @@ async def get_memory_config():
 
 @app.post("/api/memory/config")
 async def update_memory_config(req: MemoryDirRequest):
-    global memory_store, config
+    global memory_store, config, calendar_engine
     new_dir = req.memory_dir.strip()
     if not new_dir:
         raise HTTPException(status_code=400, detail="Memory directory path cannot be empty.")
@@ -630,6 +642,7 @@ async def update_memory_config(req: MemoryDirRequest):
     
     # Reinitialize memory store with new path (creates directory and migrates legacy if applicable)
     memory_store = MemoryStore(config.memory)
+    calendar_engine = CalendarEngine(memory_store.memory_dir / "calendar.md")
     
     return {
         "status": "updated",
@@ -967,6 +980,56 @@ async def master_kill():
     if kill_callback:
         asyncio.get_event_loop().call_later(0.5, kill_callback)
     return {"status": "terminating"}
+
+@app.get("/api/voice/greeting")
+async def get_voice_greeting():
+    """Retrieve a random contextual greeting from greetings.md."""
+    greeting = memory_store.get_random_greeting()
+    return {"greeting": greeting}
+
+@app.get("/api/calendar")
+async def get_calendar_events():
+    """Fetch all events and pending items from calendar.md."""
+    events = calendar_engine.get_events()
+    pending = calendar_engine.get_pending_events()
+    return {"events": events, "pending": pending}
+
+@app.post("/api/calendar")
+async def add_calendar_event(req: CalendarEventRequest):
+    """Add a scheduled task or event to calendar.md."""
+    if not req.title or not req.date:
+        raise HTTPException(status_code=400, detail="Title and date are required.")
+    event = calendar_engine.add_event(title=req.title, event_date=req.date, event_time=req.time or "", tags=req.tags)
+    await broadcast_ws("calendar_updated", {"action": "add", "event": event})
+    return {"status": "success", "event": event}
+
+@app.post("/api/calendar/toggle")
+async def toggle_calendar_event(req: CalendarToggleRequest):
+    """Toggle event completion status in calendar.md."""
+    ok = calendar_engine.toggle_event(req.identifier, completed=req.completed)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Event not found")
+    await broadcast_ws("calendar_updated", {"action": "toggle", "identifier": req.identifier})
+    return {"status": "success"}
+
+@app.get("/api/calendar/today")
+async def get_calendar_today_summary():
+    """Get natural language vocal summary for today's schedule."""
+    summary = calendar_engine.get_today_summary()
+    return {"summary": summary}
+
+@app.post("/api/system/setup-shortcut")
+async def setup_ubuntu_shortcut():
+    """Configure Ubuntu GNOME custom keybinding Super+Shift+J for Jarvis HUD."""
+    import subprocess
+    script_path = Path(__file__).resolve().parent.parent.parent.parent / "scripts" / "setup_ubuntu_shortcut.sh"
+    if script_path.exists():
+        proc = subprocess.run(["bash", str(script_path)], capture_output=True, text=True)
+        return {
+            "status": "success" if proc.returncode == 0 else "error",
+            "output": proc.stdout or proc.stderr,
+        }
+    return {"status": "error", "message": "Shortcut script not found"}
 
 # Serve Frontend HTML
 WEB_DIR = Path(__file__).parent / "web"

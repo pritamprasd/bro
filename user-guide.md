@@ -33,7 +33,12 @@ This guide covers everything you need to operate, customize, and communicate wit
 16. [Multi-Desktop & Display Perception Setup](#16-multi-desktop--display-perception-setup)
 17. [Terminal Typography & Interactive Font Scaling](#17-terminal-typography--interactive-font-scaling)
 18. [World-Class Glassmorphic HUD Design & Layout Architecture](#18-world-class-glassmorphic-hud-design--layout-architecture)
-19. [Architectural Evolution: Mark 1 vs. Mark 2](custom-docs/upgrades_mark1_and_mark2.md)
+19. [Workstation Calendar App & Markdown Schedule](#19-workstation-calendar-app--markdown-schedule)
+20. [Sub-5ms Local Intent Matcher & Cached Utterances](#20-sub-5ms-local-intent-matcher--cached-utterances)
+21. [Zero-Drop Interim Voice STT & Continuous Speech Loop](#21-zero-drop-interim-voice-stt--continuous-speech-loop)
+22. [Autonomous Multi-Step Execution Sidebar](#22-autonomous-multi-step-execution-sidebar)
+23. [Ubuntu GNOME Shortcut Launcher (Super + Shift + J)](#23-ubuntu-gnome-shortcut-launcher)
+24. [Architectural Evolution: Mark 1 vs. Mark 2](custom-docs/upgrades_mark1_and_mark2.md)
 
 ---
 
@@ -532,5 +537,103 @@ Jarvis Mark 2 features an uncompromising, futuristic glassmorphic design system 
 
 4. **Lucide Vector Iconography:**
    - All legacy emojis and inconsistent symbols have been replaced with sharp, scalable SVG vector icons from the Lucide design library.
+
+---
+
+## 19. Workstation Calendar App & Markdown Schedule
+
+Jarvis Mark 2 includes a native, markdown-driven Workstation Calendar application accessible via the **Calendar** tab in the Web HUD.
+
+### Storage & Data Model
+- All schedule items, tasks, and deadlines are persisted in plain markdown in `~/ai-memory/jarvis/calendar.md`.
+- Format:
+  ```markdown
+  - [ ] 2026-09-24 10:00 - Team standup and sprint demo #meeting
+  - [ ] 2026-09-24 14:30 - Deploy Jarvis Mark 2 to staging #task
+  - [x] 2026-09-23 18:00 - Evolution verification completed #release
+  ```
+- Any edits made in Obsidian, Vim, or VS Code to `calendar.md` are immediately recognized by Jarvis upon reload.
+
+### Web HUD Calendar Features
+1. **Interactive Monthly Grid:**
+   - Visual view of all 12 months with quick Prev (`<`), Next (`>`), and **Today** jumpers.
+   - Highlights the current day with glowing neon-cyan borders and a `TODAY` badge.
+   - Colored event chips categorized by tag (`#meeting`, `#task`, `#release`, `#maintenance`).
+2. **Searchable Pending Items Sidebar:**
+   - Right-hand task list showing uncompleted events sorted chronologically.
+   - **Instant Browser Filter:** Type keywords, dates, or tags into the search input (`#calendar-search-input`) to filter items instantly with zero network roundtrips.
+   - **Checkbox Completion:** Click any task checkbox to mark it complete; the markdown file is updated and the event toggles to checked (`[x]`).
+3. **Voice Scheduling & Recitation:**
+   - Spoken vocal check: *"How's my calendar look like today?"* triggers Jarvis to summarize your schedule (e.g., *"You have 2 items scheduled for today: Team standup at 10:00, and Deploy Jarvis Mark 2 at 14:30."*).
+   - Click the **Recite** button in the sidebar to hear the day's agenda spoken aloud at any time.
+
+---
+
+## 20. Sub-5ms Local Intent Matcher & Cached Utterances
+
+To achieve instant conversational responses with zero GPU compute overhead, Jarvis Mark 2 features a two-stage **Local Intent Matcher**:
+
+### How It Works
+1. **Compiled Regex Slot Extractor (<0.1ms):**
+   - Utterances configured in `~/ai-memory/jarvis/local_intents.md` are compiled into regex matchers during initialization.
+   - Extracts dynamic slot tokens such as `{time}`, `{period}`, `{calendar_events}`, `{file}`, and `{path}`.
+2. **Local Variations Cache (`local_intents_cache.json`):**
+   - Natural language variations are cached alongside an MD5 hash of `local_intents.md`.
+   - Bypasses both the heavy ReAct loop and Tier-0 LLM router, delivering instant sub-millisecond responses.
+
+### Default Local Workflows
+* **Vocal Greetings:** *"Hey Jarvis"*, *"Hello Jarvis"*, *"Wake up Jarvis"* -> Instant contextual response.
+* **Current Time:** *"What's the time right now?"*, *"Tell me the time"* -> *"It's 7:45 PM in the evening."*
+* **Calendar Summary:** *"How's my calendar look like today"* -> Reads today's uncompleted agenda from `calendar.md`.
+* **Instant File Viewer:** *"Show content of pyproject.toml"* -> Locates the file, reads content, and opens the high-contrast transparent HUD File Viewer modal.
+
+---
+
+## 21. Zero-Drop Interim Voice STT & Continuous Speech Loop
+
+Mark 2 resolves voice input cutoffs and dropped words with a continuous Web Speech API integration:
+
+1. **Continuous Recognition (`recognition.continuous = true`):**
+   - The microphone remains armed across pauses, allowing the user to speak naturally without being cut off mid-sentence.
+2. **Interim Live Streaming (`recognition.interimResults = true`):**
+   - Words stream onto the screen in real time as they are spoken, giving instant visual feedback in both Command Center and Audio Only modes.
+3. **Multi-Result Aggregator:**
+   - Iterates over all results from `event.resultIndex` through `event.results.length`, concatenating final and interim speech segments accurately.
+4. **800ms Silence Debounce Timer:**
+   - Only dispatches the task once the user has stopped speaking for 800ms, ensuring full sentences and multi-clause instructions are captured in their entirety.
+
+---
+
+## 22. Autonomous Multi-Step Execution Sidebar
+
+For complex missions requiring multiple desktop or browser actions, the **Autonomous Execution Sidebar** provides real-time visibility into the agent's progress:
+
+* **Floating Glassmorphic Panel:** Collapsible floating HUD on the right side of the screen with a quick-access `Steps (X)` toggle button in the bottom right corner.
+* **Step Progress Bar:** Displays `Step X of Y (Z%)` with a neon-cyan progress track.
+* **Actuator Breakdown Chart:** Visual distribution bar displaying proportions of desktop actions, browser clicks, bash shell commands, and python runs.
+* **Breadcrumb Trail:** Chronological cards tracking each step number, timestamp, action name, and observation outcome.
+* **Live Telemetry Badges:** Real-time CPU, RAM, GPU temperature, and execution mode indicators.
+
+---
+
+## 23. Ubuntu GNOME Shortcut Launcher (Super + Shift + J)
+
+Jarvis Mark 2 can be summoned from anywhere on your Ubuntu desktop with a single global key combination:
+
+* **Keybinding:** <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd>
+* **Action:** Launches your browser directly into:
+  ```
+  http://127.0.0.1:8765/?mode=audio_only&greet=1&loop=1
+  ```
+* **Behaviors Activated:**
+  1. Opens the HUD in **Audio Only** mode with the glowing Iron Man Arc Reactor.
+  2. Fetches a random greeting from `~/ai-memory/jarvis/greetings.md` and speaks it aloud.
+  3. Automatically arms the **Hands-Free Continuous Microphone Loop**, allowing you to start speaking your command immediately after the greeting finishes.
+* **Configuration:**
+  - Click **Ubuntu Shortcut (Super+Shift+J)** in the **Settings** tab under Voice Setup, OR
+  - Run the setup script directly in your terminal:
+    ```bash
+    bash scripts/setup_ubuntu_shortcut.sh
+    ```
 
 

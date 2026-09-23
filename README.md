@@ -52,6 +52,12 @@ When you execute `uv run jarvis start`, the central **Process Supervisor** (`jar
 
 | Component | Capabilities |
 | :--- | :--- |
+| **Workstation Calendar App** | Dedicated Web UI tab with interactive monthly grid, client-side searchable pending items sidebar, and natural language voice recitation (`"How's my calendar look like today"`). Backed by human-readable markdown (`~/ai-memory/jarvis/calendar.md`). |
+| **Sub-5ms Local Intent Matcher** | High-performance offline trigger engine (<0.1ms compiled regex slots + cached variations) handling common utterances (`Hey Jarvis`, `What's the time right now?`, calendar checks, and file viewers) with zero LLM latency and zero GPU compute overhead. |
+| **Zero-Drop Interim Voice STT** | Overhauled speech recognition pipeline using continuous streaming Web Speech API, real-time interim word rendering on screen, and 800ms silence debouncing to eliminate dropped phrases or premature cutoffs. |
+| **Autonomous Multi-Step Sidebar**| Floating glassmorphic execution panel featuring step progress bar, actuator donut/stacked distribution chart, step breadcrumbs with live status, and real-time hardware telemetry. |
+| **Ubuntu GNOME Voice Shortcut** | One-touch `Super+Shift+J` shortcut to summon Jarvis HUD in Hands-Free Continuous Loop with Audio Only mode and random contextual greetings from `greetings.md`. |
+| **Transparent File Viewer** | Glassmorphic line-numbered modal viewer for displaying code, markdown, and configuration files directly inside the HUD upon vocal request (`"Show content of <file>"`). |
 | **System Responsiveness** | Local models (`gemma4:12b`, `qwen2.5vl:7b`) are locked into VRAM/RAM with `keep_alive: "-1"`, eliminating HDD read penalties. |
 | **Tier-0 Router** | Sub-100ms classification via `llama3.2:3b`. Configurable via UI; falls back to `gemma4:12b` if disabled. |
 | **Decoupled Web HUD** | Tactical dashboard on `:8765` with live WebSocket streaming, hardware telemetry, and run filmstrips. |
@@ -64,7 +70,7 @@ When you execute `uv run jarvis start`, the central **Process Supervisor** (`jar
 | **Visual Audit Trail** | Human-readable KPI cards, native SVG Actuator Donut, Latency Bar chart, Success ratio gauge, full-res screenshot lightbox, and 1-click Markdown export. |
 | **Command Center Widgets**| Live Watchdogs Sentinels Matrix, Multi-Disk Storage Health (NVMe `/` & secondary HDD `/mnt/HDD-500GB/`), Recent Missions feed, and Terminal controls. |
 | **Conversation Modes** | 3 Web UI modes: `audio_only` (hands-free Arc Reactor HUD with auto-listen loop), `audio+chat` (voice replies + terminal logs), and `chat_only` (silent text mode). |
-| **In-UI System Manual** | Integrated 13-section tactical handbook tab inside the Web HUD with 1-click code copy and live action triggers. |
+| **In-UI System Manual** | Integrated 15-section tactical handbook tab inside the Web HUD with 1-click code copy and live action triggers. |
 | **System Error Log** | Real-time error tracking card in the UI displaying any model disconnects, step timeouts, or unhandled exceptions. |
 | **Visual Media Display**| Interactive Mermaid.js SVG architecture diagrams, SVG data charts, and image viewers displayed via Web HUD modal or native X11 desktop system windows. |
 | **Multi-Desktop Support**| Designate active monitor (Display 1, Display 2, or All Combined) via HUD header dropdown or dedicated management tab with live thumbnails and automatic coordinate offset grounding. |
