@@ -86,7 +86,7 @@ def brief():
     tts = TextToSpeech(config.voice)
     engine = CronEngine(config.watchdogs.cron, briefing_callback=lambda b: tts.speak(b))
     msg = engine.trigger_brief()
-    console.print(Panel(msg, title="[bold cyan]☀️ Jarvis Mark 1 Daily Brief[/bold cyan]", border_style="cyan"))
+    console.print(Panel(msg, title="[bold cyan]☀️ Jarvis Mark 2 Daily Brief[/bold cyan]", border_style="cyan"))
 
 # System Lifecycle Commands (Start, Stop, Status)
 @app.command()
@@ -97,7 +97,7 @@ def start():
     if res["status"] == "already_running":
         console.print("[yellow]Jarvis is already running.[/yellow]")
     else:
-        console.print("[bold green]✔ Jarvis Mark 1 System Online![/bold green]")
+        console.print("[bold green]✔ Jarvis Mark 2 System Online![/bold green]")
         console.print(f"[cyan]Local HUD Dashboard:[/cyan]   [bold underline]{res.get('web_url', 'http://localhost:8765')}[/bold underline]")
         if res.get("network_url"):
             console.print(f"[cyan]Mobile / Network HUD:[/cyan] [bold underline]{res.get('network_url')}[/bold underline]")
@@ -108,7 +108,7 @@ def stop():
     """Trigger Master Kill-Switch to cleanly terminate all running Jarvis services."""
     supervisor = Supervisor()
     res = supervisor.stop()
-    console.print("[bold red]🛑 Master Kill-Switch Activated:[/bold red] All Jarvis Mark 1 services terminated.")
+    console.print("[bold red]🛑 Master Kill-Switch Activated:[/bold red] All Jarvis Mark 2 services terminated.")
     for p in res.get("processes", []):
         console.print(f"  [dim]• Terminated {p}[/dim]")
 

@@ -1,6 +1,6 @@
-# 📘 JARVIS // Mark 1: Comprehensive User Guide
+# 📘 JARVIS // Mark 2: Comprehensive User Guide
 
-Welcome to **JARVIS // Mark 1**, your autonomous, multi-modal personal AI assistant built for Linux X11 workstations powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7 (16 threads)**, and **96 GB of RAM**.
+Welcome to **JARVIS // Mark 2**, your autonomous, multi-modal personal AI assistant built for Linux X11 workstations powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7 (16 threads)**, and **96 GB of RAM**.
 
 This guide covers everything you need to operate, customize, and communicate with Jarvis across voice, desktop GUI, terminal, and mobile remote control.
 
@@ -33,6 +33,7 @@ This guide covers everything you need to operate, customize, and communicate wit
 16. [Multi-Desktop & Display Perception Setup](#16-multi-desktop--display-perception-setup)
 17. [Terminal Typography & Interactive Font Scaling](#17-terminal-typography--interactive-font-scaling)
 18. [World-Class Glassmorphic HUD Design & Layout Architecture](#18-world-class-glassmorphic-hud-design--layout-architecture)
+19. [Architectural Evolution: Mark 1 vs. Mark 2](custom-docs/upgrades_mark1_and_mark2.md)
 
 ---
 
@@ -110,7 +111,7 @@ The Command Center ([`http://127.0.0.1:8765`](http://127.0.0.1:8765)) serves as 
    - **🌐 Attach Chrome:** One-click launch of everyday Chrome with remote debugging on `:9222`.
    - **📁 Organize Files:** Triggers rule-based categorization of `~/Downloads`.
    - **📷 Inspect Screen:** Captures active desktop and analyzes open windows via Qwen2.5-VL.
-   - **📊 Show Diagram:** Opens the Jarvis Mark 1 Tactical Architecture diagram in high-res SVG.
+   - **📊 Show Diagram:** Opens the Jarvis Mark 2 Tactical Architecture diagram in high-res SVG.
 
 3. **Resource Attachment Bar:**
    - Easily attach local files (`.csv`, `.pdf`, `.png`, `.py`, `.json`) directly to your mission before execution.
@@ -183,7 +184,7 @@ Message your private bot from your phone anywhere:
 
 ## 5. Resource Attachments & On-Demand Prompting
 
-Jarvis Mark 1 can ingest and analyze documents, datasets, and scripts:
+Jarvis Mark 2 can ingest and analyze documents, datasets, and scripts:
 
 ### Attaching Files Upfront
 - **In Web HUD:** Click **📎 Attach File / Resource** or drag & drop files into the resource bar. Files are uploaded to `~/.jarvis/attachments/` and previewed for the model.
@@ -205,7 +206,7 @@ If you ask Jarvis to perform a task requiring a file that you forgot to attach (
 
 ## 6. Conversational Voice Assistant & Web UI Modes
 
-Jarvis Mark 1 speaks with the **Iron Man British AI persona** (`en-GB-RyanNeural`, tuned pitch `-4Hz`, rate `+2%`).
+Jarvis Mark 2 speaks with the **Iron Man British AI persona** (`en-GB-RyanNeural`, tuned pitch `-4Hz`, rate `+2%`).
 
 ### Web UI Conversation Modes:
 You can choose your conversational modality at any time using the header segmented selector or settings:
@@ -265,7 +266,7 @@ The Daily Brief delivers a spoken and visual summary of workstation readiness, m
 
 ## 8. Selecting AI Execution Engine (Local LLM vs Cloud Gemini 3.8 Flash vs Hybrid)
 
-Jarvis Mark 1 supports flexible, zero-friction AI execution across local hardware and cloud intelligence:
+Jarvis Mark 2 supports flexible, zero-friction AI execution across local hardware and cloud intelligence:
 
 ```
                   ┌──────────────────────────────────────────────┐
@@ -361,7 +362,7 @@ In the **🎞️ Audit & History** tab:
 
 ## 12. System Failure Alerts & Error Logs
 
-Jarvis Mark 1 tracks all system exceptions, model connection failures, timeouts, and hardware sentinel warnings:
+Jarvis Mark 2 tracks all system exceptions, model connection failures, timeouts, and hardware sentinel warnings:
 1. In the Web HUD, click **⚠️ System Alerts**.
 2. If an error occurs, an error badge in the navigation bar highlights the count.
 3. Each log displays timestamp, error classification, context, and full stack trace.
@@ -421,7 +422,7 @@ When interacting with Jarvis, any requested or generated visual artifact—inclu
   Action: show_media
   Action Input: {"media_type": "diagram", "content": "graph TD; A-->B", "title": "Flow", "target": "both"}
   ```
-* **Command Center Quick Tile:** Click **📊 Show Diagram** in the Web HUD to view the Jarvis Mark 1 Tactical Architecture diagram instantly.
+* **Command Center Quick Tile:** Click **📊 Show Diagram** in the Web HUD to view the Jarvis Mark 2 Tactical Architecture diagram instantly.
 
 ---
 
@@ -477,7 +478,7 @@ You can change Jarvis's main desktop in four convenient ways:
 
 ## 17. Terminal Typography & Interactive Font Scaling
 
-To ensure optimal readability across varied workstation displays, DPI settings, and viewing distances, Jarvis Mark 1 features an enhanced, high-contrast monospace console with interactive font size scaling.
+To ensure optimal readability across varied workstation displays, DPI settings, and viewing distances, Jarvis Mark 2 features an enhanced, high-contrast monospace console with interactive font size scaling.
 
 ### Typography Specifications
 * **Font Family:** `JetBrains Mono` (with fallbacks to `Fira Code`, `Cascadia Code`, and system monospace).
@@ -507,11 +508,11 @@ Each output type in the ReAct execution loop is rendered with distinct styling:
 
 ## 18. World-Class Glassmorphic HUD Design & Layout Architecture
 
-Jarvis Mark 1 features an uncompromising, futuristic glassmorphic design system modeled after advanced tactical HUD interfaces.
+Jarvis Mark 2 features an uncompromising, futuristic glassmorphic design system modeled after advanced tactical HUD interfaces.
 
 ### Core Layout Architecture
 1. **Floating Symmetrical Glass Header:**
-   - **Left Zone:** Pulsing Arc Reactor core and `JARVIS // MARK 1` brand title with live hardware status (`● SYSTEM READY // RTX 3060 ARMED`).
+   - **Left Zone:** Pulsing Arc Reactor core and `JARVIS // MARK 2` brand title with live hardware status (`● SYSTEM READY // RTX 3060 ARMED`).
    - **Center Capsule:** A unified glass pill bar grouping the **Conversation Mode segmented controls** (`Audio` | `Audio+Chat` | `Chat`) and the **Desktop Monitor Selector** (`SCREEN: [Display 1] [👁️]`).
    - **Right Zone:** Quick action pills: **Daily brief** (warm amber), **Voice Reply** toggle (neon cyan), and the master emergency **KILL SWITCH** (crimson alert).
    - **Non-Wrapping Design:** Keeps all header controls strictly on a single row from 1280px up to 4K resolutions.

@@ -17,6 +17,18 @@ class TextToSpeech:
         self.volume = getattr(config, "tts_volume", 100)
         self.enabled = config.enabled
         self._playback_lock = threading.Lock()
+        self._current_player_process: Optional[subprocess.Popen] = None
+
+    def stop(self) -> None:
+        """Halt ongoing audio playback immediately (Barge-In)."""
+        proc = self._current_player_process
+        if proc and proc.poll() is None:
+            try:
+                proc.terminate()
+                proc.kill()
+            except Exception:
+                pass
+        self._current_player_process = None
 
     def speak(self, text: str, blocking: bool = False) -> None:
         """Synthesize and play audio response."""
@@ -74,12 +86,16 @@ class TextToSpeech:
             played = False
             for cmd in players:
                 try:
-                    res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    if res.returncode == 0:
+                    proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    self._current_player_process = proc
+                    proc.wait()
+                    if proc.returncode in (0, -9, -15):  # 0 normal, -9/-15 killed by stop()
                         played = True
                         break
                 except FileNotFoundError:
                     continue
+                finally:
+                    self._current_player_process = None
 
         finally:
             if os.path.exists(temp_path):

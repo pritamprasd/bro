@@ -498,7 +498,7 @@ class AuditManager:
 <body>
   <div class="container">
     <div class="header">
-      <div class="brand">⚡ JARVIS MARK 1 // MISSION AUDIT REPORT</div>
+      <div class="brand">⚡ JARVIS MARK 2 // MISSION AUDIT REPORT</div>
       <div class="goal">"{goal_esc}"</div>
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -531,7 +531,7 @@ class AuditManager:
     {steps_html}
 
     <div class="footer">
-      Generated automatically by Jarvis Mark 1 Tactical Assistant • Run ID: {html.escape(run_id)}
+      Generated automatically by Jarvis Mark 2 Tactical Assistant • Run ID: {html.escape(run_id)}
     </div>
   </div>
 </body>

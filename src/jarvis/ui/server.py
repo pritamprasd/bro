@@ -109,6 +109,12 @@ class VoiceSelectionRequest(BaseModel):
     rate: Optional[str] = None
     pitch: Optional[str] = None
     volume: Optional[int] = None
+    stt_engine: Optional[Literal["browser", "whisper_local"]] = None
+    sfx_enabled: Optional[bool] = None
+
+class ObsidianConfigRequest(BaseModel):
+    obsidian_vault_dir: str
+    semantic_search_enabled: Optional[bool] = True
 
 class VoicePreviewRequest(BaseModel):
     voice: Optional[str] = None
@@ -183,6 +189,11 @@ async def get_status():
         "tts_voice": current_cfg.voice.tts_voice,
         "tts_rate": current_cfg.voice.tts_rate,
         "tts_volume": getattr(current_cfg.voice, "tts_volume", 100),
+        "stt_engine": getattr(current_cfg.voice, "stt_engine", "browser"),
+        "sfx_enabled": getattr(current_cfg.voice, "sfx_enabled", True),
+        "obsidian_vault_dir": getattr(current_cfg.memory, "obsidian_vault_dir", None),
+        "semantic_search_enabled": getattr(current_cfg.memory, "semantic_search_enabled", True),
+        "rag_chunks": len(memory_store.rag.chunks) if (hasattr(memory_store, "rag") and memory_store.rag) else 0,
         "spotlight_enabled": current_cfg.spotlight.enabled,
         "cloud_model": current_cfg.model.cloud_model,
         "has_gemini_api_key": bool(current_cfg.model.gemini_api_key or os.getenv("GEMINI_API_KEY")),
@@ -596,10 +607,15 @@ async def update_memory_file(req: MemoryUpdateRequest):
 
 @app.get("/api/memory/config")
 async def get_memory_config():
+    obsidian_p = str(memory_store.rag.obsidian_dir) if (hasattr(memory_store, "rag") and memory_store.rag and memory_store.rag.obsidian_dir) else ""
     return {
         "memory_dir": config.memory.memory_dir,
         "resolved_path": str(memory_store.memory_dir),
         "default_memory_dir": "~/ai-memory/jarvis",
+        "obsidian_vault_dir": getattr(config.memory, "obsidian_vault_dir", "~/obsidian/KnowledgeBase/ai-memory"),
+        "resolved_obsidian_path": obsidian_p,
+        "semantic_search_enabled": getattr(config.memory, "semantic_search_enabled", True),
+        "total_chunks": len(memory_store.rag.chunks) if hasattr(memory_store, "rag") else 0,
     }
 
 @app.post("/api/memory/config")
@@ -620,6 +636,35 @@ async def update_memory_config(req: MemoryDirRequest):
         "memory_dir": config.memory.memory_dir,
         "resolved_path": str(memory_store.memory_dir),
     }
+
+@app.post("/api/memory/obsidian")
+async def update_obsidian_config(req: ObsidianConfigRequest):
+    """Link user's Obsidian Vault for hybrid BM25 + semantic retrieval."""
+    global memory_store, config
+    new_obsidian = req.obsidian_vault_dir.strip()
+    config.memory.obsidian_vault_dir = new_obsidian
+    if req.semantic_search_enabled is not None:
+        config.memory.semantic_search_enabled = req.semantic_search_enabled
+    save_config(config)
+
+    memory_store = MemoryStore(config.memory)
+    total = memory_store.rag.refresh_index() if hasattr(memory_store, "rag") else 0
+    obsidian_p = str(memory_store.rag.obsidian_dir) if (hasattr(memory_store, "rag") and memory_store.rag and memory_store.rag.obsidian_dir) else ""
+
+    return {
+        "status": "updated",
+        "obsidian_vault_dir": config.memory.obsidian_vault_dir,
+        "resolved_obsidian_path": obsidian_p,
+        "semantic_search_enabled": config.memory.semantic_search_enabled,
+        "total_chunks": total,
+    }
+
+@app.post("/api/memory/reindex")
+async def reindex_memory():
+    """Trigger real-time re-indexing of memory files and Obsidian knowledge base."""
+    global memory_store
+    total = memory_store.rag.refresh_index() if hasattr(memory_store, "rag") else 0
+    return {"status": "reindexed", "total_chunks": total}
 
 @app.get("/api/models")
 async def list_available_models():
@@ -814,6 +859,10 @@ async def select_voice(req: VoiceSelectionRequest):
         config.voice.tts_pitch = req.pitch
     if req.volume is not None:
         config.voice.tts_volume = max(0, min(100, int(req.volume)))
+    if req.stt_engine:
+        config.voice.stt_engine = req.stt_engine
+    if req.sfx_enabled is not None:
+        config.voice.sfx_enabled = req.sfx_enabled
     save_config(config)
     tts = TextToSpeech(config.voice)
     await broadcast_ws("voice_changed", {
@@ -821,6 +870,8 @@ async def select_voice(req: VoiceSelectionRequest):
         "tts_rate": config.voice.tts_rate,
         "tts_pitch": config.voice.tts_pitch,
         "tts_volume": getattr(config.voice, "tts_volume", 100),
+        "stt_engine": getattr(config.voice, "stt_engine", "browser"),
+        "sfx_enabled": getattr(config.voice, "sfx_enabled", True),
     })
     return {
         "status": "updated",
@@ -828,7 +879,30 @@ async def select_voice(req: VoiceSelectionRequest):
         "current_rate": config.voice.tts_rate,
         "current_pitch": config.voice.tts_pitch,
         "current_volume": getattr(config.voice, "tts_volume", 100),
+        "stt_engine": getattr(config.voice, "stt_engine", "browser"),
+        "sfx_enabled": getattr(config.voice, "sfx_enabled", True),
     }
+
+@app.post("/api/voice/stop")
+async def stop_voice():
+    """Halt ongoing speech playback immediately (Barge-in)."""
+    global current_agent_instance, tts
+    if current_agent_instance and hasattr(current_agent_instance, "tts"):
+        current_agent_instance.tts.stop()
+    if tts:
+        tts.stop()
+    await broadcast_ws("voice_stopped", {"status": "halted"})
+    return {"status": "stopped", "message": "Voice playback interrupted"}
+
+@app.post("/api/voice/transcribe")
+async def transcribe_audio(file: UploadFile = File(...)):
+    """Transcribe uploaded audio buffer using local GPU Faster-Whisper."""
+    from jarvis.voice.stt import SpeechToText
+    stt_runner = SpeechToText(config.voice)
+    content = await file.read()
+    suffix = Path(file.filename or "audio.wav").suffix or ".wav"
+    text = stt_runner.transcribe_bytes(content, suffix=suffix)
+    return {"status": "success", "text": text}
 
 @app.post("/api/voice/preview")
 async def preview_voice(req: VoicePreviewRequest):
@@ -836,7 +910,7 @@ async def preview_voice(req: VoicePreviewRequest):
     voice_to_test = req.voice or config.voice.tts_voice
     rate_to_test = req.rate or config.voice.tts_rate
     vol_to_test = req.volume if req.volume is not None else getattr(config.voice, "tts_volume", 100)
-    sample_text = req.text or "Greetings. Jarvis neural speech synthesis is online and operational."
+    sample_text = req.text or "Greetings. Jarvis Mark 2 neural speech synthesis is online and operational."
     temp_cfg = config.voice.model_copy()
     temp_cfg.tts_voice = voice_to_test
     temp_cfg.tts_rate = rate_to_test

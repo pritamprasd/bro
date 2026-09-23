@@ -34,7 +34,7 @@ def main():
     clip_preview = (clip_content[:40] + "...") if len(clip_content) > 40 else clip_content
 
     root = tk.Tk()
-    root.title("Jarvis Spotlight (Mark 1)")
+    root.title("Jarvis Spotlight (Mark 2)")
     root.attributes("-topmost", True)
     root.geometry("640x160")
     root.configure(bg="#080c14")

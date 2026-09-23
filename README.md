@@ -1,6 +1,6 @@
-# 🤖 JARVIS // MARK 1: Autonomous Personal AI Assistant for Linux X11
+# 🤖 JARVIS // MARK 2: Autonomous Personal AI Assistant for Linux X11
 
-**JARVIS // Mark 1** is an autonomous, multi-modal personal assistant designed for Linux workstations (X11) powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7**, and **96 GB of RAM**.
+**JARVIS // Mark 2** is an autonomous, multi-modal personal assistant designed for Linux workstations (X11) powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7**, and **96 GB of RAM**.
 
 It operates with **zero cloud billing required** using local Ollama models, featuring:
 - **Vision-based Computer Use** (driving desktop apps, mouse, and keyboard)
@@ -8,7 +8,8 @@ It operates with **zero cloud billing required** using local Ollama models, feat
 - **Decoupled Graphical UI & Tactical HUD** (`http://127.0.0.1:8765`)
 - **Context-Aware Desktop Spotlight Bar** (<kbd>Alt</kbd> + <kbd>J</kbd>)
 - **Two-Way Telegram Remote Control** (control workstation from mobile anywhere)
-- **Interactive Voice Communication** (Web HUD microphone, CLI `jarvis voice`, and Iron Man voice replies)
+- **Interactive Voice Communication & Instant Barge-In** (Web HUD microphone, CLI `jarvis voice`, and Iron Man voice replies)
+- **Obsidian Knowledge Base Hybrid RAG** (BM25 + Semantic search across ~/ai-memory and Obsidian Vault)
 - **"Watch & Learn" Macro Compiler** (converts repeated visual tasks into 100x faster Python scripts)
 - **Multi-Desktop Display Selection** (choose which physical monitor or virtual combined screen Jarvis sees & controls)
 - **Visual Media Display** (interactive Mermaid SVG diagrams & charts via Web HUD dialog and native X11 desktop windows)
@@ -47,7 +48,7 @@ When you execute `uv run jarvis start`, the central **Process Supervisor** (`jar
 
 ---
 
-## 🌟 Key Capabilities in Mark 1
+## 🌟 Key Capabilities in Mark 2
 
 | Component | Capabilities |
 | :--- | :--- |
@@ -113,6 +114,9 @@ uv run jarvis memory list
 
 For detailed walkthroughs on every feature, voice settings, and remote mobile usage, read:
 👉 **[user-guide.md](user-guide.md)** or open the **📖 System Manual** tab inside the Web HUD at [`http://127.0.0.1:8765`](http://127.0.0.1:8765).
+
+For a complete architectural comparison of what was built in Mark 1 and upgraded in Mark 2, see:
+👉 **[custom-docs/upgrades_mark1_and_mark2.md](custom-docs/upgrades_mark1_and_mark2.md)**.
 
 ---
 

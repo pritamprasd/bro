@@ -1,4 +1,4 @@
-"""Error and System Failure Logging for Jarvis Mark 1."""
+"""Error and System Failure Logging for Jarvis Mark 2."""
 
 import time
 import traceback

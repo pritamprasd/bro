@@ -12,7 +12,7 @@ wheels/
 # Jarvis Runtime & External Storage
 .jarvis/
 ai-memory/
-memory/
+/memory/
 runs/
 attachments/
 

@@ -26,7 +26,7 @@ class ApprovalOverlay:
         result = {"approved": False}
 
         root = tk.Tk()
-        root.title("Jarvis Mark 1 // Safety Gatekeeper")
+        root.title("Jarvis Mark 2 // Safety Gatekeeper")
         root.attributes("-topmost", True)
         root.geometry("640x420")
         root.configure(bg="#070c18")

@@ -76,3 +76,17 @@ class SpeechToText:
         )
         text = " ".join([segment.text for segment in segments]).strip()
         return text
+
+    def transcribe_bytes(self, audio_bytes: bytes, suffix: str = ".wav") -> str:
+        """Transcribe in-memory audio bytes using Whisper."""
+        with tempfile.NamedTemporaryFile("wb", suffix=suffix, delete=False) as f:
+            f.write(audio_bytes)
+            tmp_path = f.name
+        try:
+            return self.transcribe_file(tmp_path)
+        finally:
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except Exception:
+                    pass

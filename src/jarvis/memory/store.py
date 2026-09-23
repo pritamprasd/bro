@@ -31,9 +31,18 @@ DEFAULT_TELEGRAM_WORKFLOW = """# Workflow: Telegram Messaging
 
 class MemoryStore:
     def __init__(self, config: MemoryConfig):
+        self.config = config
         self.memory_dir = Path(config.memory_dir).expanduser()
         self.workflows_dir = self.memory_dir / "workflows"
         self._initialize_structure()
+
+        from jarvis.memory.rag import HybridRAGEngine
+        self.rag = HybridRAGEngine(
+            memory_dir=str(self.memory_dir),
+            obsidian_vault_dir=getattr(config, "obsidian_vault_dir", None),
+            embedding_model=getattr(config, "embedding_model", "nomic-embed-text"),
+            enabled=getattr(config, "semantic_search_enabled", True),
+        )
 
     def _initialize_structure(self) -> None:
         self.memory_dir.mkdir(parents=True, exist_ok=True)
@@ -76,7 +85,7 @@ class MemoryStore:
             pass
 
     def get_relevant_memory(self, prompt: str) -> str:
-        """Selectively load ONLY memory files relevant to the current user prompt."""
+        """Selectively load relevant memory and Obsidian notes using hybrid search."""
         p_lower = prompt.lower()
         loaded_sections: List[str] = []
 
@@ -87,29 +96,40 @@ class MemoryStore:
             if content:
                 loaded_sections.append(f"<!-- MEMORY: preferences.md -->\n{content}")
 
-        # 2. System Info if asking about environment, GPU, or desktop
-        if any(w in p_lower for w in ["system", "gpu", "x11", "hardware", "specs", "display"]):
-            sys_path = self.memory_dir / "system.md"
-            if sys_path.exists():
-                loaded_sections.append(f"<!-- MEMORY: system.md -->\n{sys_path.read_text(encoding='utf-8').strip()}")
+        # 2. Hybrid RAG Context (BM25 + Semantic Search across memory & Obsidian Vault)
+        rag_context = ""
+        if hasattr(self, "rag") and self.rag and self.rag.enabled:
+            try:
+                rag_context = self.rag.format_context(prompt, top_k=3)
+            except Exception:
+                pass
 
-        # 3. Contacts if asking about emailing or messaging someone
-        if any(w in p_lower for w in ["contact", "email", "message", "telegram", "send to", "who is"]):
-            contacts_path = self.memory_dir / "contacts.md"
-            if contacts_path.exists():
-                content = contacts_path.read_text(encoding="utf-8").strip()
-                if len(content.splitlines()) > 2:
-                    loaded_sections.append(f"<!-- MEMORY: contacts.md -->\n{content}")
+        if rag_context:
+            loaded_sections.append(rag_context)
+        else:
+            # Fallback to keyword matching if RAG finds no strong signals
+            if any(w in p_lower for w in ["system", "gpu", "x11", "hardware", "specs", "display"]):
+                sys_path = self.memory_dir / "system.md"
+                if sys_path.exists():
+                    loaded_sections.append(f"<!-- MEMORY: system.md -->\n{sys_path.read_text(encoding='utf-8').strip()}")
 
-        # 4. Workflows directory search
+            if any(w in p_lower for w in ["contact", "email", "message", "telegram", "send to", "who is"]):
+                contacts_path = self.memory_dir / "contacts.md"
+                if contacts_path.exists():
+                    content = contacts_path.read_text(encoding="utf-8").strip()
+                    if len(content.splitlines()) > 2:
+                        loaded_sections.append(f"<!-- MEMORY: contacts.md -->\n{content}")
+
+        # 3. Workflows directory check (guarantees direct retrieval for named routines)
         if self.workflows_dir.exists():
             for wf_file in self.workflows_dir.glob("*.md"):
                 topic = wf_file.stem.lower()
-                # If topic name appears in prompt or words match
-                if topic in p_lower or any(part in p_lower for part in topic.split("_")):
-                    loaded_sections.append(
-                        f"<!-- MEMORY: workflows/{wf_file.name} -->\n{wf_file.read_text(encoding='utf-8').strip()}"
-                    )
+                if topic in p_lower or any(part in p_lower for part in topic.split("_") if len(part) > 2):
+                    tag = f"<!-- MEMORY: workflows/{wf_file.name} -->"
+                    if not any(tag in s for s in loaded_sections):
+                        loaded_sections.append(
+                            f"{tag}\n{wf_file.read_text(encoding='utf-8').strip()}"
+                        )
 
         return "\n\n".join(loaded_sections)
 
@@ -118,6 +138,11 @@ class MemoryStore:
         filename = f"{re.sub(r'[^a-zA-Z0-9_-]', '_', topic.lower())}.md"
         path = self.workflows_dir / filename
         path.write_text(content, encoding="utf-8")
+        if hasattr(self, "rag") and self.rag:
+            try:
+                self.rag.refresh_index()
+            except Exception:
+                pass
         return path
 
     def append_note(self, target_file: str, note: str) -> None:
@@ -127,3 +152,8 @@ class MemoryStore:
             path.write_text(f"# {target_file}\n\n", encoding="utf-8")
         with open(path, "a", encoding="utf-8") as f:
             f.write(f"\n- {note}\n")
+        if hasattr(self, "rag") and self.rag:
+            try:
+                self.rag.refresh_index()
+            except Exception:
+                pass

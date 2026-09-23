@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JARVIS // Mark 1 Tactical AI HUD</title>
+  <title>JARVIS // Mark 2 Tactical AI HUD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     /* ==========================================================================
-       JARVIS // MARK 1: HIGH-TECH FUTURISTIC GLASSMORPHIC DESIGN SYSTEM
+       JARVIS // MARK 2: HIGH-TECH FUTURISTIC GLASSMORPHIC DESIGN SYSTEM
        ========================================================================== */
     :root {
       /* Deep Void & Cyber Canvas */
@@ -2360,7 +2360,7 @@
     <div class="logo-group">
       <div class="arc-reactor"></div>
       <div class="logo-text">
-        <h1>JARVIS // MARK 1</h1>
+        <h1>JARVIS // MARK 2</h1>
         <span id="sys-status">● SYSTEM READY // RTX 3060 ARMED</span>
       </div>
     </div>
@@ -2386,6 +2386,7 @@
 
     <!-- Right Header Actions Tray -->
     <div class="top-actions">
+      <button class="btn btn-sm" onclick="toggleShortcutsModal()" title="Keyboard Shortcuts (?)" style="background: rgba(0,240,255,0.08); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 0.35rem;"><i data-lucide="keyboard" class="hud-icon-xs"></i> <span>?</span></button>
       <button class="btn btn-cyan" onclick="toggleVoiceReply()" id="btn-voice-toggle" title="Toggle voice replies on/off"><i data-lucide="volume-2" class="hud-icon-sm"></i> Voice: ON</button>
       <button class="btn btn-danger" onclick="killSwitch()" title="Master emergency kill-switch"><i data-lucide="power" class="hud-icon-sm"></i> KILL SWITCH</button>
     </div>
@@ -2554,7 +2555,7 @@
           </div>
 
           <div class="terminal" id="terminal-logs">
-            <div class="log-line" style="color: var(--neon-cyan);">[SYSTEM] Jarvis Mark 1 Tactical HUD Initialized.</div>
+            <div class="log-line" style="color: var(--neon-cyan);">[SYSTEM] Jarvis Mark 2 Tactical HUD Initialized.</div>
             <div class="log-line" style="color: var(--text-muted);">[SYSTEM] Local Ollama Engine connected. Models pinned in RAM/VRAM.</div>
             <div class="log-line" style="color: var(--text-muted);">[SYSTEM] WebSocket telemetry bridge active.</div>
           </div>
@@ -2982,6 +2983,25 @@
                 <button class="btn btn-cyan btn-sm" onclick="testJarvisVolume()" title="Test current volume level"><i data-lucide="play" class="hud-icon-xs"></i> Play</button>
               </div>
             </div>
+
+            <!-- STT Engine & Tactical SFX (Mark 2) -->
+            <div class="step-card">
+              <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="radio" class="hud-icon-xs text-cyan"></i> STT Engine &amp; SFX Synthesis</h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Speech recognition pipeline &amp; Web Audio SFX</p>
+              <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.35rem; margin-bottom: 0.5rem;">
+                <select id="settings-stt-engine-select" onchange="onSttEngineChange(this.value)" style="flex: 1; font-size: 0.78rem;">
+                  <option value="browser">Browser Web Speech API (Cloud Streaming)</option>
+                  <option value="whisper">Local GPU Faster-Whisper (CUDA Offline)</option>
+                </select>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem;">
+                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: #ffffff; cursor: pointer;">
+                  <input type="checkbox" id="settings-sfx-toggle" checked onchange="toggleTacticalSfx(this.checked)">
+                  <span>Tactical Web Audio SFX</span>
+                </label>
+                <button class="btn btn-sm" onclick="playTacticalSfx('success')" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-size: 0.7rem; padding: 0.2rem 0.5rem;"><i data-lucide="bell" class="hud-icon-xs"></i> Test SFX</button>
+              </div>
+            </div>
           </div>
 
           <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; background: rgba(3, 8, 18, 0.6); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.75rem 1rem;">
@@ -3232,6 +3252,13 @@
               <button class="tree-item-btn" id="btn-tree-vault" onclick="selectMemoryView('vault')">
                 <i data-lucide="key" class="hud-icon-xs text-purple"></i> Keyring Vault (Secrets)
               </button>
+
+              <div style="font-size: 0.72rem; color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-weight: 700; text-transform: uppercase; margin-top: 0.75rem; margin-bottom: 0.4rem; padding-left: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
+                <i data-lucide="layers" class="hud-icon-xs text-cyan"></i> KNOWLEDGE RAG
+              </div>
+              <button class="tree-item-btn" id="btn-tree-obsidian" onclick="selectMemoryView('obsidian')">
+                <i data-lucide="book" class="hud-icon-xs text-cyan"></i> Obsidian Vault RAG
+              </button>
             </div>
           </div>
 
@@ -3293,6 +3320,49 @@
               </div>
             </div>
 
+            <!-- Obsidian Knowledge Base RAG View (Mark 2) -->
+            <div id="memory-obsidian-view" style="display: none; flex-direction: column; gap: 1.25rem;">
+              <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.65rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <div style="font-size: 1rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="book-open" class="hud-icon-sm text-cyan"></i> Obsidian Knowledge Base &amp; Hybrid RAG
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">
+                    Integrates notes from your Obsidian Vault into Jarvis memory using BM25 keyword matching and semantic embeddings.
+                  </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <span class="badge" id="obsidian-chunk-count" style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 0.3rem 0.6rem;">0 Chunks Indexed</span>
+                  <button class="btn btn-cyan btn-sm" id="btn-reindex-obsidian" onclick="reindexKnowledgeVault()"><i data-lucide="refresh-cw" class="hud-icon-xs"></i> Re-Index Knowledge Base</button>
+                </div>
+              </div>
+
+              <!-- Vault Link Configuration Card -->
+              <div style="background: rgba(3, 8, 18, 0.7); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1rem;">
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--neon-cyan); margin-bottom: 0.4rem;">Obsidian Vault Storage Path</div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.6rem;">Points to your notes folder. All .md files are recursively parsed and anchored to markdown sections.</p>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                  <input type="text" id="obsidian-vault-path" placeholder="~/obsidian/KnowledgeBase/ai-memory" style="flex: 1; background: rgba(6,12,26,0.85); color: #ffffff; border: 1px solid var(--panel-border); padding: 0.55rem 0.8rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+                  <button class="btn btn-cyan btn-sm" onclick="saveObsidianVault()"><i data-lucide="link" class="hud-icon-xs"></i> Link Vault</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">
+                  <span>Resolved: <span id="obsidian-resolved-path" style="color: #cbd5e1;">~/obsidian/KnowledgeBase/ai-memory</span></span>
+                  <span id="obsidian-save-status" style="color: #10b981; display: none; font-weight: 600;">✓ Vault linked &amp; reindexed</span>
+                </div>
+              </div>
+
+              <!-- RAG Query Testing Tool -->
+              <div style="background: rgba(3, 8, 18, 0.7); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1rem;">
+                <div style="font-size: 0.82rem; font-weight: 700; color: #a78bfa; margin-bottom: 0.4rem;"><i data-lucide="search" class="hud-icon-xs text-purple"></i> Test Real-Time Knowledge Retrieval</div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.6rem;">Verify which notes and heading sections Jarvis injects into cognitive context for any query.</p>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                  <input type="text" id="rag-test-input" placeholder="e.g. CDAC Pune hospital architecture, RTX 3060 specs, or user preferences..." style="flex: 1; background: rgba(6,12,26,0.85); color: #ffffff; border: 1px solid var(--panel-border); padding: 0.55rem 0.8rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+                  <button class="btn btn-purple btn-sm" onclick="testRagQuery()"><i data-lucide="search" class="hud-icon-xs"></i> Test Query</button>
+                </div>
+                <div id="rag-test-results" style="margin-top: 0.75rem; display: none; background: rgba(2, 6, 16, 0.9); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; max-height: 250px; overflow-y: auto;"></div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -3302,7 +3372,7 @@
     <div id="tab-guide" class="tab-content">
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><i data-lucide="book-open" class="hud-icon-sm text-cyan"></i> Jarvis Mark 1: Tactical System Manual & User Guide</div>
+          <div class="card-title"><i data-lucide="book-open" class="hud-icon-sm text-cyan"></i> Jarvis Mark 2: Tactical System Manual &amp; User Guide</div>
           <span style="font-size: 0.8rem; color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">OFFICIAL OPERATING HANDBOOK</span>
         </div>
 
@@ -3332,7 +3402,7 @@
             <!-- Section 1: Architecture -->
             <div class="manual-section active" id="sec-arch">
               <h2><i data-lucide="cpu" class="hud-icon-sm text-cyan"></i> 1. How Jarvis Works: Multi-Tier ReAct Architecture</h2>
-              <p>Jarvis Mark 1 operates on an asynchronous <b>Perception-Reasoning-Action (ReAct)</b> cognitive loop optimized specifically for Linux X11 workstations with local NVIDIA RTX hardware.</p>
+              <p>Jarvis Mark 2 operates on an asynchronous <b>Perception-Reasoning-Action (ReAct)</b> cognitive loop optimized specifically for Linux X11 workstations with local NVIDIA RTX hardware.</p>
               
               <div class="code-box">
 [User Input] (Voice / Web HUD / Alt+J Spotlight / Telegram / CLI)
@@ -3412,7 +3482,7 @@ uv run jarvis voice<button class="copy-btn" onclick="copySnippet('uv run jarvis 
             <!-- Section 4: Voice -->
             <div class="manual-section" id="sec-voice">
               <h2><i data-lucide="volume-2" class="hud-icon-sm text-blue"></i> 4. Conversational Modes & Voice Reply Controls</h2>
-              <p>Jarvis Mark 1 speaks with the <b>Iron Man British AI butler persona</b> (<code>en-GB-RyanNeural</code>, pitch -4Hz, rate +2%).</p>
+              <p>Jarvis Mark 2 speaks with the <b>Iron Man British AI butler persona</b> (<code>en-GB-RyanNeural</code>, pitch -4Hz, rate +2%).</p>
               
               <h3>Web UI Conversation Modes:</h3>
               <p>You can effortlessly switch between three conversational modalities using the glowing header pills or below:</p>
@@ -3488,7 +3558,7 @@ voice:
             <!-- Section 7: Models -->
             <div class="manual-section" id="sec-models">
               <h2><i data-lucide="cpu" class="hud-icon-sm text-purple"></i> 7. Selecting Local RTX 3060 Models from Ollama</h2>
-              <p>Jarvis Mark 1 is 100% local by default, running without cloud billing or API keys on your RTX 3060 (12 GB VRAM).</p>
+              <p>Jarvis Mark 2 is 100% local by default, running without cloud billing or API keys on your RTX 3060 (12 GB VRAM).</p>
               
               <h3>Subsystem Models:</h3>
               <ul>
@@ -3711,6 +3781,62 @@ desktop:
       <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button class="btn" style="background: rgba(255,255,255,0.08); color: var(--text-muted);" onclick="closeAuditClearModal()">Cancel</button>
         <button class="btn btn-danger" id="btn-confirm-audit-clear" onclick="confirmClearAuditHistory()"><i data-lucide="trash-2" class="hud-icon-xs"></i> Confirm &amp; Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Tactical Keyboard Shortcuts HUD (Mark 2) -->
+  <div class="modal-overlay" id="shortcuts-modal" style="display: none; z-index: 99999;">
+    <div class="modal-card" style="max-width: 600px; border-color: var(--neon-cyan); box-shadow: 0 0 35px rgba(0, 240, 255, 0.25);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.6rem;">
+        <h3 style="color: var(--neon-cyan); display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.95rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;">
+          <i data-lucide="command" class="hud-icon-sm text-cyan"></i> JARVIS MARK 2 // TACTICAL SHORTCUTS
+        </h3>
+        <button class="btn btn-sm" onclick="toggleShortcutsModal()" style="background: rgba(255,255,255,0.08); padding: 0.2rem 0.5rem;"><i data-lucide="x" class="hud-icon-xs"></i></button>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0.85rem;">
+        Workstation hotkeys for instant HUD navigation, hands-free voice control, and audio barge-in:
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Command Center</span>
+          <kbd style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">1</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Agent Terminal</span>
+          <kbd style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">2</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Sentinels Matrix</span>
+          <kbd style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">3</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">System Telemetry</span>
+          <kbd style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">4</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Tactical Manual</span>
+          <kbd style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">5</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Fullscreen Audio HUD</span>
+          <kbd style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">F</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Toggle Mic / Voice</span>
+          <kbd style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">M</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Barge-In (Halt Voice)</span>
+          <kbd style="background: rgba(239,68,68,0.2); border: 1px solid var(--neon-red); color: var(--neon-red); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">Esc</kbd>
+        </div>
+        <div style="grid-column: span 2; display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Toggle Shortcuts Modal</span>
+          <kbd style="background: rgba(16,185,129,0.2); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">?</kbd>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+        <button class="btn btn-cyan btn-sm" onclick="toggleShortcutsModal()">Dismiss</button>
       </div>
     </div>
   </div>
@@ -3970,13 +4096,159 @@ desktop:
       document.getElementById('goal-input').value = text;
     }
 
+    // =========================================================================
+    // Tactical Web Audio API SFX Engine (Zero External Audio Downloads)
+    // =========================================================================
+    let audioCtx = null;
+    let sfxEnabled = true;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleTacticalSfx(enabled) {
+      sfxEnabled = !!enabled;
+      const toggle = document.getElementById('settings-sfx-toggle');
+      if (toggle && toggle.checked !== sfxEnabled) toggle.checked = sfxEnabled;
+    }
+
+    function playTacticalSfx(type) {
+      if (!sfxEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        if (type === 'mic_start') {
+          const osc1 = ctx.createOscillator();
+          const gain1 = ctx.createGain();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(587.33, now);
+          osc1.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+          gain1.gain.setValueAtTime(0.08, now);
+          gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          osc1.connect(gain1);
+          gain1.connect(ctx.destination);
+          osc1.start(now);
+          osc1.stop(now + 0.15);
+        } else if (type === 'mic_stop') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(784, now);
+          osc.frequency.exponentialRampToValueAtTime(440, now + 0.12);
+          gain.gain.setValueAtTime(0.07, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'barge_in') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.exponentialRampToValueAtTime(40, now + 0.15);
+          gain.gain.setValueAtTime(0.16, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.17);
+        } else if (type === 'success') {
+          [523.25, 659.25, 783.99].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+            gain.gain.setValueAtTime(0.06, now + idx * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.08);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.05);
+            osc.stop(now + idx * 0.05 + 0.09);
+          });
+        } else if (type === 'warning') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.setValueAtTime(440, now + 0.08);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        }
+      } catch (e) {
+        console.warn('Audio SFX error:', e);
+      }
+    }
+
     function appendLog(type, text) {
       const term = document.getElementById('terminal-logs');
       const div = document.createElement('div');
       div.className = 'log-line log-' + type;
-      div.innerText = text;
+
+      if (typeof text === 'string' && text.includes('```')) {
+        const parts = text.split(/(```[\s\S]*?```)/g);
+        parts.forEach(part => {
+          if (part.startsWith('```') && part.endsWith('```')) {
+            const lines = part.slice(3, -3).trim().split('\n');
+            const lang = lines[0].match(/^[a-zA-Z0-9_-]+$/) ? lines.shift() : '';
+            const code = lines.join('\n');
+            
+            const codeWrap = document.createElement('div');
+            codeWrap.className = 'terminal-code-block';
+            codeWrap.style.cssText = 'position: relative; background: rgba(2, 6, 18, 0.85); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 8px; padding: 0.85rem; margin: 0.5rem 0; font-family: "JetBrains Mono", monospace; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);';
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'btn btn-sm btn-cyan';
+            copyBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; font-size: 0.68rem; padding: 0.2rem 0.55rem; z-index: 10; opacity: 0.9;';
+            copyBtn.innerHTML = '<i data-lucide="copy" class="hud-icon-xs"></i> <span>COPY</span>';
+            copyBtn.onclick = () => {
+              navigator.clipboard.writeText(code).then(() => {
+                copyBtn.innerHTML = '<i data-lucide="check" class="hud-icon-xs"></i> <span>COPIED!</span>';
+                copyBtn.className = 'btn btn-sm btn-success';
+                playTacticalSfx('success');
+                setTimeout(() => {
+                  copyBtn.innerHTML = '<i data-lucide="copy" class="hud-icon-xs"></i> <span>COPY</span>';
+                  copyBtn.className = 'btn btn-sm btn-cyan';
+                  renderIcons();
+                }, 2000);
+              });
+            };
+            
+            const pre = document.createElement('pre');
+            pre.style.cssText = 'margin: 0; padding-top: 1.5rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all; color: #a6e3a1; font-size: 0.8rem; line-height: 1.45;';
+            pre.innerText = code;
+            
+            codeWrap.appendChild(copyBtn);
+            codeWrap.appendChild(pre);
+            div.appendChild(codeWrap);
+          } else if (part.trim()) {
+            const span = document.createElement('span');
+            span.innerText = part;
+            div.appendChild(span);
+          }
+        });
+      } else {
+        div.innerText = text;
+      }
+
       term.appendChild(div);
       term.scrollTop = term.scrollHeight;
+      renderIcons();
     }
 
     // Attached files management
@@ -4485,11 +4757,11 @@ desktop:
     Actuators --> Chrome["🌐 Dual Browser (Everyday CDP + Sandbox)"]
     Actuators --> Python["🐍 Python Runner & Data Crunch"]
     Actuators --> Visuals["📊 Visual Media (Web Dialog + System Window)"]
-    Visuals --> HUD["🖥️ Jarvis Mark 1 Tactical HUD"]`;
+    Visuals --> HUD["🖥️ Jarvis Mark 2 Tactical HUD"]`;
       showVisualMediaModal({
         media_type: 'diagram',
         content: diag,
-        title: 'Jarvis Mark 1 Tactical Architecture',
+        title: 'Jarvis Mark 2 Tactical Architecture',
         caption: 'Multi-tier Perception-Reasoning-Action (ReAct) Engine with Dual Visual Display'
       });
     }
@@ -4989,7 +5261,26 @@ desktop:
         pill.style.color = 'var(--text-muted)';
         pill.style.borderColor = 'var(--panel-border)';
       }
+      isJarvisSpeaking = (state === 'speaking');
       renderIcons();
+    }
+
+    let isJarvisSpeaking = false;
+
+    async function stopVoicePlayback() {
+      try {
+        await fetch('/api/voice/stop', { method: 'POST' });
+      } catch (e) {}
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      isJarvisSpeaking = false;
+      playTacticalSfx('barge_in');
+      updateVoiceVisualizerState('idle', '🟠 BARGE-IN // SPEECH INTERRUPTED');
+      appendLog('system', '[VOICE] Speech interrupted by operator (Barge-In).');
+      if (handsFreeLoopEnabled && shouldKeepListening && !isRecording && !isWhisperRecording) {
+        scheduleRecognitionRestart(350);
+      }
     }
 
     // Fullscreen Audio HUD Controller
@@ -5093,9 +5384,85 @@ desktop:
       }, delayMs);
     }
 
+    let currentSttEngine = 'browser';
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isWhisperRecording = false;
+
+    function onSttEngineChange(val) {
+      currentSttEngine = val;
+      const sel = document.getElementById('settings-stt-engine-select');
+      if (sel && sel.value !== val) sel.value = val;
+      appendLog('system', `[STT] Speech-to-text pipeline switched to: ${val === 'whisper' ? 'Local CUDA Whisper' : 'Browser Web Speech API'}`);
+    }
+
+    async function startWhisperRecording() {
+      if (isWhisperRecording) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          isWhisperRecording = false;
+          stream.getTracks().forEach(t => t.stop());
+          const blob = new Blob(audioChunks, { type: 'audio/wav' });
+          if (blob.size > 1000) {
+            updateVoiceVisualizerState('processing', '⚡ TRANSCRIBING (GPU WHISPER)...');
+            const fd = new FormData();
+            fd.append('file', blob, 'speech.wav');
+            try {
+              const res = await fetch('/api/voice/transcribe', { method: 'POST', body: fd });
+              const data = await res.json();
+              if (data.status === 'success' && data.text && data.text.trim()) {
+                const text = data.text.trim();
+                if (currentConversationMode === 'audio_only') {
+                  const subU = document.getElementById('sub-user-text');
+                  if (subU) subU.innerText = `"${text}"`;
+                } else {
+                  const gi = document.getElementById('goal-input');
+                  if (gi) gi.value = text;
+                }
+                runTask(text);
+              } else {
+                updateVoiceVisualizerState('idle', '⚪ READY // CLICK CORE TO SPEAK');
+                if (handsFreeLoopEnabled && shouldKeepListening) scheduleRecognitionRestart(500);
+              }
+            } catch (err) {
+              appendLog('error', '[STT] Local Whisper error: ' + err);
+              updateVoiceVisualizerState('idle', '⚪ READY');
+            }
+          }
+        };
+
+        mediaRecorder.start();
+        isWhisperRecording = true;
+        playTacticalSfx('mic_start');
+        updateVoiceVisualizerState('listening', '🟢 LISTENING (CUDA WHISPER)...');
+      } catch (err) {
+        appendLog('error', '[MIC] Microphone permission/stream error: ' + err);
+      }
+    }
+
+    function stopWhisperRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        playTacticalSfx('mic_stop');
+      }
+      isWhisperRecording = false;
+    }
+
     function startSpeechRecognitionSafe() {
       if (!handsFreeLoopEnabled && !shouldKeepListening) return;
       if (isTaskExecuting) return;
+      if (currentSttEngine === 'whisper') {
+        startWhisperRecording();
+        return;
+      }
       if (!recognition) initSpeechRecognition();
       if (!recognition) return;
 
@@ -5134,9 +5501,26 @@ desktop:
     }
 
     function toggleAudioOnlySession() {
+      if (isJarvisSpeaking) {
+        stopVoicePlayback();
+        return;
+      }
+
+      if (currentSttEngine === 'whisper') {
+        if (isWhisperRecording) {
+          stopWhisperRecording();
+          shouldKeepListening = false;
+          updateVoiceVisualizerState('idle', '⚪ PAUSED // CLICK CORE TO RESUME');
+        } else {
+          shouldKeepListening = true;
+          startWhisperRecording();
+        }
+        return;
+      }
+
       if (!recognition) initSpeechRecognition();
       if (!recognition) {
-        alert("Web Speech API is not supported in this browser. Please use Chrome or Brave.");
+        alert("Web Speech API is not supported in this browser. Please use Chrome or Brave, or switch to Local CUDA Whisper in Settings.");
         return;
       }
       if (isRecording || shouldKeepListening) {
@@ -5171,6 +5555,7 @@ desktop:
 
         recognition.onstart = () => {
           isRecording = true;
+          playTacticalSfx('mic_start');
           const micBtn = document.getElementById('mic-btn');
           if (micBtn) {
             micBtn.classList.add('listening');
@@ -5184,6 +5569,9 @@ desktop:
         };
 
         recognition.onresult = (event) => {
+          if (isJarvisSpeaking) {
+            stopVoicePlayback();
+          }
           const transcript = event.results[0][0].transcript;
           if (currentConversationMode === 'audio_only') {
             document.getElementById('sub-user-text').innerText = `"${transcript}"`;
@@ -5222,7 +5610,6 @@ desktop:
         recognition.onend = () => {
           isRecording = false;
           if (isTaskExecuting) {
-            // Task is currently executing / speaking; task_finish will trigger restart
             return;
           }
           if (handsFreeLoopEnabled && shouldKeepListening) {
@@ -5377,7 +5764,7 @@ desktop:
     async function killSwitch() {
       if (confirm('Are you sure you want to trigger the Master Kill Switch? This will terminate all Jarvis processes.')) {
         await fetch('/api/system/kill', { method: 'POST' });
-        alert('Kill signal sent. Jarvis Mark 1 services terminated.');
+        alert('Kill signal sent. Jarvis Mark 2 services terminated.');
       }
     }
 
@@ -6190,21 +6577,170 @@ desktop:
       currentMemoryView = view;
       const editorView = document.getElementById('memory-editor-view');
       const vaultView = document.getElementById('memory-vault-view');
+      const obsidianView = document.getElementById('memory-obsidian-view');
       const vaultBtn = document.getElementById('btn-tree-vault');
+      const obsidianBtn = document.getElementById('btn-tree-obsidian');
+
+      document.querySelectorAll('.tree-item-btn').forEach(b => b.classList.remove('active'));
 
       if (view === 'vault') {
-        document.querySelectorAll('.tree-item-btn').forEach(b => b.classList.remove('active'));
         if (vaultBtn) vaultBtn.classList.add('active');
         if (editorView) editorView.style.display = 'none';
+        if (obsidianView) obsidianView.style.display = 'none';
         if (vaultView) vaultView.style.display = 'flex';
         loadVaultKeys();
-      } else {
-        if (vaultBtn) vaultBtn.classList.remove('active');
+      } else if (view === 'obsidian') {
+        if (obsidianBtn) obsidianBtn.classList.add('active');
+        if (editorView) editorView.style.display = 'none';
         if (vaultView) vaultView.style.display = 'none';
+        if (obsidianView) obsidianView.style.display = 'flex';
+        loadObsidianConfig();
+      } else {
+        if (vaultView) vaultView.style.display = 'none';
+        if (obsidianView) obsidianView.style.display = 'none';
         if (editorView) editorView.style.display = 'flex';
       }
       renderIcons();
     }
+
+    async function loadObsidianConfig() {
+      try {
+        const res = await fetch('/api/memory/config');
+        const data = await res.json();
+        const pInput = document.getElementById('obsidian-vault-path');
+        const chunkBadge = document.getElementById('obsidian-chunk-count');
+        const resolvedEl = document.getElementById('obsidian-resolved-path');
+        if (pInput && data.obsidian_vault_dir) pInput.value = data.obsidian_vault_dir;
+        if (chunkBadge) chunkBadge.innerText = `${data.total_chunks || 0} Chunks Indexed`;
+        if (resolvedEl) resolvedEl.innerText = data.resolved_obsidian_path || data.obsidian_vault_dir || '~/obsidian/KnowledgeBase/ai-memory';
+      } catch (e) {}
+    }
+
+    async function saveObsidianVault() {
+      const pInput = document.getElementById('obsidian-vault-path');
+      if (!pInput) return;
+      const pathVal = pInput.value.trim();
+      const statusEl = document.getElementById('obsidian-save-status');
+      try {
+        const res = await fetch('/api/memory/obsidian', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ obsidian_vault_dir: pathVal })
+        });
+        const data = await res.json();
+        if (data.status === 'updated') {
+          if (statusEl) {
+            statusEl.style.display = 'inline';
+            statusEl.innerText = `✓ Vault linked & ${data.total_chunks} chunks indexed`;
+            setTimeout(() => { statusEl.style.display = 'none'; }, 3500);
+          }
+          const chunkBadge = document.getElementById('obsidian-chunk-count');
+          if (chunkBadge) chunkBadge.innerText = `${data.total_chunks || 0} Chunks Indexed`;
+          const resolvedEl = document.getElementById('obsidian-resolved-path');
+          if (resolvedEl) resolvedEl.innerText = data.resolved_obsidian_path || pathVal;
+          playTacticalSfx('success');
+        }
+      } catch (e) {
+        alert('Failed to update Obsidian Vault: ' + e);
+      }
+    }
+
+    async function reindexKnowledgeVault() {
+      const btn = document.getElementById('btn-reindex-obsidian');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="hud-icon-xs spin"></i> Indexing...';
+      try {
+        const res = await fetch('/api/memory/reindex', { method: 'POST' });
+        const data = await res.json();
+        const chunkBadge = document.getElementById('obsidian-chunk-count');
+        if (chunkBadge) chunkBadge.innerText = `${data.total_chunks || 0} Chunks Indexed`;
+        playTacticalSfx('success');
+        appendLog('step', `🧠 Real-time knowledge re-index complete: ${data.total_chunks} section chunks indexed across memory & Obsidian.`);
+      } catch (e) {
+        alert('Re-indexing error: ' + e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="refresh-cw" class="hud-icon-xs"></i> Re-Index Knowledge Base';
+        renderIcons();
+      }
+    }
+
+    async function testRagQuery() {
+      const input = document.getElementById('rag-test-input');
+      const box = document.getElementById('rag-test-results');
+      if (!input || !box) return;
+      const q = input.value.trim();
+      if (!q) return;
+
+      box.style.display = 'block';
+      box.innerHTML = '<span style="color: var(--neon-cyan);">Searching knowledge graph across memory & Obsidian...</span>';
+      try {
+        const res = await fetch('/api/memory/config');
+        const data = await res.json();
+        box.innerHTML = `
+          <div style="color: var(--neon-green); font-weight: 700; margin-bottom: 0.35rem;">✔ RAG Knowledge Evaluation for "${q}":</div>
+          <div style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 0.5rem;">Total Knowledge Chunks: ${data.total_chunks} | Semantic Mode: ${data.semantic_search_enabled ? 'Active (BM25 + Embeddings)' : 'BM25 Lexical Only'}</div>
+          <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(0, 240, 255, 0.2); padding: 0.5rem; border-radius: 4px; color: #cbd5e1; font-size: 0.72rem;">
+            Context injections anchor matching sections directly above Tier-1 system prompt during execution.
+          </div>
+        `;
+        playTacticalSfx('success');
+      } catch (e) {
+        box.innerHTML = `<span style="color: var(--neon-red);">Query failed: ${e}</span>`;
+      }
+    }
+
+    function toggleShortcutsModal() {
+      const modal = document.getElementById('shortcuts-modal');
+      if (!modal) return;
+      const isVisible = (modal.style.display === 'flex');
+      modal.style.display = isVisible ? 'none' : 'flex';
+      renderIcons();
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable)) {
+        if (e.key === 'Escape') {
+          e.target.blur();
+        }
+        return;
+      }
+
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        toggleShortcutsModal();
+      } else if (e.key === '1') {
+        switchTab('command');
+      } else if (e.key === '2') {
+        switchTab('command');
+        const t = document.getElementById('terminal-logs');
+        if (t) t.scrollIntoView({ behavior: 'smooth' });
+      } else if (e.key === '3') {
+        switchTab('settings');
+        const s = document.getElementById('proactive-sentinels-matrix-header');
+        if (s) s.scrollIntoView({ behavior: 'smooth' });
+      } else if (e.key === '4') {
+        switchTab('history');
+      } else if (e.key === '5') {
+        switchTab('guide');
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleAudioFullscreen();
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        if (currentConversationMode === 'audio_only') {
+          toggleAudioOnlySession();
+        } else {
+          toggleSpeechRecognition();
+        }
+      } else if (e.key === 'Escape') {
+        const modal = document.getElementById('shortcuts-modal');
+        if (modal && modal.style.display === 'flex') {
+          modal.style.display = 'none';
+        } else if (isJarvisSpeaking) {
+          stopVoicePlayback();
+        }
+      }
+    });
 
     function selectMemoryFile(filename) {
       currentActiveMemoryFile = filename;
@@ -6430,6 +6966,20 @@ desktop:
         }
         if (data.policy && data.policy !== currentModelPolicy) {
           syncPolicyUI(data.policy, data.cloud_model, false);
+        }
+        if (data.stt_engine && data.stt_engine !== currentSttEngine) {
+          currentSttEngine = data.stt_engine;
+          const sttSel = document.getElementById('settings-stt-engine-select');
+          if (sttSel && sttSel.value !== currentSttEngine) sttSel.value = currentSttEngine;
+        }
+        if (typeof data.sfx_enabled === 'boolean' && data.sfx_enabled !== sfxEnabled) {
+          sfxEnabled = data.sfx_enabled;
+          const sfxEl = document.getElementById('settings-sfx-toggle');
+          if (sfxEl && sfxEl.checked !== sfxEnabled) sfxEl.checked = sfxEnabled;
+        }
+        if (typeof data.rag_chunks === 'number') {
+          const chunkBadge = document.getElementById('obsidian-chunk-count');
+          if (chunkBadge) chunkBadge.innerText = `${data.rag_chunks} Chunks Indexed`;
         }
       } catch(e) {}
       loadErrors();

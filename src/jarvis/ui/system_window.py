@@ -49,7 +49,7 @@ class SystemWindowManager:
 
             title_label = tk.Label(
                 header_frame,
-                text=f"⚡ JARVIS MARK 1 // {title.upper()}",
+                text=f"⚡ JARVIS MARK 2 // {title.upper()}",
                 fg="#00e5ff",
                 bg="#060910",
                 font=("Helvetica", 11, "bold")

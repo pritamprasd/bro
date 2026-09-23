@@ -5,6 +5,7 @@ model:
   policy: local_only
   tier0_enabled: true
   tier0_model: llama3.2:3b
+  tier0_timeout: 5.0
   local_text_model: gemma4:12b
   local_vision_model: qwen2.5-vl:7b
   cloud_model: gemini-2.5-flash
@@ -22,6 +23,8 @@ voice:
   tts_volume: 75
   always_voice_response: true
   voice_reply_on_chat: true
+  stt_engine: browser
+  sfx_enabled: true
 safety:
   prompt_on_high_stakes: true
   high_stakes_keywords:
@@ -53,6 +56,9 @@ browser:
   cdp_port: 9222
 memory:
   memory_dir: ~/ai-memory/jarvis
+  obsidian_vault_dir: /tmp/tmprd4jbb86
+  semantic_search_enabled: true
+  embedding_model: nomic-embed-text
 watchdogs:
   sentinel:
     enabled: false

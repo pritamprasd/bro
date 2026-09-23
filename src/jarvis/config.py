@@ -34,6 +34,8 @@ class VoiceConfig(BaseModel):
     tts_volume: int = 100  # 0 to 100%
     always_voice_response: bool = False
     voice_reply_on_chat: bool = True
+    stt_engine: Literal["browser", "whisper_local"] = "browser"
+    sfx_enabled: bool = True
 
 class SafetyConfig(BaseModel):
     prompt_on_high_stakes: bool = True
@@ -55,6 +57,9 @@ class BrowserConfig(BaseModel):
 
 class MemoryConfig(BaseModel):
     memory_dir: str = str(DEFAULT_MEMORY_DIR)
+    obsidian_vault_dir: Optional[str] = "~/obsidian/KnowledgeBase/ai-memory"
+    semantic_search_enabled: bool = True
+    embedding_model: str = "nomic-embed-text"
 
 class SentinelConfig(BaseModel):
     enabled: bool = True

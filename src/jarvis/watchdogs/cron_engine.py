@@ -38,7 +38,7 @@ class CronEngine:
         date_str = now.strftime("%A, %B %d")
         time_str = now.strftime("%I:%M %p")
         return (
-            f"Daily brief for {date_str}, {time_str}. All Jarvis Mark 1 systems are operational. "
+            f"Daily brief for {date_str}, {time_str}. All Jarvis Mark 2 systems are operational. "
             "RTX 3060 VRAM is primed, local reasoning models are active, and memory subsystems are synchronized. "
             "Standing by for your instructions."
         )
