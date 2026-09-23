@@ -1,6 +1,7 @@
-"""Core ReAct Agent Orchestrator for Jarvis Phase 2."""
+"""Core ReAct Agent Orchestrator for Jarvis Mark 4."""
 
 import json
+import time
 from pathlib import Path
 import re
 from typing import Any, Dict, List, Optional
@@ -17,7 +18,7 @@ from jarvis.core.safety import SafetyClassifier
 from jarvis.memory.calendar_engine import CalendarEngine
 from jarvis.memory.store import MemoryStore
 from jarvis.models.base import ChatMessage, ModelResponse
-from jarvis.models.local_matcher import LocalIntentMatcher
+from jarvis.models.local_matcher import GreetingMatcher, LocalIntentMatcher
 from jarvis.models.router import ModelRouter
 from jarvis.models.tier0 import Tier0Router
 from jarvis.security.vault import SecretVault
@@ -44,14 +45,15 @@ Available Actions:
 13. `run_python(code)`: Execute Python code (e.g. data processing, math, Telegram bot API calls via requests).
 14. `run_shell(command)`: Execute a safe bash shell command.
 15. `run_macro(macro_name)`: Execute a previously compiled deterministic macro.
-16. `get_secret(key)`: Retrieve a credential from the secure vault (e.g. "telegram_bot_token").
-17. `save_workflow(topic, content)`: Save a learned workflow or note to persistent memory.
-18. `request_file(description, expected_filename=None)`: Ask the user to supply a required file, dataset, or image if it was not provided or not found.
-19. `show_media(media_type, content, title="Visual Display", caption=None, target="auto")`: Display a diagram (mermaid), chart (svg or image path), or image to the user in a dialog or desktop system window.
-20. `manage_calendar(sub_action, title=None, date=None, time=None, tags=None, identifier=None)`: Manage workstation schedule and tasks (sub_action="add"|"toggle"|"today"|"list").
-21. `desktop_switch_monitor(screen_index)`: Switch which desktop monitor Jarvis interacts with (0=all displays combined, 1=display 1, 2=display 2).
-22. `desktop_inspect_screen(screen_index=None)`: Take a high-resolution screenshot of the active desktop monitor, observe active windows, and report visual state.
-23. `finish(result)`: Task is finished. Provide the final response to the user.
+16. `get_secret(key)`: Retrieve a single credential from the secure vault (e.g. "telegram_bot_token").
+17. `get_secrets(keys)`: **Preferred for multi-credential tasks.** Retrieve multiple secrets in ONE call. `keys` is a list, e.g. ["telegram_bot_token", "telegram_chat_id"]. Returns all values in a single observation — eliminates multiple round-trips.
+18. `save_workflow(topic, content)`: Save a learned workflow or note to persistent memory.
+19. `request_file(description, expected_filename=None)`: Ask the user to supply a required file, dataset, or image if it was not provided or not found.
+20. `show_media(media_type, content, title="Visual Display", caption=None, target="auto")`: Display a diagram (mermaid), chart (svg or image path), or image to the user in a dialog or desktop system window.
+21. `manage_calendar(sub_action, title=None, date=None, time=None, tags=None, identifier=None)`: Manage workstation schedule and tasks (sub_action="add"|"toggle"|"today"|"list").
+22. `desktop_switch_monitor(screen_index)`: Switch which desktop monitor Jarvis interacts with (0=all displays combined, 1=display 1, 2=display 2).
+23. `desktop_inspect_screen(screen_index=None)`: Take a high-resolution screenshot of the active desktop monitor, observe active windows, and report visual state.
+24. `finish(result)`: Task is finished. Provide the final response to the user.
 
 CRITICAL INSTRUCTIONS & MARK 3 BEHAVIOR:
 1. EXPLANATION PROTOCOL:
@@ -112,7 +114,17 @@ class JarvisAgent:
         """Execute a user goal through perception, reasoning, and action."""
         self.console.banner()
 
-        # 0. Sub-5ms Local Intent & Templated Offline Fast-Path
+        # 0a. Sub-1ms Hybrid Greeting Fast-Path (pure CPU regex, zero network)
+        #     Handles: "Hello", "Good morning", "Thanks", "Bye", etc.
+        greeting_resp = GreetingMatcher.match(user_goal)
+        if greeting_resp:
+            self.console.thought("[GreetingMatcher: <1ms regex] Offline instant response — no LLM needed")
+            self._deliver_output(greeting_resp, is_conversation=True)
+            self.audit.start_run(user_goal)
+            self.audit.complete_run(greeting_resp, status="success")
+            return greeting_resp
+
+        # 0b. Sub-5ms Local Intent & Templated Offline Fast-Path
         local_match = self.local_matcher.match_and_execute(user_goal)
         if local_match:
             self.console.thought(f"[Local Instant Intent: {local_match['pattern']}] Sub-5ms offline execution")
@@ -153,20 +165,29 @@ class JarvisAgent:
 
         self.console.console.print(f"[bold]Goal:[/bold] {user_goal}\n")
 
-        # 0. Start Audit Run
+        # 1. Start Audit Run
         self.audit.start_run(user_goal)
 
-        # 1. On-demand lean memory loading
+        # 2. On-demand lean memory loading
         relevant_memory = self.memory.get_relevant_memory(user_goal)
         system_instructions = SYSTEM_PROMPT
         if relevant_memory:
             system_instructions += f"\n\nContext & Relevant Memory:\n{relevant_memory}"
 
-        # 2. Tier-0 Fast Classification & Instant Response (sub-100ms)
+        # 3. Acoustic Pre-Response Acknowledgment fires BEFORE Tier-0 LLM call
+        #    This eliminates the dead-silence gap — TTS starts speaking within ~200ms of STT ending.
+        in_voice_mode = self.config.conversation_mode in ["audio_only", "audio+chat"] and self.config.voice.enabled
+        if in_voice_mode:
+            from jarvis.voice.pre_responses import get_random_pre_response
+            pre_ack = get_random_pre_response()
+            self.console.action("pre_response", pre_ack)
+            self.tts.speak(pre_ack, blocking=False)  # non-blocking: TTS runs while Tier-0 classifies
+
+        # 4. Tier-0 Fast Classification & Instant Response (sub-100ms)
         tier0_result = self.tier0.classify(user_goal, relevant_memory=relevant_memory)
         self.console.thought(f"[Tier-0 Intent: {tier0_result.intent}] {tier0_result.summary} ({tier0_result.elapsed_ms}ms)")
 
-        # Fast path: Tier-0 direct response for conversational queries (greetings, QA, explanations)
+        # Fast path: Tier-0 direct response for conversational queries (QA, explanations)
         if tier0_result.intent == "CONVERSATION":
             direct_ans = tier0_result.direct_response
             if not direct_ans:
@@ -177,13 +198,6 @@ class JarvisAgent:
                 self.audit.complete_run(direct_ans, status="success")
                 return direct_ans
 
-        # 3. Acoustic Pre-Response Acknowledgment (fills silence while LLM processes)
-        if self.config.conversation_mode in ["audio_only", "audio+chat"] and self.config.voice.enabled:
-            from jarvis.voice.pre_responses import get_random_pre_response
-            pre_ack = get_random_pre_response()
-            self.console.action("pre_response", pre_ack)
-            self.tts.speak(pre_ack, blocking=False)
-
         messages = [
             ChatMessage(role="user", content=f"Goal: {user_goal}"),
         ]
@@ -193,12 +207,15 @@ class JarvisAgent:
         for step_idx in range(1, max_steps + 1):
             self.console.step(step_idx, max_steps, "Thinking & Planning...")
 
-            # Generate reasoning & next action
+            # Generate reasoning & next action — record LLM latency
+            step_start = time.time()
             try:
+                llm_start = time.time()
                 model_resp: ModelResponse = self.router.generate_text(
                     messages=messages,
                     system_prompt=system_instructions,
                 )
+                llm_ms = round((time.time() - llm_start) * 1000, 1)
             except Exception as e:
                 err_msg = f"Model execution failed: {e}"
                 self.console.error(err_msg)
@@ -280,11 +297,14 @@ class JarvisAgent:
                 else:
                     self.console.success("Action approved by user.")
 
-            # Execute action
+            # Execute action — record tool execution latency
             self.console.action(action_name, str(params))
+            tool_start = time.time()
             action_result = self._dispatch_action(action_name, params)
+            tool_ms = round((time.time() - tool_start) * 1000, 1)
+            step_duration_ms = round((time.time() - step_start) * 1000, 1)
 
-            # Record step in Audit Manager & Macro Recorder
+            # Record step in Audit Manager & Macro Recorder (with timing)
             obs_text = action_result.output if action_result.success else f"Error: {action_result.error}"
             self.audit.record_step(
                 step_num=step_idx,
@@ -294,6 +314,10 @@ class JarvisAgent:
                 observation=obs_text,
                 success=action_result.success,
                 screenshot_b64=action_result.screenshot_base64,
+                llm_ms=llm_ms,
+                tool_ms=tool_ms,
+                duration_ms=step_duration_ms,
+                started_at=step_start,
             )
             recorded_steps.append({"action": action_name, "params": params, "thought": thought})
 
@@ -416,6 +440,19 @@ class JarvisAgent:
                 if val:
                     return ActionResult(success=True, output=f"Secret '{key}' retrieved.")
                 return ActionResult(success=False, error=f"Secret '{key}' not found in vault.")
+
+            elif action == "get_secrets":
+                # Batch credential retrieval — eliminates multiple round-trips for multi-secret tasks
+                keys = params.get("keys", [])
+                from jarvis.actuators.base import ActionResult
+                if not keys:
+                    return ActionResult(success=False, error="'keys' parameter must be a non-empty list of secret names.")
+                results = self.vault.get_secrets(keys)
+                found = {k: v for k, v in results.items() if v is not None}
+                missing = [k for k, v in results.items() if v is None]
+                lines = [f"  {k}: retrieved" for k in found] + [f"  {k}: NOT FOUND" for k in missing]
+                summary = "Secrets batch retrieval:\n" + "\n".join(lines)
+                return ActionResult(success=len(found) > 0, output=summary)
 
             elif action == "save_workflow":
                 topic = params.get("topic", "workflow")

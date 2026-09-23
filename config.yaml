@@ -57,7 +57,7 @@ browser:
   cdp_port: 9222
 memory:
   memory_dir: ~/ai-memory/jarvis
-  obsidian_vault_dir: /tmp/tmpnv05p5nx
+  obsidian_vault_dir: /tmp/tmp5aq9axvq
   semantic_search_enabled: true
   embedding_model: nomic-embed-text
 watchdogs:

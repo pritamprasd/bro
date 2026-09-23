@@ -1,4 +1,12 @@
-"""Configurable Multi-Topic Daily Briefing Engine for JARVIS Mark 3."""
+"""Configurable Multi-Topic Daily Briefing Engine for JARVIS Mark 4.
+
+Supports multiple scheduled time slots, each with independent topic selections.
+Example config snippet:
+  brief_slots:
+    - {time: "07:30", enabled: true, topics: ["weather", "calendar", "tech_news"]}
+    - {time: "12:00", enabled: true, topics: ["calendar", "world_news"]}
+    - {time: "18:30", enabled: false, topics: ["hardware", "tech_news"]}
+"""
 
 import datetime
 import json
@@ -12,6 +20,15 @@ logger = logging.getLogger("jarvis.daily_brief")
 
 DEFAULT_BRIEF_CONFIG_PATH = Path.home() / "ai-memory" / "jarvis" / "daily_brief_config.json"
 
+
+class BriefSlot(BaseModel):
+    """A single scheduled daily briefing slot."""
+    time: str = "07:30"          # 24-hour HH:MM
+    enabled: bool = True
+    label: str = ""               # Optional user label e.g. "Morning Briefing"
+    topics: List[str] = Field(default_factory=lambda: ["weather", "calendar", "tech_news", "world_news", "hardware"])
+
+
 class DailyTopicConfig(BaseModel):
     id: str
     name: str
@@ -21,10 +38,18 @@ class DailyTopicConfig(BaseModel):
     timeframe: str = "24h"
     max_items: int = 3
 
+
 class DailyBriefConfig(BaseModel):
     city: str = "Bangalore"
     voice_style: str = "butler"
     topics: List[DailyTopicConfig] = Field(default_factory=list)
+    # Mark 4: multiple scheduled slots
+    brief_slots: List[BriefSlot] = Field(
+        default_factory=lambda: [
+            BriefSlot(time="07:30", enabled=True, label="Morning Briefing",
+                      topics=["weather", "calendar", "tech_news", "world_news", "hardware"])
+        ]
+    )
 
 def get_default_brief_config() -> DailyBriefConfig:
     return DailyBriefConfig(
@@ -110,6 +135,22 @@ class DailyBriefEngine:
         new_cfg = DailyBriefConfig(**cur)
         self.save_config(new_cfg)
         return new_cfg.model_dump()
+
+    def get_active_slots(self) -> List[BriefSlot]:
+        """Return enabled slots sorted by time."""
+        return sorted(
+            [s for s in self.config.brief_slots if s.enabled],
+            key=lambda s: s.time
+        )
+
+    def get_all_slots(self) -> List[Dict[str, Any]]:
+        """Return all slots (enabled and disabled) as dicts."""
+        return [s.model_dump() for s in self.config.brief_slots]
+
+    def update_slots(self, slots: List[Dict[str, Any]]) -> None:
+        """Replace the brief_slots list and persist."""
+        self.config.brief_slots = [BriefSlot(**s) for s in slots]
+        self.save_config(self.config)
 
     def fetch_weather(self, city: str = "Bangalore") -> str:
         """Fetch live weather summary for the configured city without requiring an API key."""
@@ -206,7 +247,11 @@ class DailyBriefEngine:
         return "All workstation sensors operating within normal thermal and memory limits."
 
     def generate_briefing(self) -> Dict[str, Any]:
-        """Generate a structured briefing respecting configured topic weights."""
+        """Generate a structured briefing using all enabled topics."""
+        return self.generate_briefing_for_topics(topic_ids=None)
+
+    def generate_briefing_for_topics(self, topic_ids: Optional[List[str]] = None) -> Dict[str, Any]:
+        """Generate a briefing for a specific set of topic IDs (or all enabled topics if None)."""
         now = datetime.datetime.now()
         date_str = now.strftime("%A, %B %d, %Y")
         time_str = now.strftime("%I:%M %p")
@@ -216,8 +261,10 @@ class DailyBriefEngine:
 
         spoken_sections.append(f"Good day Sir. Daily briefing for {date_str}, {time_str}.")
 
-        # Sort topics by weight descending
+        # Filter and sort active topics
         active_topics = [t for t in self.config.topics if t.enabled]
+        if topic_ids is not None:
+            active_topics = [t for t in active_topics if t.id in topic_ids]
         active_topics.sort(key=lambda t: t.weight_pct, reverse=True)
 
         for topic in active_topics:

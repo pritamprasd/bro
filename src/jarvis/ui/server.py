@@ -840,6 +840,31 @@ async def preview_daily_brief():
     """Generate and return briefing without speaking aloud."""
     return daily_brief_engine.generate_briefing()
 
+@app.get("/api/brief/slots")
+async def get_brief_slots():
+    """Get all scheduled daily brief slots (enabled and disabled)."""
+    return {"slots": daily_brief_engine.get_all_slots()}
+
+@app.post("/api/brief/slots")
+async def update_brief_slots(data: dict):
+    """Replace all brief slots. Expects {slots: [{time, enabled, label, topics}, ...]}"""
+    slots = data.get("slots", [])
+    daily_brief_engine.update_slots(slots)
+    return {"status": "updated", "slots": daily_brief_engine.get_all_slots()}
+
+@app.post("/api/brief/trigger-slot")
+async def trigger_slot_brief(data: dict):
+    """Trigger a briefing for a specific list of topic IDs (or all if omitted)."""
+    topic_ids = data.get("topic_ids", None)
+    if topic_ids is not None:
+        res = daily_brief_engine.generate_briefing_for_topics(topic_ids)
+    else:
+        res = daily_brief_engine.generate_briefing()
+    spoken = res.get("spoken_text", "")
+    tts.speak(spoken)
+    await broadcast_ws("briefing", spoken)
+    return {"status": "delivered", "briefing": spoken, "details": res}
+
 @app.get("/api/gateway/providers")
 async def get_gateway_providers():
     """Get list of all LLM Gateway providers and telemetry."""

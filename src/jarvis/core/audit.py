@@ -21,6 +21,11 @@ class StepRecord(BaseModel):
     success: bool
     screenshot_file: Optional[str] = None
     timestamp: float
+    # Mark 4: per-step timing breakdown for the debug waterfall view
+    started_at: Optional[float] = None   # Unix timestamp when this step began
+    duration_ms: Optional[float] = None  # Total step wall-clock time (ms)
+    llm_ms: Optional[float] = None       # LLM round-trip time (ms)
+    tool_ms: Optional[float] = None      # Tool/actuator execution time (ms)
 
 class RunRecord(BaseModel):
     run_id: str
@@ -64,6 +69,10 @@ class AuditManager:
         observation: str,
         success: bool = True,
         screenshot_b64: Optional[str] = None,
+        llm_ms: Optional[float] = None,
+        tool_ms: Optional[float] = None,
+        duration_ms: Optional[float] = None,
+        started_at: Optional[float] = None,
     ) -> None:
         if not self.current_run or not self.current_run_dir:
             return
@@ -88,6 +97,10 @@ class AuditManager:
             success=success,
             screenshot_file=screenshot_file,
             timestamp=time.time(),
+            started_at=started_at,
+            duration_ms=duration_ms,
+            llm_ms=llm_ms,
+            tool_ms=tool_ms,
         )
         self.current_run.steps.append(step)
         self._save_state()

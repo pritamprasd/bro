@@ -1,4 +1,8 @@
-"""Local Intent Matcher for sub-millisecond offline execution of common voice triggers."""
+"""Local Intent Matcher for sub-millisecond offline execution of common voice triggers.
+
+Also hosts GreetingMatcher — a zero-network fast path for casual greetings and
+simple conversational queries (~0ms, pure CPU regex, no LLM needed).
+"""
 
 import hashlib
 import json
@@ -10,6 +14,138 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from jarvis.memory.calendar_engine import CalendarEngine
+
+
+# ---------------------------------------------------------------------------
+# GreetingMatcher — sub-millisecond offline fast path for casual queries
+# ---------------------------------------------------------------------------
+
+_GREETING_PATTERNS = [
+    # Greetings
+    r"^(hi|hello|hey|howdy|sup|what'?s up|yo)\b",
+    r"^good (morning|afternoon|evening|night|day)\b",
+    r"^(good morning|good evening|good afternoon|good night)\b",
+    # Status / how are you
+    r"^how are (you|u|things|it going)\b",
+    r"^(you okay|you good|all good|doing (well|okay|good))\??$",
+    r"^how'?s (it going|everything|life|things|your day)\b",
+    r"^what'?s (up|new|going on|happening)\b",
+    # Wake-up / acknowledgements
+    r"^(wake up|are you there|you awake|you online|online)\??$",
+    r"^(jarvis|hey jarvis|ok jarvis)\b",
+    # Thanks / bye
+    r"^(thanks|thank you|thank you so much|cheers|ty|thx)\b",
+    r"^(bye|goodbye|good bye|see you|see ya|later|cya)\b",
+    r"^(ok|okay|got it|got that|understood|alright|sure|cool|great|perfect|nice|awesome)\s*,?\s*(jarvis)?\s*\.?$",
+]
+
+_COMPILED_GREETING_RES = [re.compile(p, re.IGNORECASE) for p in _GREETING_PATTERNS]
+
+# Time-aware greeting responses (keyed on hour bucket)
+_GREETING_REPLIES: Dict[str, List[str]] = {
+    "morning": [
+        "Good morning, sir. Systems are operational.",
+        "Morning! All systems green. What's on the agenda?",
+        "Good morning. Ready to assist — what do you need?",
+    ],
+    "afternoon": [
+        "Afternoon, sir. How can I help?",
+        "Good afternoon. Standing by.",
+        "Afternoon! What's the mission?",
+    ],
+    "evening": [
+        "Good evening, sir. How can I assist?",
+        "Evening! Ready when you are.",
+        "Good evening. Anything I can do for you?",
+    ],
+    "night": [
+        "Still here, sir. What do you need?",
+        "Night mode active. How can I help?",
+        "I'm here. What do you need?",
+    ],
+    "generic": [
+        "Online and ready, sir.",
+        "Standing by. What can I do for you?",
+        "At your service. How can I assist?",
+        "Ready. What's the task?",
+        "All systems go. What do you need?",
+    ],
+}
+
+_THANKS_REPLIES = [
+    "Anytime, sir.",
+    "Happy to help.",
+    "Of course.",
+    "At your service.",
+    "My pleasure.",
+]
+
+_BYE_REPLIES = [
+    "Goodbye, sir.",
+    "Take care.",
+    "Signing off. Call if you need me.",
+    "See you later.",
+]
+
+_ACK_REPLIES = [
+    "Understood.",
+    "Roger that.",
+    "Acknowledged.",
+    "Got it.",
+]
+
+
+class GreetingMatcher:
+    """Zero-network, zero-latency matcher for casual greetings and acknowledgements.
+
+    Runs purely on CPU with compiled regexes — no Ollama, no keyring, no I/O.
+    Average match time: <1ms.
+    """
+
+    @staticmethod
+    def _time_bucket() -> str:
+        hour = datetime.now().hour
+        if 5 <= hour < 12:
+            return "morning"
+        elif 12 <= hour < 17:
+            return "afternoon"
+        elif 17 <= hour < 21:
+            return "evening"
+        else:
+            return "night"
+
+    @staticmethod
+    def match(user_goal: str) -> Optional[str]:
+        """Return a ready-made response string if the utterance is a casual greeting,
+        or None if the input should be routed to Tier-0 / main LLM.
+        """
+        text = user_goal.strip()
+        if not text:
+            return None
+
+        norm = text.lower().strip().rstrip(".,!?")
+
+        # Thanks
+        if re.match(r"^(thanks|thank you|thank you so much|cheers|ty|thx)\b", norm, re.IGNORECASE):
+            return random.choice(_THANKS_REPLIES)
+
+        # Goodbye
+        if re.match(r"^(bye|goodbye|good bye|see you|see ya|later|cya)\b", norm, re.IGNORECASE):
+            return random.choice(_BYE_REPLIES)
+
+        # Simple acknowledgements
+        if re.match(r"^(ok|okay|got it|understood|alright|sure|cool|great|perfect|nice|awesome)\s*,?\s*(jarvis)?\s*$", norm, re.IGNORECASE):
+            return random.choice(_ACK_REPLIES)
+
+        # Greetings / status / wake-up
+        for pattern_re in _COMPILED_GREETING_RES:
+            if pattern_re.search(norm):
+                bucket = GreetingMatcher._time_bucket()
+                # Try time-specific reply, fall back to generic
+                replies = _GREETING_REPLIES.get(bucket, []) or _GREETING_REPLIES["generic"]
+                return random.choice(replies or _GREETING_REPLIES["generic"])
+
+        return None
 
 
 class LocalIntentMatcher:
