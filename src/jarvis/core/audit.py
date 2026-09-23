@@ -531,7 +531,7 @@ class AuditManager:
     {steps_html}
 
     <div class="footer">
-      Generated automatically by Jarvis Mark 2 Tactical Assistant • Run ID: {html.escape(run_id)}
+      Generated automatically by Jarvis Mark 3 Tactical Assistant • Run ID: {html.escape(run_id)}
     </div>
   </div>
 </body>

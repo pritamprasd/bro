@@ -151,7 +151,31 @@ class TextToSpeech:
         # 12. Remove any remaining stray formatting symbols (asterisks, underscores, backticks, tildes)
         text = re.sub(r"[*_`~]", "", text)
 
-        # 13. Collapse multiple whitespace into a single space
+        # 13. Technical Pronunciation Normalization (Mark 3)
+        # Prevents spelling out "G-I-B", "M-I-B", etc.
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s*GiB\b", r"\1 GB", text, flags=re.IGNORECASE)
+        text = re.sub(r"\bGiB\b", "GB", text, flags=re.IGNORECASE)
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s*MiB\b", r"\1 MB", text, flags=re.IGNORECASE)
+        text = re.sub(r"\bMiB\b", "MB", text, flags=re.IGNORECASE)
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s*KiB\b", r"\1 KB", text, flags=re.IGNORECASE)
+        text = re.sub(r"\bKiB\b", "KB", text, flags=re.IGNORECASE)
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s*TiB\b", r"\1 TB", text, flags=re.IGNORECASE)
+        text = re.sub(r"\bTiB\b", "TB", text, flags=re.IGNORECASE)
+
+        # Acronyms and units natural pronunciation
+        text = re.sub(r"\b(\d+)\s*ms\b", r"\1 milliseconds", text)
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s*GHz\b", r"\1 gigahertz", text, flags=re.IGNORECASE)
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s*MHz\b", r"\1 megahertz", text, flags=re.IGNORECASE)
+        text = re.sub(r"\bVRAM\b", "V-RAM", text)
+        text = re.sub(r"\bHUD\b", "hud", text)
+        text = re.sub(r"\bIDE\b", "I-D-E", text)
+        text = re.sub(r"\bCLI\b", "C-L-I", text)
+        text = re.sub(r"\bAPI\b", "A-P-I", text)
+        text = re.sub(r"\bSTT\b", "S-T-T", text)
+        text = re.sub(r"\bTTS\b", "T-T-S", text)
+        text = re.sub(r"\bPID\b", "P-I-D", text)
+
+        # 14. Collapse multiple whitespace into a single space
         text = re.sub(r"\s+", " ", text)
 
         return text.strip()

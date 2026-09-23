@@ -62,6 +62,10 @@ class Tier0Router:
             prompt += f"\n\nContext & Relevant Memory:\n{relevant_memory}"
 
         timeout_sec = getattr(self.config, "tier0_timeout", 3.0) or 3.0
+        options = {"temperature": 0.2, "num_predict": 256}
+        if getattr(self.config, "tier0_device", "gpu") == "cpu":
+            options["num_gpu"] = 0
+
         try:
             resp = requests.post(
                 f"{self.base_url}/api/chat",
@@ -74,7 +78,7 @@ class Tier0Router:
                     "format": "json",
                     "keep_alive": normalize_keep_alive(self.config.keep_alive),
                     "stream": False,
-                    "options": {"temperature": 0.2, "num_predict": 256},
+                    "options": options,
                 },
                 timeout=max(3.0, float(timeout_sec)),
             )

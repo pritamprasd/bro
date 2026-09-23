@@ -6,6 +6,7 @@ model:
   tier0_enabled: true
   tier0_model: llama3.2:3b
   tier0_timeout: 5.0
+  tier0_device: cpu
   local_text_model: gemma4:12b
   local_vision_model: qwen2.5-vl:7b
   cloud_model: gemini-2.5-flash
@@ -56,7 +57,7 @@ browser:
   cdp_port: 9222
 memory:
   memory_dir: ~/ai-memory/jarvis
-  obsidian_vault_dir: /tmp/tmpton3_thj
+  obsidian_vault_dir: /tmp/tmpnv05p5nx
   semantic_search_enabled: true
   embedding_model: nomic-embed-text
 watchdogs:

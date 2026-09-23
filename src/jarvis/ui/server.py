@@ -19,11 +19,13 @@ from jarvis.actuators.cdp_browser import CDPBrowserActuator
 from jarvis.config import JarvisConfig, load_config, save_config
 from jarvis.core.audit import AuditManager
 from jarvis.core.errors import error_tracker
+from jarvis.gateway.router import LLMGatewayRouter
 from jarvis.memory.calendar_engine import CalendarEngine
 from jarvis.memory.store import MemoryStore
 from jarvis.security.vault import SecretVault
 from jarvis.voice.tts import TextToSpeech
 from jarvis.watchdogs.cron_engine import CronEngine
+from jarvis.watchdogs.daily_brief import DailyBriefEngine
 from jarvis.watchdogs.organizer import DownloadOrganizer
 from jarvis.watchdogs.sentinel import HardwareSentinel
 
@@ -45,8 +47,17 @@ organizer = DownloadOrganizer(config.watchdogs.organizer)
 vault = SecretVault()
 memory_store = MemoryStore(config.memory)
 calendar_engine = CalendarEngine(memory_store.memory_dir / "calendar.md")
+daily_brief_engine = DailyBriefEngine(
+    config_path=memory_store.memory_dir / "daily_brief_config.json",
+    calendar_engine=calendar_engine
+)
 tts = TextToSpeech(config.voice)
-cron_engine = CronEngine(config.watchdogs.cron, briefing_callback=lambda b: tts.speak(b))
+cron_engine = CronEngine(
+    config.watchdogs.cron,
+    briefing_callback=lambda b: tts.speak(b),
+    daily_brief_engine=daily_brief_engine
+)
+gateway_router = LLMGatewayRouter(vault=vault)
 
 active_websockets: List[WebSocket] = []
 current_agent_instance = None
@@ -97,6 +108,8 @@ class ModelSelectionRequest(BaseModel):
     local_text_model: Optional[str] = None
     local_vision_model: Optional[str] = None
     tier0_model: Optional[str] = None
+    tier0_enabled: Optional[bool] = None
+    tier0_device: Optional[str] = None
     cloud_model: Optional[str] = None
     gemini_api_key: Optional[str] = None
 
@@ -117,6 +130,24 @@ class VoiceSelectionRequest(BaseModel):
 class ObsidianConfigRequest(BaseModel):
     obsidian_vault_dir: str
     semantic_search_enabled: Optional[bool] = True
+
+class GatewayToggleRequest(BaseModel):
+    provider_id: str
+    enabled: bool
+
+class GatewayConfigRequest(BaseModel):
+    provider_id: str
+    model: Optional[str] = None
+    api_key: Optional[str] = None
+    priority: Optional[int] = None
+
+class GatewayTestRequest(BaseModel):
+    provider_id: str
+
+class DailyBriefConfigRequest(BaseModel):
+    city: Optional[str] = None
+    voice_style: Optional[str] = None
+    topics: Optional[List[Dict[str, Any]]] = None
 
 class VoicePreviewRequest(BaseModel):
     voice: Optional[str] = None
@@ -713,6 +744,7 @@ async def list_available_models():
             "local_vision_model": config.model.local_vision_model,
             "tier0_model": config.model.tier0_model,
             "tier0_enabled": config.model.tier0_enabled,
+            "tier0_device": getattr(config.model, "tier0_device", "cpu"),
             "cloud_model": config.model.cloud_model,
             "has_gemini_api_key": has_key,
         },
@@ -730,6 +762,10 @@ async def select_models(req: ModelSelectionRequest):
         config.model.local_vision_model = req.local_vision_model
     if req.tier0_model:
         config.model.tier0_model = req.tier0_model
+    if req.tier0_enabled is not None:
+        config.model.tier0_enabled = req.tier0_enabled
+    if req.tier0_device:
+        config.model.tier0_device = req.tier0_device
     if req.cloud_model:
         config.model.cloud_model = req.cloud_model
     if req.gemini_api_key is not None:
@@ -742,6 +778,7 @@ async def select_models(req: ModelSelectionRequest):
         "local_text_model": config.model.local_text_model,
         "local_vision_model": config.model.local_vision_model,
         "tier0_model": config.model.tier0_model,
+        "tier0_device": config.model.tier0_device,
     })
     return {"status": "updated", "current": config.model.model_dump()}
 
@@ -773,9 +810,73 @@ async def clear_system_errors():
 @app.post("/api/brief")
 async def trigger_daily_brief():
     """Manually trigger the Daily brief."""
-    msg = cron_engine.trigger_brief()
-    await broadcast_ws("briefing", msg)
-    return {"status": "delivered", "briefing": msg}
+    res = daily_brief_engine.generate_briefing()
+    spoken = res.get("spoken_text", "")
+    tts.speak(spoken)
+    await broadcast_ws("briefing", spoken)
+    return {"status": "delivered", "briefing": spoken, "details": res}
+
+@app.get("/api/brief/config")
+async def get_brief_config():
+    """Get the multi-topic daily brief configuration."""
+    return daily_brief_engine.config.model_dump()
+
+@app.post("/api/brief/config")
+async def update_brief_config(req: DailyBriefConfigRequest):
+    """Update the daily brief configuration."""
+    cfg = daily_brief_engine.config
+    if req.city is not None:
+        cfg.city = req.city
+    if req.voice_style is not None:
+        cfg.voice_style = req.voice_style
+    if req.topics is not None:
+        from jarvis.watchdogs.daily_brief import DailyTopicConfig
+        cfg.topics = [DailyTopicConfig(**t) for t in req.topics]
+    daily_brief_engine.save_config(cfg)
+    return {"status": "updated", "config": cfg.model_dump()}
+
+@app.get("/api/brief/preview")
+async def preview_daily_brief():
+    """Generate and return briefing without speaking aloud."""
+    return daily_brief_engine.generate_briefing()
+
+@app.get("/api/gateway/providers")
+async def get_gateway_providers():
+    """Get list of all LLM Gateway providers and telemetry."""
+    return {"providers": gateway_router.get_statuses()}
+
+@app.post("/api/gateway/providers/toggle")
+async def toggle_gateway_provider(req: GatewayToggleRequest):
+    """Enable or disable a specific LLM Gateway provider."""
+    if req.provider_id in gateway_router.settings.providers:
+        gateway_router.settings.providers[req.provider_id].enabled = req.enabled
+        if req.provider_id in gateway_router.telemetry:
+            gateway_router.telemetry[req.provider_id].enabled = req.enabled
+        return {"status": "ok", "provider_id": req.provider_id, "enabled": req.enabled}
+    raise HTTPException(status_code=404, detail="Provider not found")
+
+@app.post("/api/gateway/providers/config")
+async def update_gateway_config(req: GatewayConfigRequest):
+    """Update gateway provider configuration (model, priority, API key)."""
+    if req.provider_id in gateway_router.settings.providers:
+        p = gateway_router.settings.providers[req.provider_id]
+        if req.model:
+            p.model = req.model
+        if req.priority is not None:
+            p.priority = req.priority
+        if req.api_key is not None:
+            val = req.api_key.strip()
+            p.api_key = val if val else None
+            if p.vault_key and val:
+                vault.set_secret(p.vault_key, val)
+        return {"status": "ok", "provider": p.model_dump()}
+    raise HTTPException(status_code=404, detail="Provider not found")
+
+@app.post("/api/gateway/test")
+async def test_gateway_provider(req: GatewayTestRequest):
+    """Ping a gateway provider and return roundtrip latency."""
+    res = gateway_router.test_provider(req.provider_id)
+    return res
 
 @app.post("/api/voice/toggle")
 async def toggle_voice_setting(mode: str = "reply_on_chat"):
@@ -923,7 +1024,7 @@ async def preview_voice(req: VoicePreviewRequest):
     voice_to_test = req.voice or config.voice.tts_voice
     rate_to_test = req.rate or config.voice.tts_rate
     vol_to_test = req.volume if req.volume is not None else getattr(config.voice, "tts_volume", 100)
-    sample_text = req.text or "Greetings. Jarvis Mark 2 neural speech synthesis is online and operational."
+    sample_text = req.text or "Greetings. Jarvis Mark 3 neural speech synthesis is online and operational."
     temp_cfg = config.voice.model_copy()
     temp_cfg.tts_voice = voice_to_test
     temp_cfg.tts_rate = rate_to_test

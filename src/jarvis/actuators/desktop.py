@@ -2,8 +2,10 @@
 
 import base64
 import io
+import re
+import subprocess
 import time
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import mss
 from PIL import Image
 import pyautogui
@@ -105,15 +107,71 @@ class DesktopActuator(BaseActuator):
         b64_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
         return img, b64_str
 
+    def get_open_windows_info(self) -> Dict[str, Any]:
+        """Query X11 window hierarchy to find active focused window and open applications."""
+        active_window = "Unknown"
+        open_apps: List[str] = []
+        try:
+            # 1. Query active focused window
+            p_active = subprocess.run(["xprop", "-root", "_NET_ACTIVE_WINDOW"], capture_output=True, text=True, timeout=2)
+            match = re.search(r"window id # (0x[0-9a-fA-F]+)", p_active.stdout)
+            active_id = match.group(1) if match else None
+
+            if active_id and active_id != "0x0":
+                p_win = subprocess.run(["xprop", "-id", active_id, "_NET_WM_NAME", "WM_CLASS"], capture_output=True, text=True, timeout=2)
+                name_m = re.search(r'_NET_WM_NAME\([^\)]+\)\s*=\s*"(.*)"', p_win.stdout)
+                class_m = re.search(r'WM_CLASS\([^\)]+\)\s*=\s*"([^"]*)",\s*"([^"]*)"', p_win.stdout)
+                title = name_m.group(1) if name_m else ""
+                app = class_m.group(2) if class_m else (class_m.group(1) if class_m else "")
+                if app and title:
+                    active_window = f"{app} - '{title}'"
+                elif app or title:
+                    active_window = app or title
+
+            # 2. Query open windows client list
+            p_clients = subprocess.run(["xprop", "-root", "_NET_CLIENT_LIST"], capture_output=True, text=True, timeout=2)
+            win_ids = re.findall(r"0x[0-9a-fA-F]+", p_clients.stdout)
+            seen_titles = set()
+            for wid in win_ids:
+                p_item = subprocess.run(["xprop", "-id", wid, "_NET_WM_NAME", "WM_CLASS"], capture_output=True, text=True, timeout=1)
+                name_m = re.search(r'_NET_WM_NAME\([^\)]+\)\s*=\s*"(.*)"', p_item.stdout)
+                class_m = re.search(r'WM_CLASS\([^\)]+\)\s*=\s*"([^"]*)",\s*"([^"]*)"', p_item.stdout)
+                title = name_m.group(1) if name_m else ""
+                app = class_m.group(2) if class_m else (class_m.group(1) if class_m else "")
+                
+                # Filter out background or blank window entries
+                if app in ("Gjs", "Desktop") and not title:
+                    continue
+                if title or app:
+                    desc = f"{app}: {title}" if app and title else (app or title)
+                    if desc not in seen_titles:
+                        seen_titles.add(desc)
+                        open_apps.append(desc)
+        except Exception:
+            pass
+
+        return {
+            "active_window": active_window,
+            "open_apps": open_apps[:12],
+        }
+
     def inspect_screen(self, screen_index: Optional[int] = None) -> ActionResult:
-        """Capture screenshot of the desktop and return details."""
+        """Capture screenshot of the desktop, inspect active windows, and report what is open."""
         if screen_index is not None:
             self.set_screen_index(screen_index)
         img, b64 = self.capture_screenshot(max_dimension=1920)
         info = self.get_active_monitor_info()
+        win_info = self.get_open_windows_info()
+
+        active_win = win_info.get("active_window", "Desktop")
+        apps_list = win_info.get("open_apps", [])
+        apps_str = "\n  • " + "\n  • ".join(apps_list) if apps_list else "None detected"
+
         output_desc = (
-            f"Active Desktop: Display {info['screen_index']} ({info['output']}, {info['width']}x{info['height']} "
-            f"at offset +{info['left']}+{info['top']}) [Primary: {info['is_primary']}]. Captured 1080p desktop image."
+            f"Active Desktop Display: Display {info['screen_index']} ({info['output']}, {info['width']}x{info['height']})\n"
+            f"Active Focused Window: {active_win}\n"
+            f"Open Desktop Applications & Tabs:{apps_str}\n"
+            f"(High-resolution 1080p desktop image captured for visual analysis)."
         )
         return ActionResult(
             success=True,

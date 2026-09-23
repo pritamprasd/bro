@@ -1,6 +1,6 @@
-# 📘 JARVIS // Mark 2: Comprehensive User Guide
+# 📘 JARVIS // Mark 3: Comprehensive User Guide
 
-Welcome to **JARVIS // Mark 2**, your autonomous, multi-modal personal AI assistant built for Linux X11 workstations powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7 (16 threads)**, and **96 GB of RAM**.
+Welcome to **JARVIS // Mark 3**, your autonomous, multi-modal personal AI assistant built for Linux X11 workstations powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7 (16 threads)**, and **96 GB of RAM**.
 
 This guide covers everything you need to operate, customize, and communicate with Jarvis across voice, desktop GUI, terminal, and mobile remote control.
 
@@ -38,7 +38,14 @@ This guide covers everything you need to operate, customize, and communicate wit
 21. [Zero-Drop Interim Voice STT & Continuous Speech Loop](#21-zero-drop-interim-voice-stt--continuous-speech-loop)
 22. [Autonomous Multi-Step Execution Sidebar](#22-autonomous-multi-step-execution-sidebar)
 23. [Ubuntu GNOME Shortcut Launcher (Super + Shift + J)](#23-ubuntu-gnome-shortcut-launcher)
-24. [Architectural Evolution: Mark 1 vs. Mark 2](custom-docs/upgrades_mark1_and_mark2.md)
+24. [Enterprise LLM Gateway & Multi-Provider Cascading](#24-enterprise-llm-gateway)
+25. [Tier-0 Fast Classifier CPU Offloading](#25-tier-0-cpu-offloading)
+26. [Contextual 90% Screen Explanation Dialog](#26-contextual-explanation-dialog)
+27. [Deep Desktop Screen Inspection & X11 Workspace Perception](#27-deep-screen-inspection)
+28. [Configurable Multi-Topic Daily Brief Matrix](#28-multi-topic-daily-brief)
+29. [Pronunciation Engine & Natural Speech Normalization](#29-pronunciation-engine)
+30. [Interactive SVG Audit Trail & Mission Velocity Filter](#30-interactive-audit-visuals)
+31. [Architectural Evolution: Mark 1 vs. Mark 2](custom-docs/upgrades_mark1_and_mark2.md)
 
 ---
 
@@ -635,5 +642,111 @@ Jarvis Mark 2 can be summoned from anywhere on your Ubuntu desktop with a single
     ```bash
     bash scripts/setup_ubuntu_shortcut.sh
     ```
+
+---
+
+## 24. Enterprise LLM Gateway & Multi-Provider Cascading
+
+Jarvis Mark 3 introduces an enterprise-grade LLM Gateway subsystem (`src/jarvis/gateway/`) enabling multi-provider routing and resilient fallback cascading:
+
+```
+[Agent Query]
+      │
+      ▼
+[LLM Gateway Router]
+      │
+      ├── 1. Google Gemini (Gemini 2.5 Flash, 2.5 Pro, 2.0 Flash) [Priority 1]
+      │        └── (Network Timeout / Rate Limit?) ──> Automatic Fallback
+      │
+      ├── 2. OpenAI / ChatGPT (GPT-4o, GPT-4o-mini, o3-mini) [Priority 2]
+      │        └── (Quota Exceeded?) ──> Automatic Fallback
+      │
+      ├── 3. Groq / Grok (Llama 3.3 70B, Mixtral 8x7B) [Priority 3]
+      │        └── (Circuit Breaker Tripped?) ──> Automatic Fallback
+      │
+      ├── 4. Meta AI (Llama 3.3 70B Instruct) [Priority 4]
+      │        └── Automatic Fallback
+      │
+      └── 5. Local Ollama (Qwen 2.5 7B, Gemma 4 12B) [Priority 5 / Zero-Cost Offline Fallback]
+```
+
+### Gateway Key Capabilities
+1. **Priority Fallback Cascading:** If a cloud provider experiences HTTP 429 rate limits, token exhaustion, or connection timeouts, the gateway seamlessly fails over to the next configured provider without interrupting the user's mission.
+2. **Circuit Breaking & Automatic Cooldown:** Providers with 3 consecutive failures enter an automatic cooldown state (default: 60s) to prevent hammering failing APIs and degrading user latency.
+3. **Vault & Keyring Resolution:** API keys are resolved with zero-exposure security directly from the Linux Keyring Secret Vault (`jarvis vault set gemini_api_key ...`), OS environment variables, or encrypted config.
+4. **Live Latency & Diagnostic Pings:** Each provider card in the **Settings** tab features a live `Test Ping` button, success rate percentage indicator, and real-time round-trip millisecond telemetry.
+
+---
+
+## 25. Tier-0 Fast Classifier CPU Offloading
+
+To ensure maximum GPU VRAM is reserved for the primary 12B reasoning model (`gemma4:12b`) and 7B multimodal vision model (`qwen2.5-vl:7b`), Jarvis Mark 3 introduces a dedicated **Tier-0 CPU Execution Mode**:
+
+* **Why Offload to CPU:** The RTX 3060 has 12 GB of VRAM. Hosting a 12B model (~7 GB) and a 7B vision model (~4.5 GB) leaves minimal room for the 3B classifier. Running the classifier on CPU (`num_gpu: 0` in Ollama) eliminates VRAM contention.
+* **CPU Latency Profile:** On AMD Ryzen 7 (16 threads), the small 3B model infers in ~60-95ms on CPU—well within real-time voice latency limits.
+* **How to Configure:**
+  - In the **Settings** tab under **Model Architecture**, set **Tier-0 Compute Device** to `CPU (Preserve GPU VRAM for Gemma/Qwen)`.
+  - Alternatively, edit `config.yaml`:
+    ```yaml
+    models:
+      tier0_device: "cpu"
+    ```
+
+---
+
+## 26. Contextual 90% Screen Explanation Dialog
+
+When you ask Jarvis to explain a concept, architecture, workflow, or system behavior, Mark 3 enforces a two-tier explanation protocol designed for optimal cognitive load:
+
+1. **Executive Summary First:** Jarvis immediately answers with a 2-3 sentence executive summary followed by an invitation: *"Would you like me to dig deeper into the architectural details or step-by-step components?"*
+2. **Contextual 90% Modal Stage:** When visual context, Mermaid diagrams, or charts are required, Jarvis opens an expansive modal occupying **90% of screen space (90vw $\times$ 90vh)**:
+   - **Left Canvas (65% width):** High-resolution interactive SVG Mermaid diagram renderer with zoom controls (`[+]`, `[-]`, `[Reset]`) and 1-click **Export SVG** button.
+   - **Right Sidebar (35% width):** Real-time streaming markdown text sidebar detailing the architectural breakdown, accompanied by a follow-up prompt input to query deeper without losing the visual diagram context.
+
+---
+
+## 27. Deep Desktop Screen Inspection & X11 Workspace Perception
+
+In Mark 2, screen inspection only returned physical monitor geometry and dimensions. In Mark 3, `inspect_screen` conducts deep inspection of the Linux X11 desktop environment:
+
+* **Active Focused Window:** Interrogates `_NET_ACTIVE_WINDOW` to retrieve the exact focused application name and window title (e.g., `Antigravity IDE - jarvis`, `Google Chrome - GitHub Pull Request`).
+* **Open Desktop Applications:** Interrogates `_NET_CLIENT_LIST` and `WM_CLASS` to catalog all running apps, terminal sessions, and browser tabs.
+* **Visual Context Synthesis:** When asked *"What's on my screen?"* or *"Inspect active screen"*, Jarvis synthesizes both the optical screenshot and the running window hierarchy to provide rich, situational awareness.
+
+---
+
+## 28. Configurable Multi-Topic Daily Brief Matrix
+
+The Daily Brief engine in Mark 3 is completely configurable via `daily_brief_config.json` and the HUD **Settings** tab:
+
+* **Weighted Topic Matrix:** Custom sliders allow you to allocate interest percentages across 5 distinct categories:
+  - **Local Weather (15%):** Live conditions and temperatures for your configured city (e.g., Bangalore).
+  - **Workstation Calendar (25%):** Today's pending agenda and items from `~/ai-memory/jarvis/calendar.md`.
+  - **Technology & AI Headlines (30%):** Top stories fetched directly from Hacker News.
+  - **Top World News (20%):** Global breaking news from Google News RSS.
+  - **Hardware Sentinel Health (10%):** GPU temperatures, VRAM consumption, NVMe storage, and RAM usage.
+* **Audio Voice Styles:** Select between `butler` (refined Iron Man Jarvis style), `executive` (direct bulleted summary), or `concise` (speed briefing).
+* **Instant Preview & Audio Trigger:** Test your briefing immediately using the **Preview Brief** or **Hear Spoken Brief** buttons in Settings or via CLI (`uv run jarvis brief`).
+
+---
+
+## 29. Pronunciation Engine & Natural Speech Normalization
+
+Mark 3 eliminates awkward robotic letter spelling in the Text-to-Speech pipeline (`src/jarvis/voice/tts.py`):
+
+* **Binary Memory Units:** `"12 GiB"` is spoken naturally as *"12 GB"* rather than *"12 G-I-B"*; `"512 MiB"` becomes *"512 MB"*; `"64 KiB"` becomes *"64 KB"*; `"2 TiB"` becomes *"2 TB"*.
+* **Latencies & Frequencies:** `"45 ms"` is spoken as *"45 milliseconds"*; `"4.2 GHz"` as *"4.2 gigahertz"*; `"3200 MHz"` as *"3200 megahertz"*.
+* **Natural Technical Acronyms:** Terms like `VRAM`, `HUD`, `IDE`, `CLI`, `API`, `STT`, `TTS`, and `PID` are phonetically balanced for crisp British-accented audio delivery without spelling letter-by-letter.
+
+---
+
+## 30. Interactive SVG Audit Trail & Mission Velocity Filter
+
+The **Audit & History** tab features compact high-density layout with interactive charts:
+
+* **Compact KPI Matrix:** 4 streamlined cards showing Total Missions, Success Ratio, Average Step Duration, and the new **Tier-0 Fast Classifier Ratio**.
+* **Interactive Actuator Donut:** Native SVG chart showing desktop, browser, python, and shell action distribution. Clicking any slice or legend item instantly filters the mission list by that actuator type.
+* **Interactive Mission Velocity Bar Chart:** Displays execution durations for the last 10 missions with neon status indicators. Hovering shows full goal details; clicking any bar immediately selects and loads that mission's visual filmstrip replay.
+
 
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JARVIS // Mark 2 Tactical AI HUD</title>
+  <title>JARVIS // MARK 3 Tactical AI HUD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
@@ -1563,6 +1563,73 @@
       overflow-y: auto;
       box-shadow: var(--glass-shadow);
     }
+
+    /* JARVIS MARK 3: Grouped Settings Layout (Modeled after System Manual) */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .settings-layout { grid-template-columns: 1fr; }
+    }
+    .settings-sidebar {
+      background: rgba(8, 15, 32, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-top: 1px solid var(--glass-specular);
+      border-radius: 12px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      box-shadow: var(--glass-shadow);
+      position: sticky;
+      top: 1rem;
+    }
+    .settings-nav-btn {
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-family: inherit;
+    }
+    .settings-nav-btn:hover {
+      background: rgba(0, 240, 255, 0.08);
+      color: #ffffff;
+      border-color: rgba(0, 240, 255, 0.15);
+      transform: translateX(2px);
+    }
+    .settings-nav-btn.active {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--neon-cyan);
+      font-weight: 600;
+      border-left: 3px solid var(--neon-cyan);
+      border-color: rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.2);
+    }
+    .settings-content {
+      min-width: 0;
+    }
+    .settings-section {
+      display: none;
+    }
+    .settings-section.active {
+      display: block;
+      animation: fadeIn 0.2s ease forwards;
+    }
+
     .watchdog-card {
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2260,6 +2327,7 @@
     }
     .display-preview-thumbnail:hover {
       transform: scale(1.01);
+    }
 
     /* Mobile & Tablet Responsiveness (Smartphones & Remote Browsers) */
     @media (max-width: 992px) {
@@ -2552,10 +2620,127 @@
       font-size: 0.8rem;
       color: #e2e8f0;
       line-height: 1.5;
-      max-height: 55vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
+    }
+    /* JARVIS MARK 3: Quick Action Container Above Hardware Telemetry (Active in Audio Only Mode) */
+    .quick-action-container {
+      display: none;
+      margin-bottom: 0;
+    }
+    .quick-action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    .strip-tile {
+      background: rgba(4, 9, 22, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 8px;
+      padding: 0.5rem 0.35rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #cbd5e1;
+      text-align: center;
+    }
+    .strip-tile:hover {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 240, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 240, 255, 0.2);
+      color: #ffffff;
+    }
+    .strip-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* JARVIS MARK 3: 90% Screen Space Contextual Explanation Modal */
+    #contextual-explanation-modal .modal-card {
+      width: 90vw;
+      height: 90vh;
+      max-width: 95vw;
+      max-height: 95vh;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.35);
+      background: rgba(3, 7, 18, 0.95);
+      backdrop-filter: blur(25px);
+    }
+
+    /* JARVIS MARK 3: Enterprise LLM Gateway Matrix Styling */
+    .gateway-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+      margin-top: 0.85rem;
+    }
+    .gateway-card {
+      background: rgba(3, 8, 18, 0.78);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+    .gateway-card:hover {
+      border-color: rgba(0, 240, 255, 0.35);
+    }
+    .gateway-card.enabled {
+      border-color: rgba(0, 240, 255, 0.4);
+      background: rgba(0, 240, 255, 0.03);
+    }
+
+    /* JARVIS MARK 3: Configurable Daily Brief Matrix Styling */
+    .brief-topic-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(3, 8, 18, 0.75);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      margin-bottom: 0.65rem;
+    }
+    .brief-slider {
+      flex: 1;
+      height: 5px;
+      accent-color: var(--neon-cyan);
+    }
+
+    /* JARVIS MARK 3: Compact Audit KPI & Interactive Charts */
+    .kpi-grid.compact {
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+    .kpi-grid.compact .kpi-card {
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+    }
+    .kpi-grid.compact .kpi-val {
+      font-size: 1.25rem;
+    }
+    .kpi-grid.compact .kpi-label {
+      font-size: 0.68rem;
+    }
+    .chart-interactive-point {
+      cursor: pointer;
+      transition: r 0.2s ease, fill 0.2s ease;
+    }
+    .chart-interactive-point:hover {
+      r: 6;
+      fill: var(--neon-cyan);
     }
   </style>
 </head>
@@ -2566,7 +2751,7 @@
     <div class="logo-group">
       <div class="arc-reactor"></div>
       <div class="logo-text">
-        <h1>JARVIS // MARK 2</h1>
+        <h1>JARVIS // MARK 3</h1>
         <span id="sys-status">● SYSTEM READY // RTX 3060 ARMED</span>
       </div>
     </div>
@@ -2613,7 +2798,7 @@
   <main>
     <!-- TAB 1: Command Center -->
     <div id="tab-command" class="tab-content active">
-      <div style="display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; align-items: start;">
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 1.5rem; align-items: start;">
         
         <!-- Left Column: Input, Widgets & Terminal -->
         <div class="card">
@@ -2701,7 +2886,7 @@
           </div>
 
           <!-- Quick Action Launchers (Homepage Widget) -->
-          <div class="quick-widgets-grid">
+          <div class="quick-widgets-grid" id="homepage-quick-widgets">
             <div class="quick-tile" onclick="triggerBrief()">
               <i data-lucide="sun" class="tile-icon text-amber"></i>
               <div class="quick-tile-title">Daily brief</div>
@@ -2805,7 +2990,44 @@
         </div>
 
         <!-- Right Column: Quick Telemetry, Storage & Watchdog Matrix -->
-        <div class="card">
+        <div style="display: flex; flex-direction: column; gap: 1.25rem; min-width: 380px; width: 380px;">
+          <!-- Quick Action Launchers (Mark 3: Dedicated Container above Hardware Telemetry in Audio Only Mode) -->
+          <div class="card quick-action-container" id="quick-action-strip">
+            <div class="card-header" style="padding-bottom: 0.5rem; margin-bottom: 0.65rem; border-bottom: 1px solid rgba(0, 240, 255, 0.12);">
+              <div class="card-title" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px;">
+                <i data-lucide="zap" class="hud-icon-xs text-cyan"></i> Tactical Quick Actions
+              </div>
+              <span class="badge" style="font-size: 0.62rem; padding: 0.15rem 0.45rem; border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.08); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">AUDIO MODE</span>
+            </div>
+            <div class="quick-action-grid">
+              <div class="strip-tile" onclick="triggerBrief()" title="Daily Briefing">
+                <i data-lucide="sun" class="strip-icon text-amber"></i>
+                <span>Daily Brief</span>
+              </div>
+              <div class="strip-tile" onclick="pasteClipboard()" title="Paste Clipboard">
+                <i data-lucide="clipboard" class="strip-icon text-cyan"></i>
+                <span>Paste Clip</span>
+              </div>
+              <div class="strip-tile" onclick="launchCDP()" title="Attach Chrome CDP">
+                <i data-lucide="globe" class="strip-icon text-blue"></i>
+                <span>Chrome CDP</span>
+              </div>
+              <div class="strip-tile" onclick="runOrganizer()" title="Organize Downloads">
+                <i data-lucide="folder-sync" class="strip-icon text-green"></i>
+                <span>Organize</span>
+              </div>
+              <div class="strip-tile" onclick="setGoal('Take a desktop screenshot and describe active windows')" title="Inspect Screen">
+                <i data-lucide="camera" class="strip-icon text-purple"></i>
+                <span>Inspect</span>
+              </div>
+              <div class="strip-tile" onclick="showArchitectureDiagram()" title="Architecture Diagram">
+                <i data-lucide="git-branch" class="strip-icon text-cyan"></i>
+                <span>Diagram</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
           <div class="card-header">
             <div class="card-title"><i data-lucide="gauge" class="hud-icon-sm text-cyan"></i> Hardware Telemetry</div>
           </div>
@@ -2966,6 +3188,7 @@
             <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.3rem;">Model Policy: <b style="color: var(--neon-green);" id="val-policy">Local Only ($0)</b></p>
           </div>
         </div>
+        </div>
 
       </div>
     </div>
@@ -3082,9 +3305,50 @@
 
     <!-- TAB: Settings (Unified Master Control Panel) -->
     <div id="tab-settings" class="tab-content">
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        
-        <!-- CARD 1: AI Brain & Execution Policy -->
+      <div class="card" style="padding-bottom: 2rem;">
+        <div class="card-header" style="border-bottom: 1px solid rgba(0, 240, 255, 0.12); padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+          <div>
+            <div class="card-title" style="font-size: 1.05rem;"><i data-lucide="settings" class="hud-icon text-cyan"></i> Workstation Settings & Control Matrix</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Modular configuration matrix. Select a category on the left to tune AI models, cloud gateways, vocal persona, safety policies, or system watchdogs.
+            </p>
+          </div>
+          <span class="badge" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;">MARK 3 MODULAR MATRIX</span>
+        </div>
+
+        <div class="settings-layout">
+          <!-- Settings Sidebar Navigation (Grouped like System Manual) -->
+          <div class="settings-sidebar">
+            <button class="settings-nav-btn active" data-target="brain" onclick="showSettingsSection('brain', this)">
+              <i data-lucide="cpu" class="hud-icon-xs text-cyan"></i> 1. AI Brain & Models
+            </button>
+            <button class="settings-nav-btn" data-target="gateway" onclick="showSettingsSection('gateway', this)">
+              <i data-lucide="network" class="hud-icon-xs text-blue"></i> 2. LLM Gateway Matrix
+            </button>
+            <button class="settings-nav-btn" data-target="brief" onclick="showSettingsSection('brief', this)">
+              <i data-lucide="sun" class="hud-icon-xs text-amber"></i> 3. Daily Briefing
+            </button>
+            <button class="settings-nav-btn" data-target="voice" onclick="showSettingsSection('voice', this)">
+              <i data-lucide="volume-2" class="hud-icon-xs text-green"></i> 4. Voice Persona & Audio
+            </button>
+            <button class="settings-nav-btn" data-target="safety" onclick="showSettingsSection('safety', this)">
+              <i data-lucide="shield-check" class="hud-icon-xs text-purple"></i> 5. Safety & Autonomous
+            </button>
+            <button class="settings-nav-btn" data-target="display" onclick="showSettingsSection('display', this)">
+              <i data-lucide="monitor" class="hud-icon-xs text-cyan"></i> 6. Display Perception
+            </button>
+            <button class="settings-nav-btn" data-target="watchdogs" onclick="showSettingsSection('watchdogs', this)">
+              <i data-lucide="activity" class="hud-icon-xs text-amber"></i> 7. Watchdogs & Sentinels
+            </button>
+            <button class="settings-nav-btn" data-target="memory" onclick="showSettingsSection('memory', this)">
+              <i data-lucide="folder-cog" class="hud-icon-xs text-blue"></i> 8. Memory Storage
+            </button>
+          </div>
+
+          <!-- Settings Content Viewport (Only the active group is visible) -->
+          <div class="settings-content">
+            <div class="settings-section active" id="sec-settings-brain">
+              <!-- CARD 1: AI Brain & Execution Policy -->
         <div class="card">
           <div class="card-header">
             <div>
@@ -3183,44 +3447,80 @@
             <div class="step-card">
               <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="zap" class="hud-icon-xs"></i> 3. Tier-0 Fast Classifier</h4>
               <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Sub-100ms intent classification</p>
-              <select id="sel-tier0-model" style="width: 100%;"></select>
+              <select id="sel-tier0-model" style="width: 100%; margin-bottom: 0.5rem;"></select>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 0.72rem; color: #ffffff; font-weight: 500;">Execution Device:</span>
+                <select id="sel-tier0-device" style="width: auto; height: 26px; font-size: 0.72rem; padding: 0 0.5rem; background: rgba(3,7,18,0.9); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px;">
+                  <option value="cpu">CPU (Preserve GPU VRAM)</option>
+                  <option value="gpu">GPU (CUDA)</option>
+                </select>
+              </div>
             </div>
           </div>
 
           <button class="btn btn-cyan" style="padding: 0.65rem 1.75rem;" onclick="saveModelSelection()"><i data-lucide="save" class="hud-icon-xs"></i> Save Model Preferences</button>
         </div>
+            </div>
 
-        <!-- CARD 2: Autonomous Execution & Safety Gatekeeper (Item 4) -->
-        <div class="card">
+            <div class="settings-section" id="sec-settings-gateway">
+              <!-- CARD: Enterprise LLM Gateway Matrix (Mark 3) -->
+        <div class="card" id="card-llm-gateway">
           <div class="card-header">
             <div>
-              <div class="card-title" style="font-size: 0.92rem; letter-spacing: 0.5px;"><i data-lucide="shield-check" class="hud-icon-sm text-green"></i> Autonomous Execution &amp; Safety Gatekeeper</div>
-              <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
-                Configures on-screen authorization for high-stakes bash commands, system modifications, and credentials.
+              <div class="card-title"><i data-lucide="network" class="hud-icon-sm text-cyan"></i> Enterprise LLM Gateway Matrix</div>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                Manage enterprise upstream AI providers, toggle active models, store API keys safely in Vault, and monitor latency &amp; fallback health.
               </p>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <span class="badge" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;" id="settings-auto-badge">APPROVAL OVERLAY ACTIVE</span>
-              <button class="btn btn-sm" onclick="testApprovalOverlay()" style="background: rgba(0, 240, 255, 0.12); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-size: 0.74rem;" title="Test and preview the floating desktop approval dialog"><i data-lucide="eye" class="hud-icon-xs"></i> Preview Approval Dialog</button>
-            </div>
+            <button class="btn btn-cyan btn-sm" onclick="loadGatewayProviders()"><i data-lucide="refresh-cw" class="hud-icon-xs"></i> Refresh Gateway</button>
           </div>
-          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.25rem; background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 10px; padding: 1.1rem 1.35rem;">
-            <div style="flex: 1; min-width: 280px;">
-              <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.35rem;">Autonomous Mode (Unattended Execution)</div>
-              <div style="font-size: 0.8rem; color: #94a3b8; line-height: 1.45; max-width: 650px;">
-                When disabled, any destructive system command (e.g. <code>rm -rf</code>, <code>sudo</code>, payments, emails) summons the floating X11 Approval Overlay dialog. When enabled, Jarvis executes continuously without human prompts.
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.85rem;">
-              <span id="settings-auto-label" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--neon-cyan);">OFF (Approval Overlay Active)</span>
-              <button class="btn" id="btn-toggle-auto" onclick="toggleAutonomousSetting()" style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-weight: 700; min-width: 140px;">
-                <i data-lucide="toggle-left" class="hud-icon-xs"></i> Toggle Mode
-              </button>
-            </div>
+
+          <div class="gateway-grid" id="gateway-providers-container">
+            <div style="color: var(--text-muted); padding: 1rem;">Loading enterprise gateway providers...</div>
           </div>
         </div>
+            </div>
 
-        <!-- CARD 3: Voice Persona, Speech Speed & Jarvis Volume (Items 1 & 2) -->
+            <div class="settings-section" id="sec-settings-brief">
+              <!-- CARD: Configurable Multi-Topic Daily Brief Matrix (Mark 3) -->
+        <div class="card" id="card-daily-brief-config">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><i data-lucide="sun" class="hud-icon-sm text-amber"></i> Configurable Multi-Topic Daily Brief Matrix</div>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                Customize topics, interest percentage weights, local city weather, news genres, and schedule parameters for spoken &amp; visual morning briefings.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button class="btn btn-warning btn-sm" onclick="previewDailyBrief()"><i data-lucide="eye" class="hud-icon-xs"></i> Test Brief Preview</button>
+              <button class="btn btn-cyan btn-sm" onclick="saveDailyBriefConfig()"><i data-lucide="save" class="hud-icon-xs"></i> Save Brief Config</button>
+            </div>
+          </div>
+
+          <div style="background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <i data-lucide="map-pin" class="hud-icon-sm text-amber"></i>
+              <div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">Weather City Target:</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Current: Bangalore / Worldwide via Open-Meteo</div>
+              </div>
+              <input type="text" id="brief-city-input" value="Bangalore" style="background: rgba(6,12,26,0.85); color: #ffffff; border: 1px solid rgba(255,171,0,0.35); border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; width: 140px;">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Total Weight:</span>
+              <span id="brief-total-weight" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--neon-green); font-size: 0.85rem;">100%</span>
+            </div>
+          </div>
+
+          <div id="brief-topics-list">
+            <!-- Populated via loadDailyBriefConfig() -->
+          </div>
+        </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-voice">
+              <!-- CARD 3: Voice Persona, Speech Speed & Jarvis Volume (Items 1 & 2) -->
         <div class="card">
           <div class="card-header">
             <div class="card-title"><i data-lucide="volume-2" class="hud-icon-sm text-cyan"></i> Voice Persona, Speech Speed &amp; Jarvis Volume</div>
@@ -3295,8 +3595,42 @@
             </div>
           </div>
         </div>
+            </div>
 
-        <!-- CARD 4: Perception & Display Perceptor (Item 1) -->
+            <div class="settings-section" id="sec-settings-safety">
+              <!-- CARD 2: Autonomous Execution & Safety Gatekeeper (Item 4) -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title" style="font-size: 0.92rem; letter-spacing: 0.5px;"><i data-lucide="shield-check" class="hud-icon-sm text-green"></i> Autonomous Execution &amp; Safety Gatekeeper</div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
+                Configures on-screen authorization for high-stakes bash commands, system modifications, and credentials.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;" id="settings-auto-badge">APPROVAL OVERLAY ACTIVE</span>
+              <button class="btn btn-sm" onclick="testApprovalOverlay()" style="background: rgba(0, 240, 255, 0.12); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-size: 0.74rem;" title="Test and preview the floating desktop approval dialog"><i data-lucide="eye" class="hud-icon-xs"></i> Preview Approval Dialog</button>
+            </div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.25rem; background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 10px; padding: 1.1rem 1.35rem;">
+            <div style="flex: 1; min-width: 280px;">
+              <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.35rem;">Autonomous Mode (Unattended Execution)</div>
+              <div style="font-size: 0.8rem; color: #94a3b8; line-height: 1.45; max-width: 650px;">
+                When disabled, any destructive system command (e.g. <code>rm -rf</code>, <code>sudo</code>, payments, emails) summons the floating X11 Approval Overlay dialog. When enabled, Jarvis executes continuously without human prompts.
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <span id="settings-auto-label" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--neon-cyan);">OFF (Approval Overlay Active)</span>
+              <button class="btn" id="btn-toggle-auto" onclick="toggleAutonomousSetting()" style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-weight: 700; min-width: 140px;">
+                <i data-lucide="toggle-left" class="hud-icon-xs"></i> Toggle Mode
+              </button>
+            </div>
+          </div>
+        </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-display">
+              <!-- CARD 4: Perception & Display Perceptor (Item 1) -->
         <div class="card">
           <div class="card-header">
             <div class="card-title"><i data-lucide="monitor" class="hud-icon-sm text-cyan"></i> Workstation Perception &amp; Active Display</div>
@@ -3311,8 +3645,10 @@
             <button class="btn btn-cyan btn-sm" onclick="previewActiveDesktop()"><i data-lucide="camera" class="hud-icon-xs"></i> Grab Screen Capture</button>
           </div>
         </div>
+            </div>
 
-        <!-- CARD 5: Watchdogs, Sentinels & Automation Rules (Item 8) -->
+            <div class="settings-section" id="sec-settings-watchdogs">
+              <!-- CARD 5: Watchdogs, Sentinels & Automation Rules (Item 8) -->
         <div class="card">
           <div class="card-header">
             <div class="card-title"><i data-lucide="activity" class="hud-icon-sm text-cyan"></i> Watchdogs &amp; Telemetry Thresholds</div>
@@ -3337,8 +3673,10 @@
             </div>
           </div>
         </div>
+            </div>
 
-        <!-- CARD 6: Memory & Persistent Knowledge Storage Directory (Item 1) -->
+            <div class="settings-section" id="sec-settings-memory">
+              <!-- CARD 6: Memory & Persistent Knowledge Storage Directory (Item 1) -->
         <div class="card">
           <div class="card-header">
             <div>
@@ -3370,7 +3708,9 @@
             <div id="memory-dir-status" style="display: none; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 500;"></div>
           </div>
         </div>
-
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3408,8 +3748,8 @@
           </div>
         </div>
 
-        <!-- Human-Readable KPI Analytics Widgets -->
-        <div class="kpi-grid">
+        <!-- Human-Readable KPI Analytics Widgets (Mark 3 Compact) -->
+        <div class="kpi-grid compact">
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-total-runs">0</div>
             <div class="kpi-label"><i data-lucide="target" class="hud-icon-xs text-cyan"></i> Total Missions</div>
@@ -3420,15 +3760,19 @@
           </div>
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-avg-duration">0.0s</div>
-            <div class="kpi-label"><i data-lucide="clock" class="hud-icon-xs text-amber"></i> Avg Execution Time</div>
+            <div class="kpi-label"><i data-lucide="clock" class="hud-icon-xs text-amber"></i> Avg Duration</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-total-steps">0</div>
-            <div class="kpi-label"><i data-lucide="footprints" class="hud-icon-xs text-purple"></i> Total Steps Executed</div>
+            <div class="kpi-label"><i data-lucide="footprints" class="hud-icon-xs text-purple"></i> Steps Done</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-val" id="kpi-top-actuator" style="color: #82b1ff;">Desktop</div>
-            <div class="kpi-label"><i data-lucide="cpu" class="hud-icon-xs text-blue"></i> Primary Actuator</div>
+            <div class="kpi-label"><i data-lucide="cpu" class="hud-icon-xs text-blue"></i> Actuator</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-tier0-ratio" style="color: var(--neon-cyan);">CPU (0 VRAM)</div>
+            <div class="kpi-label"><i data-lucide="zap" class="hud-icon-xs text-cyan"></i> Tier-0 Router</div>
           </div>
         </div>
 
@@ -4230,6 +4574,64 @@ desktop:
     </div>
   </div>
 
+  <!-- Contextual Explanation & Mermaid Diagram Modal (Mark 3: 90% Screen Space) -->
+  <div class="modal-overlay" id="contextual-explanation-modal" style="display: none; z-index: 99999;">
+    <div class="modal-card">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(3, 8, 18, 0.85);">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <i data-lucide="git-branch" class="hud-icon-sm text-cyan"></i>
+          <div>
+            <h3 style="margin: 0; font-size: 0.96rem; color: #ffffff; font-family: 'JetBrains Mono', monospace;" id="explanation-modal-title">Contextual Architecture &amp; System Explanation</h3>
+            <div style="font-size: 0.7rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">90% Screen Immersive Interactive Visual Workspace</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <button class="btn btn-outline btn-sm" onclick="zoomExplanationDiagram(1.15)" title="Zoom In"><i data-lucide="zoom-in" class="hud-icon-xs"></i> Zoom In</button>
+          <button class="btn btn-outline btn-sm" onclick="zoomExplanationDiagram(0.85)" title="Zoom Out"><i data-lucide="zoom-out" class="hud-icon-xs"></i> Zoom Out</button>
+          <button class="btn btn-outline btn-sm" onclick="resetExplanationZoom()" title="Reset Zoom">Reset</button>
+          <button class="btn btn-cyan btn-sm" onclick="exportExplanationSvg()"><i data-lucide="download" class="hud-icon-xs"></i> Export SVG</button>
+          <button class="btn btn-danger btn-sm" onclick="closeExplanationModal()"><i data-lucide="x" class="hud-icon-xs"></i> Close</button>
+        </div>
+      </div>
+
+      <!-- Split Stage (65% Left Diagram, 35% Right Streaming Sidebar) -->
+      <div style="display: flex; flex: 1; overflow: hidden; height: calc(100% - 60px);">
+        <!-- Left: Interactive Diagram Canvas -->
+        <div id="explanation-diagram-stage" style="flex: 0 0 65%; overflow: auto; padding: 1.5rem; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at center, rgba(0, 240, 255, 0.03) 0%, rgba(2, 6, 16, 0.95) 100%); position: relative;">
+          <div id="explanation-diagram-viewport" style="transform-origin: center center; transition: transform 0.15s ease; width: 100%; display: flex; justify-content: center;"></div>
+        </div>
+
+        <!-- Right: Explanation & Deep-Dive Text Sidebar -->
+        <div id="explanation-text-sidebar" style="flex: 0 0 35%; border-left: 1px solid rgba(0, 240, 255, 0.2); background: rgba(3, 8, 20, 0.9); backdrop-filter: blur(16px); display: flex; flex-direction: column; overflow: hidden;">
+          <div style="padding: 0.85rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0, 240, 255, 0.05); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.76rem; font-weight: 700; color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">
+              <i data-lucide="file-text" class="hud-icon-xs"></i> Executive Summary &amp; Details
+            </span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--neon-green); font-size: 0.65rem;">LIVE STREAM</span>
+          </div>
+
+          <div style="padding: 1.15rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 1rem;" id="explanation-stream-content">
+            <div id="explanation-summary-capsule" style="background: rgba(0, 240, 255, 0.08); border-left: 3px solid var(--neon-cyan); padding: 0.85rem; border-radius: 6px; font-size: 0.85rem; color: #e2e8f0; line-height: 1.5;"></div>
+            <div id="explanation-deep-dive-body" style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.6; white-space: pre-wrap;"></div>
+          </div>
+
+          <!-- Dig Deeper Suggestions Footer -->
+          <div style="padding: 0.85rem 1rem; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(2, 6, 16, 0.95);">
+            <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 0.4rem;">
+              <i data-lucide="compass" class="hud-icon-xs text-amber"></i> Would you like to dig deeper?
+            </div>
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;" id="explanation-dig-deeper-chips">
+              <button class="chip" onclick="askFollowUpExplanation('Explain the internal architecture and data flow in detail')">Data Flow</button>
+              <button class="chip" onclick="askFollowUpExplanation('What are the potential failure modes and recovery procedures?')">Failure Modes</button>
+              <button class="chip" onclick="askFollowUpExplanation('Provide an implementation code snippet for this component')">Code Snippet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Multi-Step Execution Floating Glassmorphic Sidebar (Mark 2) -->
   <div id="multi-step-sidebar" class="collapsed">
     <div class="multi-step-header">
@@ -4305,6 +4707,16 @@ desktop:
   </button>
 
   <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     // Global Lucide Icon Renderer
     function renderIcons() {
       if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -4314,8 +4726,13 @@ desktop:
 
     // Tab switching
     function switchTab(name, targetBtn = null) {
-      if (name === 'models' || name === 'telemetry') {
+      let requestedSettingsSection = null;
+      if (name === 'models') {
         name = 'settings';
+        requestedSettingsSection = 'brain';
+      } else if (name === 'telemetry') {
+        name = 'settings';
+        requestedSettingsSection = 'watchdogs';
       }
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -4330,10 +4747,17 @@ desktop:
       if (name === 'calendar') loadCalendar();
       if (name === 'history') loadHistory();
       if (name === 'settings') {
+        if (requestedSettingsSection) {
+          showSettingsSection(requestedSettingsSection);
+        } else if (!document.querySelector('.settings-section.active')) {
+          showSettingsSection('brain');
+        }
         loadModels();
         loadVoices();
         loadDesktopMonitors();
         loadMemoryConfig();
+        loadGatewayProviders();
+        loadDailyBriefConfig();
       }
       if (name === 'errors') loadErrors();
       if (name === 'memory') {
@@ -4813,6 +5237,21 @@ desktop:
       if (target) target.classList.add('active');
     }
 
+    // In-UI Grouped Settings Navigation (JARVIS Mark 3)
+    function showSettingsSection(secId, btn) {
+      document.querySelectorAll('.settings-nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+      if (btn) {
+        btn.classList.add('active');
+      } else {
+        const found = document.querySelector(`.settings-nav-btn[data-target="${secId}"]`);
+        if (found) found.classList.add('active');
+      }
+      const target = document.getElementById('sec-settings-' + secId);
+      if (target) target.classList.add('active');
+      renderIcons();
+    }
+
     function copySnippet(text) {
       navigator.clipboard.writeText(text).then(() => {
         alert("Copied command to clipboard:\n" + text);
@@ -4945,6 +5384,16 @@ desktop:
             finishMultiStepSession(resultText);
             loadHistory();
 
+            // Mark 3: Automatic 90% Screen Explanation Dialog on Diagrams
+            if (resultText && resultText.includes('```mermaid')) {
+              const mMatch = resultText.match(/```mermaid([\s\S]*?)```/);
+              if (mMatch) {
+                const diagramCode = mMatch[0];
+                const cleanText = resultText.replace(/```mermaid[\s\S]*?```/, '').trim();
+                openContextualExplanation('System Architecture & Explanation', diagramCode, cleanText);
+              }
+            }
+
             if (currentConversationMode === 'audio_only') {
               if (resultText) {
                 const jarvisSub = document.getElementById('sub-jarvis-text');
@@ -5059,42 +5508,8 @@ desktop:
       }
 
       if (mediaType === 'diagram') {
-        icon.innerHTML = '<i data-lucide="git-branch" class="hud-icon-md text-cyan"></i>';
-        badge.style.borderColor = 'var(--neon-cyan)';
-        badge.style.color = 'var(--neon-cyan)';
-        badge.style.background = 'rgba(0, 229, 255, 0.15)';
-
-        let cleanMermaid = (data.content || '').trim();
-        if (cleanMermaid.startsWith('```mermaid')) {
-          cleanMermaid = cleanMermaid.replace(/^```mermaid\s*/i, '').replace(/```\s*$/, '').trim();
-        } else if (cleanMermaid.startsWith('```')) {
-          cleanMermaid = cleanMermaid.replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/, '').trim();
-        }
-
-        container.innerHTML = '<div class="mermaid-viewport" id="mermaid-render-viewport"><div style="color: var(--neon-cyan); font-family: monospace; padding: 2rem;">Rendering dynamic architecture diagram...</div></div>';
-
-        try {
-          if (window.mermaid) {
-            const renderId = 'mermaid-' + Math.floor(Math.random() * 1000000);
-            const renderResult = await mermaid.render(renderId, cleanMermaid);
-            const vp = document.getElementById('mermaid-render-viewport');
-            if (vp) vp.innerHTML = renderResult.svg;
-          } else {
-            const vp = document.getElementById('mermaid-render-viewport');
-            if (vp) vp.innerHTML = `<pre style="color: #a6e3a1; font-family: monospace; text-align: left; width: 100%;">${cleanMermaid}</pre>`;
-          }
-        } catch (renderErr) {
-          console.error("Mermaid render error:", renderErr);
-          const vp = document.getElementById('mermaid-render-viewport');
-          if (vp) {
-            vp.innerHTML = `
-              <div style="width: 100%; text-align: left;">
-                <div style="color: var(--neon-amber); font-size: 0.8rem; margin-bottom: 0.5rem;"><i data-lucide="alert-triangle" class="hud-icon-xs text-amber"></i> Diagram rendered in source mode:</div>
-                <pre style="color: #a6e3a1; font-family: monospace; background: #04060a; padding: 1rem; border-radius: 6px; overflow-x: auto; white-space: pre-wrap;">${cleanMermaid}</pre>
-              </div>
-            `;
-          }
-        }
+        openContextualExplanation(data.title || 'Contextual Architecture & Explanation', data.content, data.caption || 'Contextual visual architecture and relational flow.');
+        return;
       } else if (mediaType === 'chart') {
         icon.innerHTML = '<i data-lucide="trending-up" class="hud-icon-md text-green"></i>';
         badge.style.borderColor = 'var(--neon-green)';
@@ -5602,6 +6017,9 @@ desktop:
       const audioHud = document.getElementById('audio-only-hud');
       const voiceToggleBtn = document.getElementById('btn-voice-toggle');
 
+      const quickStrip = document.getElementById('quick-action-strip');
+      const homeQuickWidgets = document.getElementById('homepage-quick-widgets');
+
       if (mode === 'audio_only') {
         if (badge) {
           badge.innerHTML = '<i data-lucide="mic" class="hud-icon-xs"></i> AUDIO ONLY';
@@ -5610,6 +6028,11 @@ desktop:
           badge.style.background = 'rgba(0, 229, 255, 0.15)';
         }
         if (audioHud) audioHud.style.display = 'block';
+        if (quickStrip) {
+          quickStrip.style.display = 'block';
+          renderIcons();
+        }
+        if (homeQuickWidgets) homeQuickWidgets.style.display = 'none';
         if (voiceToggleBtn) voiceToggleBtn.innerHTML = '<i data-lucide="volume-2" class="hud-icon-xs"></i> Voice: ON (Audio Only)';
         if (modeChanged) {
           shouldKeepListening = true;
@@ -5627,6 +6050,8 @@ desktop:
           badge.style.background = 'rgba(0, 229, 255, 0.1)';
         }
         if (audioHud) audioHud.style.display = 'none';
+        if (quickStrip) quickStrip.style.display = 'none';
+        if (homeQuickWidgets) homeQuickWidgets.style.display = 'grid';
         if (voiceToggleBtn) voiceToggleBtn.innerHTML = '<i data-lucide="volume-2" class="hud-icon-xs"></i> Voice Reply: ON';
         if (modeChanged && logChange) {
           appendLog('step', 'Conversation Mode: AUDIO + CHAT (Voice Replies + Terminal Stream)');
@@ -5639,6 +6064,8 @@ desktop:
           badge.style.background = 'rgba(166, 227, 161, 0.15)';
         }
         if (audioHud) audioHud.style.display = 'none';
+        if (quickStrip) quickStrip.style.display = 'none';
+        if (homeQuickWidgets) homeQuickWidgets.style.display = 'grid';
         if (voiceToggleBtn) voiceToggleBtn.innerHTML = '<i data-lucide="volume-x" class="hud-icon-xs"></i> Voice Reply: MUTED';
         if (modeChanged) {
           shouldKeepListening = false;
@@ -6377,6 +6804,7 @@ desktop:
         const selVision = document.getElementById('sel-vision-model');
         const selTier0 = document.getElementById('sel-tier0-model');
         const selCloud = document.getElementById('sel-cloud-model');
+        const selTier0Device = document.getElementById('sel-tier0-device');
 
         if (selText && selVision && selTier0 && data.models) {
           selText.innerHTML = '';
@@ -6392,6 +6820,14 @@ desktop:
           if (data.current.local_text_model) selText.value = data.current.local_text_model;
           if (data.current.local_vision_model) selVision.value = data.current.local_vision_model;
           if (data.current.tier0_model) selTier0.value = data.current.tier0_model;
+        }
+
+        if (selTier0Device && data.current.tier0_device) {
+          selTier0Device.value = data.current.tier0_device;
+        }
+        const kpiTier0 = document.getElementById('kpi-tier0-ratio');
+        if (kpiTier0 && data.current.tier0_device) {
+          kpiTier0.innerText = data.current.tier0_device === 'cpu' ? 'CPU (0 VRAM)' : 'GPU (CUDA)';
         }
 
         if (selCloud && data.cloud_models) {
@@ -6427,6 +6863,7 @@ desktop:
         local_text_model: document.getElementById('sel-text-model') ? document.getElementById('sel-text-model').value : undefined,
         local_vision_model: document.getElementById('sel-vision-model') ? document.getElementById('sel-vision-model').value : undefined,
         tier0_model: document.getElementById('sel-tier0-model') ? document.getElementById('sel-tier0-model').value : undefined,
+        tier0_device: document.getElementById('sel-tier0-device') ? document.getElementById('sel-tier0-device').value : undefined,
         cloud_model: document.getElementById('sel-cloud-model') ? document.getElementById('sel-cloud-model').value : currentCloudModel,
       };
       if (apiKeyVal) {
@@ -6450,6 +6887,359 @@ desktop:
       } catch(e) {
         alert('Failed to save model configuration: ' + e);
       }
+    }
+
+    // JARVIS MARK 3: Enterprise LLM Gateway Matrix
+    let cachedGatewayProviders = [];
+
+    async function loadGatewayProviders() {
+      const container = document.getElementById('gateway-providers-container');
+      if (!container) return;
+      try {
+        const res = await fetch('/api/gateway/providers');
+        const data = await res.json();
+        cachedGatewayProviders = data.providers || [];
+        renderGatewayProviders();
+      } catch(e) {
+        container.innerHTML = `<div style="color: var(--neon-red); padding: 1rem;">Failed to load Gateway: ${e}</div>`;
+      }
+    }
+
+    function renderGatewayProviders() {
+      const container = document.getElementById('gateway-providers-container');
+      if (!container) return;
+      if (!cachedGatewayProviders.length) {
+        container.innerHTML = '<div style="color: var(--text-muted); padding: 1rem;">No enterprise providers configured.</div>';
+        return;
+      }
+
+      container.innerHTML = cachedGatewayProviders.map(p => {
+        const enabledClass = p.enabled ? 'enabled' : '';
+        const badgeColor = p.healthy ? 'var(--neon-green)' : 'var(--neon-red)';
+        const badgeText = p.circuit_open ? 'CIRCUIT TRIPPED' : (p.healthy ? 'HEALTHY' : 'DEGRADED');
+        const pingText = p.last_ping_ms ? `${p.last_ping_ms}ms` : '-- ms';
+
+        return `
+          <div class="gateway-card ${enabledClass}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="font-weight: 700; color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i data-lucide="${p.is_local ? 'hard-drive' : 'cloud'}" class="hud-icon-xs text-cyan"></i> ${p.display_name}
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">
+                  Priority: <b style="color: var(--neon-cyan);">#${p.priority}</b> • Latency: <b style="color: #cbd5e1;">${pingText}</b> • Success: <b>${p.success_rate}%</b>
+                </div>
+              </div>
+              <label class="handsfree-toggle" title="Enable or disable this LLM provider">
+                <input type="checkbox" ${p.enabled ? 'checked' : ''} onchange="toggleGatewayProvider('${p.id}', this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between; font-size: 0.74rem;">
+              <span class="badge" style="background: rgba(0,0,0,0.4); border: 1px solid ${badgeColor}; color: ${badgeColor}; font-size: 0.68rem;">● ${badgeText}</span>
+              <span style="color: var(--text-muted); font-size: 0.7rem;">Reqs: <b>${p.total_requests}</b> | Errs: <b>${p.total_errors}</b></span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.72rem; color: var(--text-muted); width: 60px;">Model:</label>
+                <select id="gw-model-${p.id}" style="flex: 1; height: 26px; font-size: 0.74rem; padding: 0 0.4rem;" onchange="saveGatewayProviderConfig('${p.id}')">
+                  ${p.available_models.map(m => `<option value="${m}" ${m === p.model ? 'selected' : ''}>${m}</option>`).join('')}
+                </select>
+              </div>
+
+              ${!p.is_local ? `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <label style="font-size: 0.72rem; color: var(--text-muted); width: 60px;">API Key:</label>
+                  <input type="password" id="gw-key-${p.id}" placeholder="${p.has_api_key ? '•••••••••••••••• (Active)' : 'Enter API Key...'}" style="flex: 1; height: 26px; font-size: 0.74rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 0 0.5rem; color: #ffffff;">
+                  <button class="btn btn-sm" onclick="saveGatewayProviderConfig('${p.id}')" title="Save API Key to Linux Vault" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;"><i data-lucide="save" class="hud-icon-xs"></i> Save</button>
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.2rem;">
+              <button class="btn btn-outline btn-sm" onclick="testGatewayProvider('${p.id}')" id="btn-gw-test-${p.id}" style="font-size: 0.72rem; padding: 0.25rem 0.65rem;">
+                <i data-lucide="activity" class="hud-icon-xs"></i> Test Ping
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function toggleGatewayProvider(providerId, enabled) {
+      try {
+        await fetch('/api/gateway/providers/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider_id: providerId, enabled: enabled })
+        });
+        loadGatewayProviders();
+      } catch(e) {
+        alert("Failed to toggle provider: " + e);
+      }
+    }
+
+    async function saveGatewayProviderConfig(providerId) {
+      const modelElem = document.getElementById(`gw-model-${providerId}`);
+      const keyElem = document.getElementById(`gw-key-${providerId}`);
+      const payload = { provider_id: providerId };
+      if (modelElem) payload.model = modelElem.value;
+      if (keyElem && keyElem.value.trim()) payload.api_key = keyElem.value.trim();
+
+      try {
+        await fetch('/api/gateway/providers/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (keyElem && keyElem.value.trim()) {
+          keyElem.value = '';
+          keyElem.placeholder = '•••••••••••••••• (Active)';
+        }
+        loadGatewayProviders();
+        alert(`Gateway provider '${providerId}' updated!`);
+      } catch(e) {
+        alert("Failed to save provider config: " + e);
+      }
+    }
+
+    async function testGatewayProvider(providerId) {
+      const btn = document.getElementById(`btn-gw-test-${providerId}`);
+      if (btn) btn.innerText = 'Pinging...';
+      try {
+        const res = await fetch('/api/gateway/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider_id: providerId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`✅ Provider '${providerId}' ping successful! Latency: ${data.latency_ms}ms (Model: ${data.model})`);
+        } else {
+          alert(`❌ Provider '${providerId}' test failed: ${data.error}`);
+        }
+        loadGatewayProviders();
+      } catch(e) {
+        alert("Ping error: " + e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="activity" class="hud-icon-xs"></i> Test Ping';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    // JARVIS MARK 3: Configurable Multi-Topic Daily Brief Matrix
+    let cachedBriefConfig = null;
+
+    async function loadDailyBriefConfig() {
+      try {
+        const res = await fetch('/api/brief/config');
+        cachedBriefConfig = await res.json();
+        renderDailyBriefConfig();
+      } catch(e) {
+        console.warn("Failed to load daily brief config:", e);
+      }
+    }
+
+    function renderDailyBriefConfig() {
+      if (!cachedBriefConfig) return;
+      const cityInput = document.getElementById('brief-city-input');
+      if (cityInput && cachedBriefConfig.city) {
+        cityInput.value = cachedBriefConfig.city;
+      }
+      const listContainer = document.getElementById('brief-topics-list');
+      if (!listContainer) return;
+
+      let totalWeight = 0;
+      listContainer.innerHTML = (cachedBriefConfig.topics || []).map((t, idx) => {
+        if (t.enabled) totalWeight += Number(t.weight_pct);
+        return `
+          <div class="brief-topic-row">
+            <div style="display: flex; align-items: center; gap: 0.6rem; min-width: 220px;">
+              <input type="checkbox" ${t.enabled ? 'checked' : ''} onchange="toggleBriefTopic(${idx}, this.checked)">
+              <div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">${t.name}</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">${t.genre_or_query || 'Default feed'} • ${t.timeframe}</div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; max-width: 450px;">
+              <span style="font-size: 0.72rem; color: var(--text-muted); width: 85px;">Focus Weight:</span>
+              <input type="range" class="brief-slider" min="0" max="100" step="5" value="${t.weight_pct}" oninput="onBriefSliderInput(${idx}, this.value)" onchange="onBriefSliderChange(${idx}, this.value)">
+              <span id="brief-topic-pct-${idx}" style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: var(--neon-cyan); width: 40px; text-align: right;">${t.weight_pct}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const totalElem = document.getElementById('brief-total-weight');
+      if (totalElem) {
+        totalElem.innerText = `${totalWeight}%`;
+        totalElem.style.color = (totalWeight === 100) ? 'var(--neon-green)' : 'var(--neon-amber)';
+      }
+    }
+
+    function toggleBriefTopic(idx, enabled) {
+      if (cachedBriefConfig && cachedBriefConfig.topics[idx]) {
+        cachedBriefConfig.topics[idx].enabled = enabled;
+        renderDailyBriefConfig();
+      }
+    }
+
+    function onBriefSliderInput(idx, val) {
+      const span = document.getElementById(`brief-topic-pct-${idx}`);
+      if (span) span.innerText = `${val}%`;
+      if (cachedBriefConfig && cachedBriefConfig.topics[idx]) {
+        cachedBriefConfig.topics[idx].weight_pct = parseInt(val);
+      }
+      let sum = 0;
+      cachedBriefConfig.topics.forEach(t => { if (t.enabled) sum += Number(t.weight_pct); });
+      const totalElem = document.getElementById('brief-total-weight');
+      if (totalElem) {
+        totalElem.innerText = `${sum}%`;
+        totalElem.style.color = (sum === 100) ? 'var(--neon-green)' : 'var(--neon-amber)';
+      }
+    }
+
+    function onBriefSliderChange(idx, val) {
+      onBriefSliderInput(idx, val);
+    }
+
+    async function saveDailyBriefConfig() {
+      if (!cachedBriefConfig) return;
+      const cityInput = document.getElementById('brief-city-input');
+      if (cityInput) cachedBriefConfig.city = cityInput.value.trim() || 'Bangalore';
+
+      try {
+        const res = await fetch('/api/brief/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cachedBriefConfig)
+        });
+        const data = await res.json();
+        alert("Daily Brief configuration saved successfully!");
+      } catch(e) {
+        alert("Failed to save Daily Brief configuration: " + e);
+      }
+    }
+
+    async function previewDailyBrief() {
+      try {
+        const res = await fetch('/api/brief/preview');
+        const data = await res.json();
+        openContextualExplanation(
+          `☀️ Daily Brief Preview // ${data.city}`,
+          `graph TD\n  A[☀️ Daily Briefing] --> B[⛅ Weather: ${data.city}]\n  A --> C[📅 Calendar Agenda]\n  A --> D[💻 Tech & AI News]\n  A --> E[🌐 World Headlines]\n  A --> F[⚡ Workstation Status]`,
+          data.spoken_text
+        );
+      } catch(e) {
+        alert("Failed to preview daily brief: " + e);
+      }
+    }
+
+    // JARVIS MARK 3: 90% Screen Space Contextual Explanation Dialog
+    let explanationZoom = 1.0;
+    let currentExplanationSvg = '';
+
+    async function openContextualExplanation(title, diagramCode, explanationText) {
+      const modal = document.getElementById('contextual-explanation-modal');
+      const titleElem = document.getElementById('explanation-modal-title');
+      const viewport = document.getElementById('explanation-diagram-viewport');
+      const summaryCapsule = document.getElementById('explanation-summary-capsule');
+      const deepDiveBody = document.getElementById('explanation-deep-dive-body');
+
+      if (!modal) return;
+      if (titleElem) titleElem.innerText = title || 'Contextual Architecture & System Explanation';
+
+      // Split summary (first 2-3 sentences) from remaining details
+      let summary = '';
+      let remaining = explanationText || '';
+      const periodIdx = remaining.indexOf('. ');
+      if (periodIdx !== -1) {
+        const secondPeriod = remaining.indexOf('. ', periodIdx + 2);
+        const splitAt = (secondPeriod !== -1) ? secondPeriod + 1 : periodIdx + 1;
+        summary = remaining.slice(0, splitAt).trim();
+        remaining = remaining.slice(splitAt).trim();
+      } else {
+        summary = remaining;
+        remaining = 'Would you like to dig deeper into any specific aspect of this architecture?';
+      }
+
+      if (summaryCapsule) {
+        summaryCapsule.innerHTML = `<b>EXECUTIVE SUMMARY:</b><br>${summary}`;
+      }
+      if (deepDiveBody) {
+        deepDiveBody.innerHTML = remaining.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+      }
+
+      // Render Mermaid diagram
+      if (viewport && diagramCode) {
+        viewport.innerHTML = '<div style="color: var(--neon-cyan); font-family: monospace;">Rendering interactive diagram...</div>';
+        let cleanMermaid = diagramCode.trim();
+        if (cleanMermaid.startsWith('```mermaid')) {
+          cleanMermaid = cleanMermaid.replace(/^```mermaid\s*/i, '').replace(/```\s*$/, '').trim();
+        } else if (cleanMermaid.startsWith('```')) {
+          cleanMermaid = cleanMermaid.replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/, '').trim();
+        }
+
+        if (window.mermaid) {
+          try {
+            const id = 'mermaid-expl-' + Math.floor(Math.random() * 1000000);
+            const res = await mermaid.render(id, cleanMermaid);
+            currentExplanationSvg = res.svg;
+            viewport.innerHTML = res.svg;
+          } catch(err) {
+            console.warn("Mermaid render error:", err);
+            viewport.innerHTML = `<pre style="color: #a6e3a1; font-family: monospace; text-align: left;">${cleanMermaid}</pre>`;
+          }
+        } else {
+          viewport.innerHTML = `<pre style="color: #a6e3a1; font-family: monospace; text-align: left;">${cleanMermaid}</pre>`;
+        }
+      }
+
+      explanationZoom = 1.0;
+      if (viewport) viewport.style.transform = `scale(${explanationZoom})`;
+      modal.style.display = 'flex';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function zoomExplanationDiagram(factor) {
+      explanationZoom = Math.max(0.4, Math.min(3.0, explanationZoom * factor));
+      const viewport = document.getElementById('explanation-diagram-viewport');
+      if (viewport) viewport.style.transform = `scale(${explanationZoom})`;
+    }
+
+    function resetExplanationZoom() {
+      explanationZoom = 1.0;
+      const viewport = document.getElementById('explanation-diagram-viewport');
+      if (viewport) viewport.style.transform = `scale(1.0)`;
+    }
+
+    function exportExplanationSvg() {
+      if (!currentExplanationSvg) {
+        alert("No SVG diagram available to export.");
+        return;
+      }
+      const blob = new Blob([currentExplanationSvg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `jarvis_diagram_${Date.now()}.svg`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function closeExplanationModal() {
+      const modal = document.getElementById('contextual-explanation-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function askFollowUpExplanation(promptText) {
+      closeExplanationModal();
+      setGoal(promptText);
+      runTask();
     }
 
     // Load Errors
@@ -6488,7 +7278,16 @@ desktop:
       loadErrors();
     }
 
-    // Native SVG Donut Chart
+    function filterHistoryByActuator(key) {
+      const search = document.getElementById('history-search');
+      if (search) {
+        search.value = key;
+        filterHistoryList();
+      }
+      showToast(`Filtered missions by actuator: ${key}`, 'info');
+    }
+
+    // Native SVG Donut Chart with interactive click-to-filter
     function renderActuatorDonut(breakdown, percentages) {
       const svg = document.getElementById('donut-svg');
       const legend = document.getElementById('donut-legend');
@@ -6542,14 +7341,25 @@ desktop:
             stroke-dasharray="${dash} ${circumference}"
             stroke-dashoffset="${-offset}"
             transform="rotate(-90 90 90)"
+            style="cursor: pointer; transition: stroke-width 0.2s, opacity 0.2s;"
+            onmouseover="this.setAttribute('stroke-width', '26'); this.style.filter='drop-shadow(0 0 8px ${color})';"
+            onmouseout="this.setAttribute('stroke-width', '22'); this.style.filter='none';"
+            onclick="filterHistoryByActuator('${key}')"
           >
-            <title>${labels[key] || key}: ${val} actions (${Math.round(pct * 100)}%)</title>
+            <title>Click to filter: ${labels[key] || key} - ${val} actions (${Math.round(pct * 100)}%)</title>
           </circle>
         `;
         offset += dash;
 
         const legItem = document.createElement('div');
         legItem.className = 'legend-item';
+        legItem.style.cursor = 'pointer';
+        legItem.style.padding = '3px 6px';
+        legItem.style.borderRadius = '4px';
+        legItem.style.transition = 'background 0.2s';
+        legItem.onmouseover = () => { legItem.style.background = 'rgba(255,255,255,0.08)'; };
+        legItem.onmouseout = () => { legItem.style.background = 'transparent'; };
+        legItem.onclick = () => filterHistoryByActuator(key);
         legItem.innerHTML = `
           <div class="legend-color" style="background: ${color};"></div>
           <span>${labels[key] || key}: <b>${val}</b> (${Math.round(pct * 100)}%)</span>
@@ -6565,7 +7375,7 @@ desktop:
       svg.innerHTML = circlesHtml;
     }
 
-    // Native SVG Mission Velocity Chart
+    // Native SVG Mission Velocity Chart with interactive click-to-view run
     function renderVelocityChart(recentTimeline) {
       const svg = document.getElementById('velocity-svg');
       if (!svg) return;
@@ -6586,11 +7396,16 @@ desktop:
         const x = 16 + (idx * (barWidth + 8));
         const y = height - barH - 18;
         const color = item.status === 'success' ? 'var(--neon-green)' : 'var(--neon-red)';
+        const runId = item.run_id || '';
 
         svgHtml += `
-          <g>
-            <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="3" fill="${color}" opacity="0.85">
-              <title>${item.goal}\nDuration: ${item.duration_sec}s\nStatus: ${item.status}</title>
+          <g style="cursor: pointer;" onclick="if ('${runId}') { selectRun('${runId}'); showToast('Mission ${runId.slice(0,8)} selected', 'info'); }">
+            <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="3" fill="${color}" opacity="0.85"
+              style="transition: opacity 0.2s, transform 0.2s;"
+              onmouseover="this.setAttribute('opacity', '1.0'); this.style.filter='drop-shadow(0 0 6px ${color})';"
+              onmouseout="this.setAttribute('opacity', '0.85'); this.style.filter='none';"
+            >
+              <title>Mission #${idx+1} [${item.status.toUpperCase()}]\nGoal: ${item.goal}\nDuration: ${item.duration_sec}s (${item.step_count || 0} steps)\nClick to inspect filmstrip details</title>
             </rect>
             <text x="${x + barWidth/2}" y="${y - 4}" text-anchor="middle" fill="#8492a6" font-size="9" font-family="JetBrains Mono">${item.duration_sec}s</text>
             <text x="${x + barWidth/2}" y="${height - 4}" text-anchor="middle" fill="#8492a6" font-size="9" font-family="JetBrains Mono">#${idx+1}</text>
@@ -7981,6 +8796,8 @@ desktop:
     loadDesktopMonitors();
     loadVoices();
     loadModels();
+    loadGatewayProviders();
+    loadDailyBriefConfig();
     loadMemory();
     loadCalendar();
     applyTerminalFontSize();
@@ -7989,6 +8806,8 @@ desktop:
       applyTerminalFontSize();
       loadVoices();
       loadModels();
+      loadGatewayProviders();
+      loadDailyBriefConfig();
       loadMemory();
       loadCalendar();
       renderIcons();
