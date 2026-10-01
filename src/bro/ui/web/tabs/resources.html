@@ -1,0 +1,215 @@
+<div id="tab-resources" class="tab-content">
+      <div class="card" style="display: flex; flex-direction: column; min-height: 800px;">
+        <div class="card-header" style="flex-wrap: wrap; gap: 0.8rem; border-bottom: 1px solid rgba(0, 240, 255, 0.15); padding-bottom: 0.85rem;">
+          <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+            <div class="card-title" style="margin: 0; font-size: 1rem;">
+              <i data-lucide="layers" class="hud-icon text-cyan"></i>
+              <span>BRO Variant 4 // Technical Design Specification</span>
+            </div>
+            <span class="badge" style="background: rgba(0, 240, 255, 0.12); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;">design.md</span>
+            <span class="badge" id="resources-doc-size" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;">Loading...</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <button class="btn btn-sm" onclick="copyDesignDoc()" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan);">
+              <i data-lucide="copy" class="hud-icon-xs"></i> Copy Markdown
+            </button>
+            <a href="/api/docs/design" target="_blank" class="btn btn-sm" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+              <i data-lucide="external-link" class="hud-icon-xs"></i> JSON API
+            </a>
+            <button class="btn btn-sm" onclick="loadDesignDocument()" style="background: rgba(255,255,255,0.08);"><i data-lucide="refresh-cw" class="hud-icon-xs"></i></button>
+          </div>
+        </div>
+
+        <div class="manual-layout" style="margin-top: 1rem; display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 1.5rem;">
+          <!-- Left: Table of Contents -->
+          <div class="manual-sidebar" id="resources-toc-list" style="max-height: 750px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.3rem;">
+            <!-- Populated dynamically by buildResourcesTOC() -->
+          </div>
+
+          <!-- Right: Rendered Markdown Content -->
+          <div class="manual-content" style="background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.5rem 2rem; max-height: 750px; overflow-y: auto;">
+            <div id="resources-markdown-viewer" style="line-height: 1.7; color: var(--text-main); font-size: 0.88rem;">
+              <!-- Rendered design.md content -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Interactive Modal for On-Demand Resource Request (Req 1) -->
+  <div class="modal-overlay" id="file-request-modal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <h3 style="color: var(--neon-amber); display: flex; align-items: center; gap: 0.5rem;"><i
+            data-lucide="file-question" class="hud-icon-sm text-amber"></i> Resource Required by Bro</h3>
+        <span
+          style="font-size: 0.72rem; background: rgba(255, 171, 0, 0.2); color: var(--neon-amber); padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold;">TASK
+          PAUSED</span>
+      </div>
+      <p style="color: #ffffff; font-size: 0.9rem; margin-bottom: 0.4rem;" id="modal-req-desc">A required file is needed
+        to proceed with this task.</p>
+      <p style="color: var(--neon-cyan); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; margin-bottom: 1rem;"
+        id="modal-req-exp"></p>
+
+      <!-- Option 1: Drag & Drop / File Picker -->
+      <div
+        style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.35rem;">
+        Option 1: Pick or Drop File from Computer</div>
+      <input type="file" id="modal-file-input" style="display:none;" onchange="handleModalFileUpload(event)">
+      <div
+        style="border: 2px dashed var(--panel-border); padding: 1.25rem; border-radius: 8px; text-align: center; cursor: pointer; margin-bottom: 1rem; background: rgba(0,0,0,0.25);"
+        onclick="document.getElementById('modal-file-input').click()">
+        <i data-lucide="upload-cloud" class="hud-icon-lg text-cyan"></i>
+        <div style="color: var(--neon-cyan); font-weight: 600; font-size: 0.85rem; margin-top: 0.3rem;">Click to Select
+          or Drop Required File</div>
+        <div style="color: var(--text-muted); font-size: 0.75rem;" id="modal-selected-filename">No file selected yet
+        </div>
+      </div>
+
+      <!-- Option 2: Enter Local Path -->
+      <div
+        style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.35rem;">
+        Option 2: Or Enter Local File Path on Workstation</div>
+      <input type="text" id="modal-path-input" placeholder="e.g. ~/data.csv or ~/Downloads/report.pdf"
+        style="width: 100%; background: rgba(6, 12, 26, 0.75); backdrop-filter: blur(14px); border: 1px solid var(--panel-border); border-top: 1px solid rgba(255,255,255,0.15); padding: 0.65rem 0.95rem; border-radius: 8px; color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; outline: none; margin-bottom: 1.25rem; box-shadow: inset 0 1px 4px rgba(0,0,0,0.5);">
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+        <button class="btn" style="background: rgba(255,255,255,0.08); color: var(--text-muted);"
+          onclick="cancelSuppliedFile()"><i data-lucide="skip-forward" class="hud-icon-xs"></i> File Unavailable /
+          Skip</button>
+        <button class="btn btn-cyan" id="modal-submit-btn" onclick="submitSuppliedFile()"><i data-lucide="check"
+            class="hud-icon-xs"></i> Supply File & Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Audit & Metrics Reset Confirmation (Item 7) -->
+  <div class="modal-overlay" id="audit-clear-modal">
+    <div class="modal-card"
+      style="max-width: 520px; border-color: rgba(255, 59, 48, 0.4); box-shadow: 0 0 35px rgba(255, 59, 48, 0.25);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="color: var(--neon-red); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <i data-lucide="alert-triangle" class="hud-icon-sm text-red"></i> Clear Audit Logs &amp; Reset Metrics
+        </h3>
+        <button class="btn btn-sm" onclick="closeAuditClearModal()"
+          style="background: rgba(255,255,255,0.08); padding: 0.2rem 0.5rem;"><i data-lucide="x"
+            class="hud-icon-xs"></i></button>
+      </div>
+      <p style="color: #ffffff; font-size: 0.88rem; line-height: 1.4; margin-bottom: 0.75rem;">
+        Are you sure you want to clear all historical mission runs, step screenshots, and reset analytics KPI metrics?
+      </p>
+      <div
+        style="background: rgba(3, 8, 18, 0.75); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 8px; padding: 0.75rem; margin-bottom: 1.25rem;">
+        <div
+          style="font-size: 0.75rem; color: var(--neon-cyan); font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.35rem;">
+          <i data-lucide="shield-check" class="hud-icon-xs"></i> AUTOMATIC SAFETY ARCHIVE
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;">
+          A full timestamped snapshot of your audit records will be automatically saved to <code
+            style="color: #a6e3a1;">~/ai-memory/bro/backups/audit_backup_&lt;timestamp&gt;/</code> before deletion.
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button class="btn" style="background: rgba(255,255,255,0.08); color: var(--text-muted);"
+          onclick="closeAuditClearModal()">Cancel</button>
+        <button class="btn btn-danger" id="btn-confirm-audit-clear" onclick="confirmClearAuditHistory()"><i
+            data-lucide="trash-2" class="hud-icon-xs"></i> Confirm &amp; Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Tactical Keyboard Shortcuts HUD (Variant 2) -->
+  <div class="modal-overlay" id="shortcuts-modal" style="display: none; z-index: 99999;">
+    <div class="modal-card"
+      style="max-width: 600px; border-color: var(--neon-cyan); box-shadow: 0 0 35px rgba(0, 240, 255, 0.25);">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.6rem;">
+        <h3
+          style="color: var(--neon-cyan); display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.95rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;">
+          <i data-lucide="command" class="hud-icon-sm text-cyan"></i> BRO VARIANT 2 // TACTICAL SHORTCUTS
+        </h3>
+        <button class="btn btn-sm" onclick="toggleShortcutsModal()"
+          style="background: rgba(255,255,255,0.08); padding: 0.2rem 0.5rem;"><i data-lucide="x"
+            class="hud-icon-xs"></i></button>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0.85rem;">
+        Workstation hotkeys for instant HUD navigation, hands-free voice control, and audio barge-in:
+      </p>
+      <div
+        style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Command Center</span>
+          <kbd
+            style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">1</kbd>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Agent Terminal</span>
+          <kbd
+            style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">2</kbd>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Sentinels Matrix</span>
+          <kbd
+            style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">3</kbd>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">System Telemetry</span>
+          <kbd
+            style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">4</kbd>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Tactical Manual</span>
+          <kbd
+            style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">5</kbd>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Fullscreen Audio HUD</span>
+          <kbd
+            style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">F</kbd>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Toggle Mic / Voice</span>
+          <kbd
+            style="background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">M</kbd>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Barge-In (Halt Voice)</span>
+          <kbd
+            style="background: rgba(239,68,68,0.2); border: 1px solid var(--neon-red); color: var(--neon-red); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">Esc</kbd>
+        </div>
+        <div
+          style="grid-column: span 2; display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: rgba(3, 8, 18, 0.8); border: 1px solid var(--panel-border); border-radius: 6px;">
+          <span style="color: #ffffff;">Toggle Shortcuts Modal</span>
+          <kbd
+            style="background: rgba(16,185,129,0.2); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">?</kbd>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+        <button class="btn btn-cyan btn-sm" onclick="toggleShortcutsModal()">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Screenshot Lightbox Modal -->
+  <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1100px; margin-bottom: 0.75rem;">
+      <span style="color: var(--neon-cyan); font-weight: 600; font-size: 0.9rem;" id="lightbox-title">Step Screenshot
+        (1920x1080)</span>
+      <button class="btn btn-danger" onclick="closeLightbox(null)"><i data-lucide="x" class="hud-icon-xs"></i>
+        Close</button>
+    </div>
+    <img src="" class="lightbox-img" id="lightbox-image" alt="Full resolution screenshot">
+  </div>
+
+  <!-- High-Tech Media Display Modal (Diagrams, Charts, Images) -->

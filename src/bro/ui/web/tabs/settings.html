@@ -1,0 +1,782 @@
+<div id="tab-settings" class="tab-content">
+      <div class="card" style="padding-bottom: 2rem;">
+        <div class="card-header"
+          style="border-bottom: 1px solid rgba(0, 240, 255, 0.12); padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+          <div>
+            <div class="card-title" style="font-size: 1.05rem;"><i data-lucide="settings"
+                class="hud-icon text-cyan"></i> Workstation Settings & Control Matrix</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Modular configuration matrix. Select a category on the left to tune AI models, cloud gateways, vocal
+              persona, safety policies, or system watchdogs.
+            </p>
+          </div>
+          <span class="badge"
+            style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;">MARK
+            4 MODULAR MATRIX</span>
+        </div>
+
+        <div class="settings-layout">
+          <!-- Settings Sidebar Navigation (Grouped like System Manual) -->
+          <div class="settings-sidebar">
+            <button class="settings-nav-btn active" data-target="brain" onclick="showSettingsSection('brain', this)">
+              <i data-lucide="cpu" class="hud-icon-xs text-cyan"></i> 1. AI Brain & Models
+            </button>
+            <button class="settings-nav-btn" data-target="gateway" onclick="showSettingsSection('gateway', this)">
+              <i data-lucide="network" class="hud-icon-xs text-blue"></i> 2. LLM Gateway Matrix
+            </button>
+            <button class="settings-nav-btn" data-target="brief" onclick="showSettingsSection('brief', this)">
+              <i data-lucide="sun" class="hud-icon-xs text-amber"></i> 3. Daily Briefing
+            </button>
+            <button class="settings-nav-btn" data-target="voice" onclick="showSettingsSection('voice', this)">
+              <i data-lucide="volume-2" class="hud-icon-xs text-green"></i> 4. Voice Persona & Audio
+            </button>
+            <button class="settings-nav-btn" data-target="safety" onclick="showSettingsSection('safety', this)">
+              <i data-lucide="shield-check" class="hud-icon-xs text-purple"></i> 5. Safety & Autonomous
+            </button>
+            <button class="settings-nav-btn" data-target="display" onclick="showSettingsSection('display', this)">
+              <i data-lucide="monitor" class="hud-icon-xs text-cyan"></i> 6. Display Perception
+            </button>
+            <button class="settings-nav-btn" data-target="watchdogs" onclick="showSettingsSection('watchdogs', this)">
+              <i data-lucide="activity" class="hud-icon-xs text-amber"></i> 7. Watchdogs & Sentinels
+            </button>
+            <button class="settings-nav-btn" data-target="memory" onclick="showSettingsSection('memory', this)">
+              <i data-lucide="folder-cog" class="hud-icon-xs text-blue"></i> 8. Memory Storage
+            </button>
+            <button class="settings-nav-btn" data-target="theme" onclick="showSettingsSection('theme', this)">
+              <i data-lucide="palette" class="hud-icon-xs text-purple"></i> 9. UX Theme & Styling
+            </button>
+            <button class="settings-nav-btn" data-target="audiovisualizer" onclick="showSettingsSection('audiovisualizer', this)">
+              <i data-lucide="activity" class="hud-icon-xs text-cyan"></i> 10. Audio HUD Animations
+            </button>
+          </div>
+
+          <!-- Settings Content Viewport (Only the active group is visible) -->
+          <div class="settings-content">
+            <div class="settings-section active" id="sec-settings-brain">
+              <!-- CARD 1: AI Brain & Execution Policy -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title"><i data-lucide="cpu" class="hud-icon-sm text-cyan"></i> AI Brain & Execution
+                      Engine Policy</div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                      Select active execution intelligence: Local GPU (Local GPU / Ollama), Cloud Gemini 3.8 Flash, or
+                      Hybrid Escalation.
+                    </p>
+                  </div>
+                  <button class="btn btn-cyan btn-sm" onclick="loadModels()"><i data-lucide="refresh-cw"
+                      class="hud-icon-xs"></i> Refresh Models</button>
+                </div>
+
+                <!-- Policy Selector Buttons -->
+                <div style="margin: 1rem 0 1.25rem 0;">
+                  <div
+                    style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">
+                    Active Intelligence Engine:</div>
+                  <div class="policy-hero-grid">
+                    <div class="policy-hero-card active" id="card-policy-local_only"
+                      onclick="setAIBackendPolicy('local_only')">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                        <div
+                          style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+                          <i data-lucide="hard-drive" class="hud-icon-xs text-green"></i> 100% Local LLM (Local GPU)
+                        </div>
+                        <span class="status-dot dot-green" id="dot-policy-local"></span>
+                      </div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;">
+                        Private, offline, zero cloud calls. Gemma 4 12B &amp; Qwen2.5-VL 7B pinned in VRAM.
+                      </div>
+                    </div>
+
+                    <div class="policy-hero-card" id="card-policy-cloud_only"
+                      onclick="setAIBackendPolicy('cloud_only')">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                        <div
+                          style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+                          <i data-lucide="cloud-lightning" class="hud-icon-xs text-purple"></i> Cloud Gemini 3.8 / 2.5
+                          Flash
+                        </div>
+                        <span class="status-dot dot-gray" id="dot-policy-cloud"></span>
+                      </div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;">
+                        Ultra-fast multimodal reasoning via Google AI Studio Free Tier API ($0 cost).
+                      </div>
+                    </div>
+
+                    <div class="policy-hero-card" id="card-policy-tier_fallback"
+                      onclick="setAIBackendPolicy('tier_fallback')">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                        <div
+                          style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+                          <i data-lucide="shuffle" class="hud-icon-xs text-cyan"></i> Hybrid Fallback Tier
+                        </div>
+                        <span class="status-dot dot-gray" id="dot-policy-hybrid"></span>
+                      </div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.35;">
+                        Executes locally on Local GPU; automatically escalates to Gemini Flash if local fails.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Cloud Gemini Settings Row -->
+                <div id="cloud-gemini-config-box"
+                  style="background: rgba(3, 8, 18, 0.75); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 8px; padding: 0.85rem 1rem; display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                  <div style="display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 280px;">
+                    <i data-lucide="sparkles" class="hud-icon-sm text-cyan"></i>
+                    <div style="flex: 1;">
+                      <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Cloud Gemini Model</div>
+                      <div style="font-size: 0.7rem; color: var(--text-muted);">Selected for Cloud / Hybrid mode</div>
+                    </div>
+                    <select id="sel-cloud-model" style="min-width: 220px;" onchange="onCloudModelChange(this.value)">
+                      <option value="gemini-2.5-flash">Gemini 3.8 / 2.5 Flash (Free Tier)</option>
+                      <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                      <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                      <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    </select>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 280px;">
+                    <i data-lucide="key" class="hud-icon-sm text-cyan"></i>
+                    <div style="flex: 1;">
+                      <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Gemini API Key</div>
+                      <div style="font-size: 0.7rem; color: var(--text-muted);"><a href="https://aistudio.google.com"
+                          target="_blank" style="color: var(--neon-cyan); text-decoration: underline;">Get free key at
+                          aistudio.google.com</a></div>
+                    </div>
+                    <input type="password" id="input-gemini-api-key"
+                      placeholder="AIzaSy... (leave blank to keep current)"
+                      style="height: 28px; background: rgba(6,12,26,0.85); color: #ffffff; border: 1px solid rgba(0,240,255,0.35); border-radius: 14px; font-size: 0.74rem; padding: 0 0.65rem; font-family: 'JetBrains Mono', monospace; width: 170px;">
+                    <button class="btn btn-sm" onclick="toggleApiKeyVisibility()"
+                      style="background: rgba(255,255,255,0.08); padding: 0.2rem 0.5rem; font-size: 0.7rem;"
+                      title="Toggle API key visibility"><i data-lucide="eye" class="hud-icon-xs"></i></button>
+                  </div>
+                </div>
+
+                <!-- Local Ollama Model Assignments -->
+                <div
+                  style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">
+                  Local Ollama Model Assignments (Local GPU Subsystems):</div>
+                <div
+                  style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="brain"
+                        class="hud-icon-xs"></i> 1. Text &amp; Reasoning Model</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Complex planning and
+                      tool invocation</p>
+                    <select id="sel-text-model" style="width: 100%;"></select>
+                  </div>
+
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="eye"
+                        class="hud-icon-xs"></i> 2. Vision UI Grounding Model</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Desktop screenshots
+                      &amp; click coordinates</p>
+                    <select id="sel-vision-model" style="width: 100%;"></select>
+                  </div>
+
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="zap"
+                        class="hud-icon-xs"></i> 3. Tier-0 Fast Classifier</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Sub-100ms intent
+                      classification</p>
+                    <select id="sel-tier0-model" style="width: 100%; margin-bottom: 0.5rem;"></select>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                      <span style="font-size: 0.72rem; color: #ffffff; font-weight: 500;">Execution Device:</span>
+                      <select id="sel-tier0-device"
+                        style="width: auto; height: 26px; font-size: 0.72rem; padding: 0 0.5rem; background: rgba(3,7,18,0.9); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px;">
+                        <option value="cpu">CPU (Preserve GPU VRAM)</option>
+                        <option value="gpu">GPU (CUDA)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="btn btn-cyan" style="padding: 0.65rem 1.75rem;" onclick="saveModelSelection()"><i
+                    data-lucide="save" class="hud-icon-xs"></i> Save Model Preferences</button>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-gateway">
+              <!-- CARD: Enterprise LLM Gateway Matrix (Variant 3) -->
+              <div class="card" id="card-llm-gateway">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title"><i data-lucide="network" class="hud-icon-sm text-cyan"></i> Enterprise LLM
+                      Gateway Matrix</div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                      Manage enterprise upstream AI providers, toggle active models, store API keys safely in Vault, and
+                      monitor latency &amp; fallback health.
+                    </p>
+                  </div>
+                  <button class="btn btn-cyan btn-sm" onclick="loadGatewayProviders()"><i data-lucide="refresh-cw"
+                      class="hud-icon-xs"></i> Refresh Gateway</button>
+                </div>
+
+                <div class="gateway-grid" id="gateway-providers-container">
+                  <div style="color: var(--text-muted); padding: 1rem;">Loading enterprise gateway providers...</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-brief">
+              <!-- CARD: Configurable Multi-Topic Daily Brief Matrix (Variant 3) -->
+              <div class="card" id="card-daily-brief-config">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title"><i data-lucide="sun" class="hud-icon-sm text-amber"></i> Configurable
+                      Multi-Topic Daily Brief Matrix</div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                      Customize topics, interest percentage weights, local city weather, news genres, and schedule
+                      parameters for spoken &amp; visual morning briefings.
+                    </p>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button class="btn btn-warning btn-sm" onclick="previewDailyBrief()"><i data-lucide="eye"
+                        class="hud-icon-xs"></i> Test Brief Preview</button>
+                    <button class="btn btn-cyan btn-sm" onclick="saveDailyBriefConfig()"><i data-lucide="save"
+                        class="hud-icon-xs"></i> Save Brief Config</button>
+                  </div>
+                </div>
+
+                <div
+                  style="background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <i data-lucide="map-pin" class="hud-icon-sm text-amber"></i>
+                    <div>
+                      <div style="font-size: 0.8rem; font-weight: 700; color: #ffffff;">Weather City Target:</div>
+                      <div style="font-size: 0.7rem; color: var(--text-muted);">Current: Bangalore / Worldwide via
+                        Open-Meteo</div>
+                    </div>
+                    <input type="text" id="brief-city-input" value="Bangalore"
+                      style="background: rgba(6,12,26,0.85); color: #ffffff; border: 1px solid rgba(255,171,0,0.35); border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; width: 140px;">
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Total Weight:</span>
+                    <span id="brief-total-weight"
+                      style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--neon-green); font-size: 0.85rem;">100%</span>
+                  </div>
+                </div>
+
+                <div id="brief-topics-list">
+                  <!-- Populated via loadDailyBriefConfig() -->
+                </div>
+
+                <!-- VARIANT 4: Multi-Slot Brief Schedule Manager -->
+                <div style="margin-top: 1.5rem; border-top: 1px solid rgba(0,240,255,0.12); padding-top: 1.25rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                      <div
+                        style="font-size: 0.9rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="clock" class="hud-icon-xs text-amber"></i>
+                        ☀️ Scheduled Brief Slots
+                      </div>
+                      <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Configure multiple
+                        briefing times with independent topic selections</div>
+                    </div>
+                    <button class="btn btn-cyan btn-sm" onclick="addBriefSlot()">
+                      <i data-lucide="plus" class="hud-icon-xs"></i> Add Slot
+                    </button>
+                  </div>
+
+                  <div id="brief-slots-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <!-- Populated by loadBriefSlots() -->
+                  </div>
+
+                  <div style="display: flex; gap: 0.6rem; margin-top: 1rem;">
+                    <button class="btn btn-cyan btn-sm" onclick="saveBriefSlots()">
+                      <i data-lucide="save" class="hud-icon-xs"></i> Save Slots
+                    </button>
+                    <button class="btn btn-sm" style="background: rgba(255,255,255,0.06);" onclick="loadBriefSlots()">
+                      <i data-lucide="refresh-cw" class="hud-icon-xs"></i> Reload
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-voice">
+              <!-- CARD 3: Voice Persona, Speech Speed & Bro Volume (Items 1 & 2) -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i data-lucide="volume-2" class="hud-icon-sm text-cyan"></i> Voice Persona,
+                    Speech Speed &amp; Bro Volume</div>
+                  <button class="btn btn-warning btn-sm" onclick="triggerBrief()"><i data-lucide="sun"
+                      class="hud-icon-xs"></i> Trigger Morning Brief</button>
+                </div>
+
+                <div
+                  style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                  <!-- Voice Persona -->
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="mic"
+                        class="hud-icon-xs"></i> Vocal Persona</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Neural Edge-TTS
+                      voice actor for spoken replies</p>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                      <select id="settings-voice-select" onchange="onVoiceSelectChange(this.value)"
+                        style="flex: 1;"></select>
+                      <button class="btn btn-cyan btn-sm"
+                        onclick="previewSelectedVoice(document.getElementById('settings-voice-select').value)"
+                        title="Test voice"><i data-lucide="volume-2" class="hud-icon-xs"></i> Test</button>
+                    </div>
+                  </div>
+
+                  <!-- Voice Speed -->
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="gauge"
+                        class="hud-icon-xs"></i> Speech Speed Rate</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Playback rate for
+                      speech delivery (0.50x to 2.00x)</p>
+                    <div style="display: flex; align-items: center; gap: 0.65rem; margin-top: 0.5rem;">
+                      <input type="range" id="settings-voice-speed-slider" min="0.5" max="2.0" step="0.05" value="1.0"
+                        oninput="onVoiceSpeedInput(this.value)" onchange="onVoiceSpeedChange(this.value)"
+                        style="flex: 1;">
+                      <span class="voice-speed-badge" id="settings-voice-speed-val"
+                        style="min-width: 44px; text-align: center;">1.00x</span>
+                      <button class="btn btn-sm" onclick="resetVoiceSpeed()"
+                        style="background: rgba(255,255,255,0.08); font-size: 0.7rem; padding: 0.25rem 0.5rem;">Reset</button>
+                    </div>
+                  </div>
+
+                  <!-- Bro Volume Slider (Item 2) -->
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="volume-2"
+                        class="hud-icon-xs text-cyan"></i> Bro Volume</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Master audio
+                      playback volume (0% to 100%)</p>
+                    <div style="display: flex; align-items: center; gap: 0.65rem; margin-top: 0.5rem;">
+                      <input type="range" id="settings-volume-slider" min="0" max="100" step="5" value="100"
+                        oninput="onVolumeInput(this.value)" onchange="onVolumeChange(this.value)" style="flex: 1;">
+                      <span class="badge" id="settings-volume-val"
+                        style="background: rgba(0, 240, 255, 0.2); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); min-width: 48px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">100%</span>
+                      <button class="btn btn-cyan btn-sm" onclick="testBroVolume()"
+                        title="Test current volume level"><i data-lucide="play" class="hud-icon-xs"></i> Play</button>
+                    </div>
+                  </div>
+
+                  <!-- STT Engine & Tactical SFX (Variant 2) -->
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="radio"
+                        class="hud-icon-xs text-cyan"></i> STT Engine &amp; SFX Synthesis</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Speech recognition
+                      pipeline &amp; Web Audio SFX</p>
+                    <div
+                      style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.35rem; margin-bottom: 0.5rem;">
+                      <select id="settings-stt-engine-select" onchange="onSttEngineChange(this.value)"
+                        style="flex: 1; font-size: 0.78rem;">
+                        <option value="browser">Browser Web Speech API (Cloud Streaming)</option>
+                        <option value="whisper">Local GPU Faster-Whisper (CUDA Offline)</option>
+                      </select>
+                    </div>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem;">
+                      <label
+                        style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: #ffffff; cursor: pointer;">
+                        <input type="checkbox" id="settings-sfx-toggle" checked
+                          onchange="toggleTacticalSfx(this.checked)">
+                        <span>Tactical Web Audio SFX</span>
+                      </label>
+                      <button class="btn btn-sm" onclick="playTacticalSfx('success')"
+                        style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-size: 0.7rem; padding: 0.2rem 0.5rem;"><i
+                          data-lucide="bell" class="hud-icon-xs"></i> Test SFX</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; background: rgba(3, 8, 18, 0.6); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.75rem 1rem;">
+                  <label
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.8rem; color: #ffffff;">
+                    <input type="checkbox" id="settings-voice-reply-chat"
+                      onchange="toggleVoiceReplyOnChat(this.checked)">
+                    <span>Always speak responses during text chat mode</span>
+                  </label>
+                  <label
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.8rem; color: #ffffff;">
+                    <input type="checkbox" id="settings-handsfree-loop" checked
+                      onchange="toggleHandsFreeLoop(this.checked)">
+                    <span>Hands-Free Continuous Microphone Loop</span>
+                  </label>
+                  <label
+                    style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.8rem; color: #ffffff;">
+                    <input type="checkbox" id="settings-genz-greetings-toggle"
+                      onchange="toggleGenZGreetings(this.checked)">
+                    <span style="display: flex; align-items: center; gap: 0.35rem;">
+                      <i data-lucide="sparkles" class="hud-icon-xs text-amber"></i>
+                      <span>Gen-Z Mode (Slang &amp; Salutations)</span>
+                      <span class="badge" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; background: rgba(255, 170, 0, 0.15); border: 1px solid var(--neon-amber); color: var(--neon-amber); font-family: 'JetBrains Mono', monospace;">SLANG</span>
+                    </span>
+                  </label>
+                  <div style="margin-left: auto; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                    <button class="btn btn-cyan btn-sm" onclick="showSettingsSection('audiovisualizer')"
+                      title="Configure real-time Audio HUD microphone animations"><i
+                        data-lucide="activity" class="hud-icon-xs"></i> HUD Animations</button>
+                    <button class="btn btn-cyan btn-sm" onclick="setupUbuntuShortcut()" id="btn-setup-shortcut"
+                      title="Register Super+Shift+J GNOME shortcut to open Bro in voice mode"><i
+                        data-lucide="command" class="hud-icon-xs"></i> Ubuntu Shortcut (Super+Shift+J)</button>
+                    <button class="btn btn-warning btn-sm" onclick="triggerBrief()"><i data-lucide="sun"
+                        class="hud-icon-xs"></i> Daily Workstation Brief</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-safety">
+              <!-- CARD 2: Autonomous Execution & Safety Gatekeeper (Item 4) -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title" style="font-size: 0.92rem; letter-spacing: 0.5px;"><i
+                        data-lucide="shield-check" class="hud-icon-sm text-green"></i> Autonomous Execution &amp; Safety
+                      Gatekeeper</div>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
+                      Configures on-screen authorization for high-stakes bash commands, system modifications, and
+                      credentials.
+                    </p>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span class="badge"
+                      style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;"
+                      id="settings-auto-badge">APPROVAL OVERLAY ACTIVE</span>
+                    <button class="btn btn-sm" onclick="testApprovalOverlay()"
+                      style="background: rgba(0, 240, 255, 0.12); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-size: 0.74rem;"
+                      title="Test and preview the floating desktop approval dialog"><i data-lucide="eye"
+                        class="hud-icon-xs"></i> Preview Approval Dialog</button>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.25rem; background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 10px; padding: 1.1rem 1.35rem;">
+                  <div style="flex: 1; min-width: 280px;">
+                    <div style="font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.35rem;">Autonomous
+                      Mode (Unattended Execution)</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; line-height: 1.45; max-width: 650px;">
+                      When disabled, any destructive system command (e.g. <code>rm -rf</code>, <code>sudo</code>,
+                      payments, emails) summons the floating X11 Approval Overlay dialog. When enabled, Bro executes
+                      continuously without human prompts.
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.85rem;">
+                    <span id="settings-auto-label"
+                      style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--neon-cyan);">OFF
+                      (Approval Overlay Active)</span>
+                    <button class="btn" id="btn-toggle-auto" onclick="toggleAutonomousSetting()"
+                      style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-weight: 700; min-width: 140px;">
+                      <i data-lucide="toggle-left" class="hud-icon-xs"></i> Toggle Mode
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-display">
+              <!-- CARD 4: Perception & Display Perceptor (Item 1) -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i data-lucide="monitor" class="hud-icon-sm text-cyan"></i> Workstation
+                    Perception &amp; Active Display</div>
+                  <button class="btn btn-cyan btn-sm" onclick="previewActiveDesktop()"><i data-lucide="eye"
+                      class="hud-icon-xs"></i> Inspect Display</button>
+                </div>
+                <div
+                  style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; background: rgba(3, 8, 18, 0.7); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.85rem 1rem;">
+                  <div style="flex: 1; min-width: 250px;">
+                    <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem;">Active
+                      Perception Display:</div>
+                    <div style="font-size: 0.74rem; color: var(--text-muted);">Choose which physical monitor Bro
+                      captures and interacts with.</div>
+                  </div>
+                  <select id="settings-desktop-select" onchange="changeMainDesktop(parseInt(this.value))"
+                    style="min-width: 240px;"></select>
+                  <button class="btn btn-cyan btn-sm" onclick="previewActiveDesktop()"><i data-lucide="camera"
+                      class="hud-icon-xs"></i> Grab Screen Capture</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-watchdogs">
+              <!-- CARD 5: Watchdogs, Sentinels & Automation Rules (Item 8) -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i data-lucide="activity" class="hud-icon-sm text-cyan"></i> Watchdogs &amp;
+                    Telemetry Thresholds</div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="flame"
+                        class="hud-icon-xs text-amber"></i> Thermal Sentinel</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Alerts before RTX
+                      3060 thermal throttling (&gt;80°C) or disk saturation (&gt;90%).</p>
+                    <span style="color: var(--neon-green); font-size: 0.78rem; font-weight: 700;">● ACTIVE &amp;
+                      MONITORING (30s POLLING)</span>
+                  </div>
+
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="folder-sync"
+                        class="hud-icon-xs text-cyan"></i> Download Auto-Organizer</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Monitors ~/Downloads
+                      and categorizes PDFs, Data, Archives into folders.</p>
+                    <button class="btn btn-cyan btn-sm" onclick="runOrganizer()" style="margin-top: 0.35rem;"><i
+                        data-lucide="refresh-cw" class="hud-icon-xs"></i> Trigger Scan Now</button>
+                  </div>
+
+                  <div class="step-card">
+                    <h4 style="color: var(--neon-cyan); font-size: 0.85rem;"><i data-lucide="command"
+                        class="hud-icon-xs text-purple"></i> Spotlight Bar (Alt+J)</h4>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;">Global desktop
+                      shortcut to summon translucent HUD perception bar.</p>
+                    <span style="color: var(--neon-cyan); font-size: 0.78rem; font-weight: 700;">KEYBIND: &lt;ALT&gt; +
+                      J</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-memory">
+              <!-- CARD 6: Memory & Persistent Knowledge Storage Directory (Item 1) -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title" style="font-size: 0.92rem; letter-spacing: 0.5px;">
+                      <i data-lucide="folder-cog" class="hud-icon-sm text-cyan"></i> Memory &amp; Knowledge Storage
+                      Directory
+                    </div>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
+                      Filesystem repository for long-term memory, preferences, system profiles, and automated macros.
+                    </p>
+                  </div>
+                  <span class="badge"
+                    style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">
+                    <i data-lucide="git-branch" class="hud-icon-xs"></i> OMITTED FROM GIT
+                  </span>
+                </div>
+                <p
+                  style="color: #94a3b8; font-size: 0.82rem; margin-top: 0; margin-bottom: 0.85rem; line-height: 1.45;">
+                  Configure where Bro stores persistent markdown memory files (<code>preferences.md</code>,
+                  <code>system.md</code>, <code>contacts.md</code>, and <code>workflows/</code>). Default location is
+                  <code>~/ai-memory/bro</code>. Updates are saved to <code>config.yaml</code> and applied
+                  immediately.
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem;">
+                  <div style="flex: 1; min-width: 280px; position: relative;">
+                    <input type="text" id="memory-dir-input" placeholder="e.g. ~/ai-memory/bro"
+                      style="width: 100%; background: rgba(3, 7, 16, 0.85); backdrop-filter: blur(14px); color: #00f3ff; border: 1px solid var(--panel-border); font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; padding: 0.65rem 0.95rem; border-radius: 8px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.6); outline: none;">
+                  </div>
+                  <button class="btn btn-cyan" onclick="saveMemoryConfig()"><i data-lucide="save"
+                      class="hud-icon-xs"></i> Save Directory</button>
+                  <button class="btn"
+                    style="background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid var(--panel-border);"
+                    onclick="resetMemoryConfig()"><i data-lucide="rotate-ccw" class="hud-icon-xs"></i> Reset to
+                    Default</button>
+                </div>
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace;">
+                  <div style="color: var(--text-muted);">
+                    Resolved System Path: <span id="memory-dir-resolved" style="color: #a6e3a1;">Loading path...</span>
+                  </div>
+                  <div id="memory-dir-status"
+                    style="display: none; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 500;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" id="sec-settings-theme">
+              <!-- CARD: System UX Theme & Visual Style -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title"><i data-lucide="palette" class="hud-icon-sm text-purple"></i> System UX Theme &amp; Visual Style</div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                      Choose your preferred desktop visual design system. Changes apply instantaneously across all HUD tabs and persist locally.
+                    </p>
+                  </div>
+                  <span class="badge" id="theme-active-badge"
+                    style="background: rgba(168, 85, 247, 0.15); border: 1px solid var(--neon-purple); color: var(--neon-purple); font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;">DEFAULT CYBER</span>
+                </div>
+
+                <div style="margin: 1rem 0 1.25rem 0;">
+                  <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.75rem;">
+                    Select Interface Theme:
+                  </div>
+                  <div class="policy-hero-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
+                    
+                    <!-- Theme Card: Default (Cyber Glassmorphism) -->
+                    <div class="policy-hero-card active theme-card" id="theme-card-default" onclick="setSystemTheme('default')">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                          <i data-lucide="sparkles" class="hud-icon-sm text-cyan"></i> Default (Cyber Glassmorphism)
+                        </div>
+                        <span class="status-dot dot-green" id="dot-theme-default"></span>
+                      </div>
+                      <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Deep void cyber-canvas (#030712), high-voltage glowing neon borders, frosted glass translucency, and holographic sci-fi HUD styling.
+                      </div>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(0,240,255,0.15); color: var(--neon-cyan); border: 1px solid rgba(0,240,255,0.3);">Frosted Glass</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(59,130,246,0.15); color: var(--neon-blue); border: 1px solid rgba(59,130,246,0.3);">Neon Glow</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.08); color: #cbd5e1;">Deep Void</span>
+                      </div>
+                    </div>
+
+                    <!-- Theme Card: Neomorphism (Soft 3D Extrusion) -->
+                    <div class="policy-hero-card theme-card" id="theme-card-neumorphism" onclick="setSystemTheme('neumorphism')">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                          <i data-lucide="layers" class="hud-icon-sm text-purple"></i> Neomorphism (Soft 3D Extrusion)
+                        </div>
+                        <span class="status-dot dot-gray" id="dot-theme-neumorphism"></span>
+                      </div>
+                      <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Tactile matte slate surfaces (#1a1e24), physical dual-shadow extrusion, inset pressed controls, smooth convex curves, and zero backdrop-filter latency.
+                      </div>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(168,85,247,0.15); color: var(--neon-purple); border: 1px solid rgba(168,85,247,0.3);">Dual Shadows</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(0,210,255,0.15); color: var(--neon-cyan); border: 1px solid rgba(0,210,255,0.3);">Tactile Insets</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.08); color: #cbd5e1;">Matte Slate</span>
+                      </div>
+                    </div>
+
+                    <!-- Theme Card: Aurora Glassmorphism (Frosted Crystal Smoked Glass) -->
+                    <div class="policy-hero-card theme-card" id="theme-card-glassmorphism" onclick="setSystemTheme('glassmorphism')">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                          <i data-lucide="sparkles" class="hud-icon-sm text-cyan"></i> Aurora Glassmorphism (Frosted Crystal)
+                        </div>
+                        <span class="status-dot dot-gray" id="dot-theme-glassmorphism"></span>
+                      </div>
+                      <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Cosmic aurora background mesh (#070b16), ultra-modern frosted smoked-glass panels (28px blur), crisp specular rim highlights, and vibrant electric cyan/magenta shimmer.
+                      </div>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(0,229,255,0.15); color: var(--neon-cyan); border: 1px solid rgba(0,229,255,0.3);">Smoked Glass</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(217,70,239,0.15); color: #d946ef; border: 1px solid rgba(217,70,239,0.3);">Aurora Mesh</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.08); color: #ffffff;">28px Blur</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- Live Preview Note -->
+                <div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 0.75rem 1rem;">
+                  <i data-lucide="info" class="hud-icon-xs text-cyan"></i>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+                    Theme selection is automatically stored in your browser's <code style="color: var(--neon-cyan);">localStorage</code> (<code style="color: var(--neon-cyan);">bro_system_theme</code>) and applies instantly across all tabs with zero performance overhead.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 10: Audio HUD Microphone Animation Settings -->
+            <div class="settings-section" id="sec-settings-audiovisualizer">
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title"><i data-lucide="activity" class="hud-icon-sm text-cyan"></i> Audio HUD Microphone Animation Visualizer</div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                      Select your preferred real-time audio visualizer animation style for the Dedicated Audio HUD. Changes apply instantaneously and persist locally.
+                    </p>
+                  </div>
+                  <span class="badge" id="audiovisualizer-active-badge"
+                    style="background: rgba(0, 229, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;">QUANTUM SPHERE</span>
+                </div>
+
+                <div style="margin: 1rem 0 1.25rem 0;">
+                  <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.75rem;">
+                    Select Visualizer Style:
+                  </div>
+                  <div class="policy-hero-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
+                    
+                    <!-- Style 1: Quantum Aurora Sphere (Particle Wave) [Matches Image] -->
+                    <div class="policy-hero-card active anim-style-card" id="anim-card-quantum_sphere" onclick="setAudioVisualizerStyle('quantum_sphere')">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                          <i data-lucide="globe" class="hud-icon-sm text-cyan"></i> Quantum Aurora Sphere (Particle Wave)
+                        </div>
+                        <span class="status-dot dot-green" id="dot-anim-quantum_sphere"></span>
+                      </div>
+                      <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Luminous 3D glowing sphere with soft cyan rim lighting, undulating magenta-to-cyan sinuous particle ribbon, live query transcript, and pulsing microphone core.
+                      </div>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(0,229,255,0.15); color: var(--neon-cyan); border: 1px solid rgba(0,229,255,0.3);">Glowing Sphere Orb</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(224,64,251,0.15); color: #e040fb; border: 1px solid rgba(224,64,251,0.3);">Particle Ribbon</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.08); color: #cbd5e1;">Hardware Accelerated</span>
+                      </div>
+                    </div>
+
+                    <!-- Style 2: Arc Reactor Core Pulse -->
+                    <div class="policy-hero-card anim-style-card" id="anim-card-arc_reactor" onclick="setAudioVisualizerStyle('arc_reactor')">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                          <i data-lucide="disc" class="hud-icon-sm text-blue"></i> Arc Reactor Core Pulse
+                        </div>
+                        <span class="status-dot dot-gray" id="dot-anim-arc_reactor"></span>
+                      </div>
+                      <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Classic Stark-inspired rotating concentric holographic rings, interactive pulsing core with state transitions, and responsive equalizer sound bars.
+                      </div>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(59,130,246,0.15); color: var(--neon-blue); border: 1px solid rgba(59,130,246,0.3);">Holographic Rings</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(0,240,255,0.15); color: var(--neon-cyan); border: 1px solid rgba(0,240,255,0.3);">Equalizer Bars</span>
+                      </div>
+                    </div>
+
+                    <!-- Style 3: Neon Cyber Spectrum Matrix -->
+                    <div class="policy-hero-card anim-style-card" id="anim-card-equalizer_matrix" onclick="setAudioVisualizerStyle('equalizer_matrix')">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                          <i data-lucide="bar-chart-2" class="hud-icon-sm text-green"></i> Neon Cyber Spectrum Matrix
+                        </div>
+                        <span class="status-dot dot-gray" id="dot-anim-equalizer_matrix"></span>
+                      </div>
+                      <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Futuristic 32-band spectrum equalizer with gradient peak caps, fluid frequency oscillations, and neon glow reflections.
+                      </div>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(0,255,157,0.15); color: var(--neon-green); border: 1px solid rgba(0,255,157,0.3);">32-Band Spectrum</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(168,85,247,0.15); color: var(--neon-purple); border: 1px solid rgba(168,85,247,0.3);">Fluid Frequency</span>
+                      </div>
+                    </div>
+
+                    <!-- Style 4: Cyber Talking Emoji Avatar (Emoticon Lip-Sync) -->
+                    <div class="policy-hero-card anim-style-card" id="anim-card-talking_emoji" onclick="setAudioVisualizerStyle('talking_emoji')">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                          <i data-lucide="smile" class="hud-icon-sm text-amber"></i> Cyber Talking Emoji Avatar
+                        </div>
+                        <span class="status-dot dot-gray" id="dot-anim-talking_emoji"></span>
+                      </div>
+                      <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+                        Expressive cyber emoticon character with real-time lip-sync mouth modulation, emotive eye blinking, audio ripples & vocal state awareness.
+                      </div>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(254,228,64,0.15); color: #fee440; border: 1px solid rgba(254,228,64,0.3);">Talking Lip-Sync</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(236,72,153,0.15); color: #ec4899; border: 1px solid rgba(236,72,153,0.3);">Emotive Eyes</span>
+                        <span style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(0,229,255,0.15); color: var(--neon-cyan); border: 1px solid rgba(0,229,255,0.3);">60 FPS Canvas</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- Info Note -->
+                <div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 0.75rem 1rem;">
+                  <i data-lucide="info" class="hud-icon-xs text-cyan"></i>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+                    Visualizer animation preference is saved to <code style="color: var(--neon-cyan);">localStorage</code> (<code style="color: var(--neon-cyan);">bro_audio_visualizer_style</code>) and executes via optimized HTML5 Canvas rendering for 60 FPS smooth motion.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Audit & History (Req 2 Visual Overhaul) -->

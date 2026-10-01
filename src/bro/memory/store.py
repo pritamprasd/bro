@@ -54,7 +54,7 @@ DEFAULT_GREETINGS = """# Bro Variant 4 Vocal Greetings & Salutations
 ## Gen-Z Greetings & Slang
 - Yo, what's good! Bro in the building, no cap.
 - Vibe check passed. All systems bussin and ready to slay, boss.
-- Sup! Neural core is locked in, highkey ready for whatever you got.
+- Sup! Neural core is locked in, highkey vibe ready for whatever you got.
 - Ayo, we're live fr fr. What's the move today?
 - Main character energy loaded. What are we cookin up?
 - Sheesh, workstation is running clean. What's the play?
@@ -182,8 +182,10 @@ class MemoryStore:
             except Exception:
                 pass
 
-        if gen_z_mode and genz_candidates:
-            return random.choice(genz_candidates)
+        if gen_z_mode:
+            if genz_candidates:
+                return random.choice(genz_candidates)
+            return "Yo, what's good! Bro in the building, no cap."
         if standard_candidates:
             return random.choice(standard_candidates)
         if genz_candidates:

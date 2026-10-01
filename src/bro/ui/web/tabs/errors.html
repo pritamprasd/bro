@@ -1,0 +1,19 @@
+<div id="tab-errors" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i data-lucide="alert-triangle" class="hud-icon-sm text-amber"></i> System Failures,
+            Timeouts & Error Logs</div>
+          <button class="btn btn-danger" onclick="clearErrors()"><i data-lucide="trash-2" class="hud-icon-xs"></i> Clear
+            Error History</button>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Any model disconnects, step timeouts, actuator failures, or unexpected runtime errors are logged here with
+          stack traces.
+        </p>
+        <div id="errors-container">
+          <p style="color: var(--text-muted);">No system errors currently logged. System operational.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Memory & Secrets -->

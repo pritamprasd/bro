@@ -1,0 +1,492 @@
+<div id="tab-guide" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i data-lucide="book-open" class="hud-icon-sm text-cyan"></i> Bro Variant 2: Tactical
+            System Manual &amp; User Guide</div>
+          <span style="font-size: 0.8rem; color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace;">OFFICIAL
+            OPERATING HANDBOOK</span>
+        </div>
+
+        <div class="manual-layout">
+          <!-- Manual Sidebar Navigation -->
+          <div class="manual-sidebar">
+            <button class="manual-nav-btn active" onclick="showManualSection('arch', this)"><i data-lucide="cpu"
+                class="manual-icon text-cyan"></i> 1. Architecture & Loop</button>
+            <button class="manual-nav-btn" onclick="showManualSection('lifecycle', this)"><i data-lucide="power"
+                class="manual-icon text-amber"></i> 2. Lifecycle & Kill-Switch</button>
+            <button class="manual-nav-btn" onclick="showManualSection('modalities', this)"><i data-lucide="mic"
+                class="manual-icon text-green"></i> 3. 4 Communication Modalities</button>
+            <button class="manual-nav-btn" onclick="showManualSection('voice', this)"><i data-lucide="volume-2"
+                class="manual-icon text-blue"></i> 4. Bro Voice Persona</button>
+            <button class="manual-nav-btn" onclick="showManualSection('brief', this)"><i data-lucide="sun"
+                class="manual-icon text-amber"></i> 5. Daily Brief</button>
+            <button class="manual-nav-btn" onclick="showManualSection('resources', this)"><i data-lucide="paperclip"
+                class="manual-icon text-cyan"></i> 6. Resource Attachments & Prompts</button>
+            <button class="manual-nav-btn" onclick="showManualSection('models', this)"><i data-lucide="cpu"
+                class="manual-icon text-purple"></i> 7. Selecting Local Models</button>
+            <button class="manual-nav-btn" onclick="showManualSection('automation', this)"><i data-lucide="terminal"
+                class="manual-icon text-cyan"></i> 8. Desktop & Web Automation</button>
+            <button class="manual-nav-btn" onclick="showManualSection('safety', this)"><i data-lucide="shield-check"
+                class="manual-icon text-green"></i> 9. Safety Gatekeeper Overlay</button>
+            <button class="manual-nav-btn" onclick="showManualSection('audit', this)"><i data-lucide="history"
+                class="manual-icon text-blue"></i> 10. Audit Trail & Analytics</button>
+            <button class="manual-nav-btn" onclick="showManualSection('alerts', this)"><i data-lucide="alert-triangle"
+                class="manual-icon text-amber"></i> 11. Alerts & Error Logs</button>
+            <button class="manual-nav-btn" onclick="showManualSection('memory', this)"><i data-lucide="database"
+                class="manual-icon text-purple"></i> 12. Lean Memory & Vault</button>
+            <button class="manual-nav-btn" onclick="showManualSection('media', this)"><i data-lucide="bar-chart-3"
+                class="manual-icon text-cyan"></i> 13. Visual Media & System Windows</button>
+            <button class="manual-nav-btn" onclick="showManualSection('displays', this)"><i data-lucide="monitor"
+                class="manual-icon text-blue"></i> 14. Multi-Desktop Perception</button>
+            <button class="manual-nav-btn" onclick="showManualSection('terminal', this)"><i data-lucide="terminal"
+                class="manual-icon text-cyan"></i> 15. Terminal Typography & Scaler</button>
+          </div>
+
+          <!-- Manual Content Viewport -->
+          <div class="manual-content">
+
+            <!-- Section 1: Architecture -->
+            <div class="manual-section active" id="sec-arch">
+              <h2><i data-lucide="cpu" class="hud-icon-sm text-cyan"></i> 1. How Bro Works: Multi-Tier ReAct
+                Architecture</h2>
+              <p>Bro Variant 2 operates on an asynchronous <b>Perception-Reasoning-Action (ReAct)</b> cognitive loop
+                optimized specifically for Linux X11 workstations with local NVIDIA RTX hardware.</p>
+
+              <div class="code-box">
+                [User Input] (Voice / Web HUD / Alt+J Spotlight / Telegram / CLI)
+                │
+                ▼
+                [Tier-0 Instant Router: Llama 3.2 3B] (&lt;100ms intent classification)
+                │
+                ├── If Conversation ──&gt; Direct Assistant Voice Reply (Bro)
+                │
+                └── If Complex Task ──&gt; [Tier-1 Logic: Gemma 4 12B] (Pinned in VRAM)
+                │
+                ├── Visual Inspection ──&gt; [Qwen2.5-VL 7B]
+                ├── High-Stakes Action? ──&gt; [Approval Overlay]
+                └── Actuators:
+                ├── Desktop GUI (mss + pyautogui)
+                ├── Everyday Browser (Chrome CDP :9222)
+                ├── Sandboxed Web (Playwright)
+                └── Python Runner (Data/Telegram)</div>
+
+              <h3>Runtime Processes:</h3>
+              <p>When running <code>bro start</code>, a master <b>Process Supervisor</b> manages two background
+                daemons:</p>
+              <ul>
+                <li><b><code>ui_server</code> (FastAPI + Uvicorn on :8765):</b> Powers this Bro HUD dashboard,
+                  WebSocket live streaming, telemetry polling, and audit storage.</li>
+                <li><b><code>worker</code> daemon:</b> Listens for the global <kbd>Alt</kbd> + <kbd>J</kbd> desktop
+                  hotkey, polls the Telegram bot, and triggers proactive sentinel watchdogs.</li>
+              </ul>
+            </div>
+
+            <!-- Section 2: Lifecycle -->
+            <div class="manual-section" id="sec-lifecycle">
+              <h2><i data-lucide="power" class="hud-icon-sm text-amber"></i> 2. Lifecycle Management: Startup, Status &
+                Kill-Switch</h2>
+              <p>Bro features a centralized supervisor with PID file tracking in
+                <code>~/.bro/supervisor.pid</code>.
+              </p>
+
+              <h3>Starting Bro:</h3>
+              <p>Starts all background components (Web HUD, Spotlight Bar, Telegram Bot, Watchdogs):</p>
+              <div class="code-box">uv run bro start<button class="copy-btn"
+                  onclick="copySnippet('uv run bro start')"><i data-lucide="copy" class="hud-icon-xs"></i>
+                  Copy</button></div>
+
+              <h3>Checking Health & Status:</h3>
+              <div class="code-box">uv run bro status<button class="copy-btn"
+                  onclick="copySnippet('uv run bro status')"><i data-lucide="copy" class="hud-icon-xs"></i>
+                  Copy</button></div>
+
+              <h3>Master Kill-Switch (Clean Termination):</h3>
+              <p>Immediately sends SIGTERM signals to all child daemons and removes PID files cleanly:</p>
+              <ul>
+                <li><b>Via CLI:</b> <code>uv run bro stop</code></li>
+                <li><b>Via Web HUD:</b> Click the red <b>🛑 KILL SWITCH</b> button in the header bar.</li>
+                <li><b>Via Telegram:</b> Send <code>/kill</code> to your remote bot.</li>
+              </ul>
+            </div>
+
+            <!-- Section 3: Modalities -->
+            <div class="manual-section" id="sec-modalities">
+              <h2><i data-lucide="mic" class="hud-icon-sm text-green"></i> 3. Four Communication Modalities</h2>
+              <p>You can interact with Bro effortlessly through four distinct user interfaces:</p>
+
+              <h3>A. Web HUD Dashboard (Voice Microphone)</h3>
+              <p>Click the <b>Microphone Button</b> in the Mission Control bar. Speak your command (e.g. <i>"Hello
+                  Bro"</i>, <i>"Inspect active screen and summarize"</i>). The Web Speech API transcribes your speech
+                in real time and submits the task automatically.</p>
+
+              <h3>B. Desktop Spotlight Bar (<kbd>Alt</kbd> + <kbd>J</kbd>)</h3>
+              <p>Press <kbd>Alt</kbd> + <kbd>J</kbd> from any application (VS Code, terminal, browser). A floating
+                translucent HUD appears in the center of your screen. It automatically captures your active window title
+                and clipboard text. Type your goal and press <kbd>Enter</kbd>.</p>
+
+              <h3>C. Terminal CLI & Voice</h3>
+              <div class="code-box"># Direct CLI Task:
+                uv run bro run "Summarize latest downloads" -f ~/Downloads/report.pdf
+
+                # Dedicated Voice Listening Mode (faster-whisper on Local GPU):
+                uv run bro voice<button class="copy-btn" onclick="copySnippet('uv run bro voice')"><i
+                    data-lucide="copy" class="hud-icon-xs"></i> Copy</button></div>
+
+              <h3>D. Telegram Remote Control from Phone</h3>
+              <p>Message your private bot anywhere while on the go:</p>
+              <ul>
+                <li><code>/run &lt;goal&gt;</code>: Runs an autonomous task on your workstation and replies with the
+                  outcome.</li>
+                <li><code>/status</code>: Returns real-time CPU, RAM, GPU temperature, and VRAM telemetry.</li>
+                <li><code>/screen</code>: Captures a high-resolution screenshot of your desktop and sends the image.
+                </li>
+                <li><code>/kill</code>: Emergency kill-switch.</li>
+              </ul>
+            </div>
+
+            <!-- Section 4: Voice -->
+            <div class="manual-section" id="sec-voice">
+              <h2><i data-lucide="volume-2" class="hud-icon-sm text-blue"></i> 4. Conversational Modes & Voice Reply
+                Controls</h2>
+              <p>Bro Variant 2 speaks with the <b>Bro Neural Voice Persona</b> (<code>en-GB-RyanNeural</code>,
+                pitch -4Hz, rate +2%).</p>
+
+              <h3>Web UI Conversation Modes:</h3>
+              <p>You can effortlessly switch between three conversational modalities using the glowing header pills or
+                below:</p>
+              <ul>
+                <li><b><i data-lucide="mic" class="hud-icon-xs text-cyan"></i> Audio Only:</b>
+                  Hands-free, voice-first interaction! Activates the animated <b>Bro Arc Reactor Voice HUD</b> with
+                  soundwave equalizers. With <i>Hands-Free Continuous Loop</i> enabled, the microphone automatically
+                  re-arms after Bro speaks back, giving you a fluid spoken dialogue.
+                </li>
+                <li><b><i data-lucide="zap" class="hud-icon-xs text-amber"></i> Audio + Chat (Default):</b>
+                  The best of both worlds. Full real-time terminal streaming and thought transparency, combined with
+                  spoken voice replies whenever Bro responds.
+                </li>
+                <li><b><i data-lucide="message-square" class="hud-icon-xs text-green"></i> Chat Only:</b>
+                  Silent mode. All voice playback is muted. Interactions are logged and delivered strictly as formatted
+                  text in the terminal and chat console.
+                </li>
+              </ul>
+
+              <div style="display: flex; gap: 0.6rem; margin: 1rem 0; flex-wrap: wrap;">
+                <button class="btn btn-cyan" onclick="setConversationMode('audio_only'); switchTab('command')"><i
+                    data-lucide="mic" class="hud-icon-xs"></i> Switch to Audio Only Mode</button>
+                <button class="btn btn-cyan" onclick="setConversationMode('audio+chat'); switchTab('command')"><i
+                    data-lucide="zap" class="hud-icon-xs"></i> Switch to Audio + Chat</button>
+                <button class="btn btn-cyan" onclick="setConversationMode('chat_only'); switchTab('command')"><i
+                    data-lucide="message-square" class="hud-icon-xs"></i> Switch to Chat Only</button>
+              </div>
+
+              <h3>Conversational Intent:</h3>
+              <p>When you say <i>"Hello"</i>, <i>"Good morning"</i>, or ask casual questions, the Tier-0 router flags
+                this as <code>CONVERSATION</code> and Bro speaks back directly.</p>
+
+              <h3>Configuration in <code>config.yaml</code>:</h3>
+              <div class="code-box"># Conversation mode on Web UI: "audio_only", "audio+chat", or "chat_only"
+                conversation_mode: "audio+chat"
+
+                voice:
+                enabled: true
+                voice_reply_on_chat: true # Speak answers to conversational chat
+                always_voice_response: false # Speak answers to all tasks<button class="copy-btn"
+                  onclick="copySnippet('conversation_mode: \" audio+chat\"')"><i data-lucide="copy"
+                    class="hud-icon-xs"></i> Copy</button></div>
+            </div>
+
+            <!-- Section 5: Daily Brief -->
+            <div class="manual-section" id="sec-brief">
+              <h2><i data-lucide="sun" class="hud-icon-sm text-amber"></i> 5. Daily Brief: On-Demand & Workstation
+                Status</h2>
+              <p>The Daily Brief provides a spoken and visual summary of workstation health, memory sync, and greeting.
+              </p>
+
+              <h3>Triggering On-Demand:</h3>
+              <ul>
+                <li><b>Via CLI:</b> <code>uv run bro brief</code></li>
+                <li><b>Via Web HUD:</b> Click the yellow <b>Daily brief</b> button in the top navigation or quick action
+                  tile.</li>
+              </ul>
+              <h3>Auto-Start Disabled by Default:</h3>
+              <p>To avoid unwanted interruptions, scheduled morning briefings are turned off by default. To enable
+                automatic briefings at 08:30 AM, set <code>watchdogs.cron.enabled: true</code> in
+                <code>config.yaml</code>.
+              </p>
+              <button class="btn btn-warning" onclick="triggerBrief()"><i data-lucide="sun" class="hud-icon-xs"></i>
+                Trigger Daily brief Now</button>
+            </div>
+
+            <!-- Section 6: Resources -->
+            <div class="manual-section" id="sec-resources">
+              <h2><i data-lucide="paperclip" class="hud-icon-sm text-cyan"></i> 6. Resource Attachments & On-Demand
+                Missing File Prompting</h2>
+              <p>Bro can leverage local files, CSV datasets, PDF documents, or reference images to accomplish tasks.
+              </p>
+
+              <h3>Attaching Files Upfront:</h3>
+              <ul>
+                <li><b>In Web HUD:</b> Click <b>Attach File / Resource</b> or drop files into the resource bar. Each
+                  attached file is indexed and sent with your task.</li>
+                <li><b>In CLI:</b> Use the <code>-f</code> or <code>--file</code> flag:
+                  <div class="code-box">uv run bro run "Analyze quarterly revenue" -f /path/to/q3.csv<button
+                      class="copy-btn" onclick="copySnippet('uv run bro run \" Analyze quarterly revenue\" -f
+                      /path/to/q3.csv')"><i data-lucide="copy" class="hud-icon-xs"></i> Copy</button></div>
+                </li>
+              </ul>
+
+              <h3>On-Demand Missing File Prompting:</h3>
+              <p>If you ask Bro to perform a task requiring a file that was not provided (e.g. <i>"Process the
+                  customer dataset"</i>), Bro will detect this during reasoning and invoke <code>request_file</code>:
+              </p>
+              <ul>
+                <li>An interactive alert modal appears on the Web HUD (or a Rich prompt in terminal).</li>
+                <li>You can either <b>Upload / Drop</b> the file, or enter an <b>Absolute Local Path</b> (e.g.
+                  <code>~/data.csv</code>).
+                </li>
+                <li>Click <b>Supply File & Continue</b>. Bro resumes execution immediately with the supplied file!
+                </li>
+                <li>If the file is unavailable, click <b>File Unavailable / Skip</b> and Bro will continue with an
+                  alternative strategy.</li>
+              </ul>
+            </div>
+
+            <!-- Section 7: Models -->
+            <div class="manual-section" id="sec-models">
+              <h2><i data-lucide="cpu" class="hud-icon-sm text-purple"></i> 7. Selecting Local Local GPU Models from
+                Ollama</h2>
+              <p>Bro Variant 2 is 100% local by default, running without cloud billing or API keys on your Local GPU (12
+                GB VRAM).</p>
+
+              <h3>Subsystem Models:</h3>
+              <ul>
+                <li><b>1. Text & Reasoning:</b> <code>gemma4:12b</code> — handles complex ReAct planning and multi-step
+                  tool orchestration.</li>
+                <li><b>2. Vision UI Grounding:</b> <code>qwen2.5vl:7b</code> — inspects 1080p desktop screenshots and
+                  calculates UI click coordinates.</li>
+                <li><b>3. Tier-0 Fast Classifier:</b> <code>llama3.2:3b</code> — sub-100ms classifier to route intents
+                  instantly.</li>
+              </ul>
+              <p>To switch models, navigate to the <b>Model Selection</b> tab, pick your preferred models from the
+                dynamic Ollama list, and click <b>Save Model Preferences</b>.</p>
+              <button class="btn btn-cyan" onclick="switchTab('models')"><i data-lucide="cpu" class="hud-icon-xs"></i>
+                Open Model Selection Tab →</button>
+            </div>
+
+            <!-- Section 8: Automation -->
+            <div class="manual-section" id="sec-automation">
+              <h2><i data-lucide="terminal" class="hud-icon-sm text-cyan"></i> 8. Desktop & Web Automation Capabilities
+              </h2>
+
+              <h3>Vision-Based Computer Use:</h3>
+              <p>Bro captures your physical X11 display (1920×1080) in &lt;20ms using <code>mss</code>, calculates
+                element coordinates using <code>qwen2.5vl:7b</code>, and moves the mouse and types via
+                <code>pyautogui</code>.
+              </p>
+
+              <h3>Dual Browser Strategy:</h3>
+              <ul>
+                <li><b>Everyday Chrome / Brave (CDP Mode):</b> Click <b>Attach Chrome (CDP :9222)</b>. Bro connects
+                  directly to your active browser session with full access to your logged-in GitHub, Gmail, or Jira
+                  accounts without 2FA or CAPTCHAs.</li>
+                <li><b>Isolated Sandbox:</b> For disposable or private web tasks, Bro spins up an isolated Playwright
+                  browser with its own sandbox directory in <code>~/.bro/browser_data</code>.</li>
+              </ul>
+
+              <h3>Python Runner:</h3>
+              <p>Executes safe local Python scripts for heavy data crunching, math, and Telegram messaging via
+                <code>requests</code>. Keyring credentials are auto-injected as environment variables.
+              </p>
+
+              <h3>"Watch & Learn" Macro Compiler:</h3>
+              <p>When you demonstrate a multi-step desktop workflow, Bro compiles the action sequence into a
+                deterministic Python script in <code>~/ai-memory/bro/workflows/</code>. Future executions run in
+                &lt;0.5s without model overhead.</p>
+              <button class="btn btn-cyan" onclick="launchCDP()"><i data-lucide="globe" class="hud-icon-xs"></i> Attach
+                Everyday Chrome (:9222)</button>
+            </div>
+
+            <!-- Section 9: Safety -->
+            <div class="manual-section" id="sec-safety">
+              <h2><i data-lucide="shield-check" class="hud-icon-sm text-green"></i> 9. Safety Gatekeeper & Approval
+                Overlay</h2>
+              <p>By default, <code>autonomous_mode: false</code>:</p>
+              <ul>
+                <li>Any high-stakes action (e.g. destructive commands like <code>rm -rf</code>, <code>sudo</code>,
+                  database drops, payments, sending emails) automatically pauses execution.</li>
+                <li>A floating translucent <b>Approval Overlay</b> appears on your X11 display.</li>
+                <li>Press <kbd>Enter</kbd> to authorize or <kbd>Esc</kbd> to reject.</li>
+                <li>To enable full unattended autonomy, launch tasks with <code>--autonomous</code> or toggle in
+                  <code>config.yaml</code>.
+                </li>
+              </ul>
+            </div>
+
+            <!-- Section 10: Audit -->
+            <div class="manual-section" id="sec-audit">
+              <h2><i data-lucide="history" class="hud-icon-sm text-blue"></i> 10. Audit Trail, Session Replay & KPI
+                Analytics</h2>
+              <p>Every mission is recorded in <code>~/.bro/runs/</code> with metadata, step observations, and
+                full-resolution screenshot filmstrips.</p>
+              <ul>
+                <li><b>Visual Charts:</b> Inspect the SVG Actuator Donut Chart and Latency Trend Bar Chart in the
+                  <b>Audit & History</b> tab.
+                </li>
+                <li><b>Step Lightbox:</b> Click any step screenshot to open the 1080p full-resolution lightbox viewer.
+                </li>
+                <li><b>Markdown Export:</b> Click <b>Export Markdown Report</b> to save a clean summary of any mission.
+                </li>
+              </ul>
+              <button class="btn btn-cyan" onclick="switchTab('history')"><i data-lucide="history"
+                  class="hud-icon-xs"></i> Open Audit & History Tab →</button>
+            </div>
+
+            <!-- Section 11: Alerts -->
+            <div class="manual-section" id="sec-alerts">
+              <h2><i data-lucide="alert-triangle" class="hud-icon-sm text-amber"></i> 11. System Failure Alerts,
+                Timeouts & Error Logs</h2>
+              <p>Bro tracks all exceptions, model connection failures, step timeouts, and sentinel warnings in memory
+                and on disk.</p>
+              <ul>
+                <li>Click <b>System Alerts</b> to view active warnings with timestamps, classifications, and stack
+                  traces.</li>
+                <li>If errors occur, an alert badge appears in the top navigation bar.</li>
+                <li>Click <b>Clear Error History</b> once issues are addressed.</li>
+              </ul>
+              <button class="btn btn-cyan" onclick="switchTab('errors')"><i data-lucide="alert-triangle"
+                  class="hud-icon-xs"></i> Open System Alerts Tab →</button>
+            </div>
+
+            <!-- Section 12: Memory -->
+            <div class="manual-section" id="sec-memory">
+              <h2><i data-lucide="database" class="hud-icon-sm text-purple"></i> 12. Lean Markdown Memory & Secure
+                Keyring Vault</h2>
+
+              <h3>Lean Markdown Memory:</h3>
+              <p>Stored as human-editable markdown files in <code>~/ai-memory/bro/</code> (omitted from git,
+                configurable in Tab 6):</p>
+              <ul>
+                <li><code>preferences.md</code>: Personal assistant preferences and rules.</li>
+                <li><code>system.md</code>: Linux workstation hardware specifications.</li>
+                <li><code>contacts.md</code>: Frequently contacted people and communication channels.</li>
+                <li><code>workflows/</code>: Application recipes and compiled macros.</li>
+              </ul>
+
+              <h3>Secure Vault (Linux Keyring):</h3>
+              <div class="code-box"># Store credentials in Linux Keyring:
+                uv run bro vault set telegram_bot_token "YOUR_TOKEN"
+                uv run bro vault set telegram_chat_id "YOUR_CHAT_ID"
+
+                # List stored keys:
+                uv run bro vault list<button class="copy-btn" onclick="copySnippet('uv run bro vault list')"><i
+                    data-lucide="copy" class="hud-icon-xs"></i> Copy</button></div>
+              <button class="btn btn-cyan" onclick="switchTab('memory')"><i data-lucide="database"
+                  class="hud-icon-xs"></i> Open Memory & Secrets Tab →</button>
+            </div>
+
+            <!-- Section 13: Visual Media & System Windows -->
+            <div class="manual-section" id="sec-media">
+              <h2><i data-lucide="bar-chart-3" class="hud-icon-sm text-cyan"></i> 13. Visual Media: Diagrams, Charts &
+                System Windows</h2>
+              <p>Whenever Bro needs to present a diagram, chart, plot, or screenshot, it renders the visual using
+                either an in-HUD dialog or a native X11 desktop system window.</p>
+
+              <h3>Supported Visual Modalities:</h3>
+              <ul>
+                <li><b>Mermaid Diagrams:</b> Architecture diagrams, flowcharts, sequence diagrams, and state machines
+                  are rendered interactively via Mermaid.js SVG engine.</li>
+                <li><b>SVG & Data Charts:</b> Inline SVGs or generated data plots (matplotlib/seaborn) are displayed
+                  with crisp vector quality.</li>
+                <li><b>Screenshots & Images:</b> High-resolution desktop captures, inspection crops, and local images
+                  with full-resolution zoom.</li>
+              </ul>
+
+              <h3>Dual Delivery Targets:</h3>
+              <ul>
+                <li><b>Web HUD Dialog Modal:</b> Translucent Bro HUD popup with interactive zoom, raw code viewer
+                  toggle, and instant clipboard copy.</li>
+                <li><b>Native X11 Desktop Window:</b> Clean desktop window powered by Python Tkinter & Pillow with
+                  smooth image scaling and resolution tags.</li>
+              </ul>
+
+              <div style="display: flex; gap: 0.6rem; margin: 1rem 0; flex-wrap: wrap;">
+                <button class="btn btn-cyan" onclick="showArchitectureDiagram()"><i data-lucide="bar-chart-3"
+                    class="hud-icon-xs"></i> Test Diagram Dialog Now</button>
+              </div>
+
+              <h3>Agent Action Syntax:</h3>
+              <div class="code-box"># Agent action syntax:
+                Action: show_media
+                Action Input: {"media_type": "diagram", "content": "graph TD; A-->B", "title": "Flow", "target":
+                "both"}<button class="copy-btn" onclick="copySnippet('Action: show_media\nAction Input: {\"
+                  media_type\": \"diagram\", \"content\": \"graph TD; A-->B\", \"title\": \"Flow\", \"target\":
+                  \"both\"}')"><i data-lucide="copy" class="hud-icon-xs"></i> Copy</button></div>
+            </div>
+
+            <!-- Section 14: Multi-Desktop & Display Perception -->
+            <div class="manual-section" id="sec-displays">
+              <h2><i data-lucide="monitor" class="hud-icon-sm text-cyan"></i> 14. Multi-Desktop & Display Perception
+                Setup</h2>
+              <p>On Linux X11 systems with multiple physical or virtual monitors, Bro allows you to designate which
+                screen serves as the active perception canvas for mouse, keyboard, and visual grounding operations.</p>
+
+              <h3>Multi-Monitor Topologies:</h3>
+              <ul>
+                <li><b>Display 0 (Combined Virtual Canvas):</b> Captures all screens stitched together into one bounding
+                  box.</li>
+                <li><b>Display 1 (Physical Screen 1):</b> The primary physical monitor (e.g. HDMI-1 at 1920×1080).</li>
+                <li><b>Display 2 (Physical Screen 2):</b> Secondary physical monitor with automatic coordinate offset
+                  calibration.</li>
+              </ul>
+
+              <h3>How to Configure:</h3>
+              <p>Switch displays anytime via the <b>SCREEN</b> dropdown in the persistent top header capsule, or visit
+                the <b>Main Desktop</b> tab to inspect high-resolution live screen previews.</p>
+
+              <div style="margin: 1rem 0;">
+                <button class="btn btn-cyan btn-sm" onclick="switchTab('displays')"><i data-lucide="monitor"
+                    class="hud-icon-xs"></i> Open Main Desktop Tab →</button>
+              </div>
+
+              <div class="code-box"># CLI or Config:
+                # ~/.bro/config.yaml
+                desktop:
+                screen_index: 1 # 1=Primary, 2=Secondary, 0=Combined Canvas<button class="copy-btn"
+                  onclick="copySnippet('desktop:\n  screen_index: 1')"><i data-lucide="copy" class="hud-icon-xs"></i>
+                  Copy</button></div>
+            </div>
+
+            <!-- Section 15: Terminal Typography & Font Scaler -->
+            <div class="manual-section" id="sec-terminal">
+              <h2><i data-lucide="terminal" class="hud-icon-sm text-cyan"></i> 15. Terminal Typography & Interactive
+                Font Scaler</h2>
+              <p>The Command Center terminal console is engineered with a high-contrast obsidian deck, JetBrains Mono
+                font, and dynamic size scaling to ensure maximum scannability on all Linux X11 display scaling profiles.
+              </p>
+
+              <h3>Key Readability Enhancements:</h3>
+              <ul>
+                <li><b>Custom Font Scaling:</b> Use <code>[A-]</code> and <code>[A+]</code> in the controls bar beneath
+                  the console to scale text between 12px and 26px. Click <code>[Reset]</code> to return to 15px.</li>
+                <li><b>Permanent Persistence:</b> Your preferred font size is saved directly to your browser's
+                  <code>localStorage</code> (<code>bro_terminal_font_size</code>) and restored automatically.
+                </li>
+                <li><b>Relaxed Line Height & Letter Spacing:</b> 1.7 line height and 0.022em letter spacing eliminate
+                  cramped or overlapping code blocks.</li>
+                <li><b>Translucent Badge Accents:</b> Color-coded left border badges and subtle tints separate thoughts
+                  (sky blue), actions (warm amber), steps (neon cyan), results (emerald green), and errors (crimson).
+                </li>
+              </ul>
+
+              <div style="margin: 1rem 0;">
+                <button class="btn btn-cyan btn-sm" onclick="switchTab('command')"><i data-lucide="terminal"
+                    class="hud-icon-xs"></i> Return to Command Center Terminal →</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Resources & Technical Design Document (Variant 4) -->

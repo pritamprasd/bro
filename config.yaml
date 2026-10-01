@@ -58,7 +58,7 @@ browser:
   cdp_port: 9222
 memory:
   memory_dir: /home/pritam/ai-memory/bro
-  obsidian_vault_dir: /tmp/tmpyvo77nln
+  obsidian_vault_dir: /tmp/tmpeik5170x
   semantic_search_enabled: true
   embedding_model: nomic-embed-text
 watchdogs:

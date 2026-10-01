@@ -1,0 +1,329 @@
+/* ==========================================================================
+   BRO TACTICAL HUD // THEME TOKENS & DESIGN SYSTEM DEFINITIONS
+   ========================================================================== */
+
+/* 1. DEFAULT CYBER GLASSMORPHISM */
+:root {
+  /* Deep Void & Cyber Canvas */
+  --bg-dark: #030712;
+  --bg-space: #070d1d;
+
+  /* Glassmorphic Panel & Card Tokens */
+  --panel-bg: rgba(11, 20, 40, 0.58);
+  --panel-bg-hover: rgba(16, 28, 56, 0.72);
+  --panel-bg-solid: rgba(8, 15, 32, 0.88);
+  --panel-border: rgba(0, 240, 255, 0.18);
+  --panel-border-glow: rgba(0, 240, 255, 0.45);
+  --panel-hover: rgba(0, 240, 255, 0.35);
+  --glass-specular: rgba(255, 255, 255, 0.18);
+
+  /* High-Voltage Cyber Accents */
+  --neon-cyan: #00f0ff;
+  --neon-cyan-dim: rgba(0, 240, 255, 0.15);
+  --neon-blue: #3b82f6;
+  --neon-purple: #a855f7;
+  --neon-green: #00ff9d;
+  --neon-red: #ff2a5f;
+  --neon-amber: #ffb703;
+
+  /* Modern Typography & Contrast */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-cyan: #38bdf8;
+
+  /* Holographic Glows & Elevation */
+  --glow: 0 0 20px rgba(0, 240, 255, 0.3);
+  --glow-lg: 0 0 35px rgba(0, 240, 255, 0.45);
+  --glow-amber: 0 0 20px rgba(255, 183, 3, 0.35);
+  --glow-red: 0 0 25px rgba(255, 42, 95, 0.45);
+  --glow-green: 0 0 20px rgba(0, 255, 157, 0.35);
+  --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 16px rgba(0, 240, 255, 0.03);
+}
+
+/* 2. NEOMORPHISM (TACTILE SOFT 3D EXTRUSION) */
+[data-theme="neumorphism"] {
+  /* Soft Slate Matte Backgrounds */
+  --bg-dark: #1a1e24;
+  --bg-space: #14171d;
+
+  /* Neumorphic Extruded & Inset Surfaces */
+  --panel-bg: #20252e;
+  --panel-bg-hover: #252b35;
+  --panel-bg-solid: #20252e;
+  --panel-border: rgba(255, 255, 255, 0.04);
+  --panel-border-glow: rgba(0, 210, 255, 0.25);
+  --panel-hover: rgba(255, 255, 255, 0.06);
+  --glass-specular: rgba(255, 255, 255, 0.06);
+
+  /* Refined Tactile Accents */
+  --neon-cyan: #00d2ff;
+  --neon-cyan-dim: rgba(0, 210, 255, 0.12);
+  --neon-blue: #4361ee;
+  --neon-purple: #7209b7;
+  --neon-green: #06d6a0;
+  --neon-red: #ef476f;
+  --neon-amber: #ffd166;
+
+  /* Typography & High Contrast for WCAG */
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-cyan: #38bdf8;
+
+  /* Soft Dual Shadows (Light Top-Left + Dark Bottom-Right) */
+  --glow: 0 0 15px rgba(0, 210, 255, 0.2);
+  --glow-lg: 0 0 25px rgba(0, 210, 255, 0.3);
+  --glow-amber: 0 0 15px rgba(255, 209, 102, 0.25);
+  --glow-red: 0 0 20px rgba(239, 71, 111, 0.3);
+  --glow-green: 0 0 15px rgba(6, 214, 160, 0.25);
+  --glass-shadow: 8px 8px 18px #101317, -8px -8px 18px #2a313d;
+}
+
+[data-theme="neumorphism"] body {
+  background: #1a1e24 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="neumorphism"] .card,
+[data-theme="neumorphism"] .audio-only-card,
+[data-theme="neumorphism"] .settings-sidebar,
+[data-theme="neumorphism"] .step-card,
+[data-theme="neumorphism"] .policy-hero-card,
+[data-theme="neumorphism"] .active-llm-container,
+[data-theme="neumorphism"] .quick-action-strip,
+[data-theme="neumorphism"] .kpi-card,
+[data-theme="neumorphism"] .metric-card,
+[data-theme="neumorphism"] .filmstrip-item,
+[data-theme="neumorphism"] .nav-bar,
+[data-theme="neumorphism"] #tab-bar,
+[data-theme="neumorphism"] .settings-content {
+  background: #20252e !important;
+  box-shadow: 7px 7px 16px #101317, -7px -7px 16px #2a313d !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: none !important;
+  border-radius: 14px !important;
+}
+
+[data-theme="neumorphism"] .btn,
+[data-theme="neumorphism"] .tab-btn,
+[data-theme="neumorphism"] .chip,
+[data-theme="neumorphism"] .audio-chip,
+[data-theme="neumorphism"] .settings-nav-btn,
+[data-theme="neumorphism"] .filter-btn,
+[data-theme="neumorphism"] .quick-action-card,
+[data-theme="neumorphism"] .calendar-nav-btn,
+[data-theme="neumorphism"] .theme-card {
+  background: #20252e !important;
+  box-shadow: 4px 4px 9px #101317, -4px -4px 9px #2a313d !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 10px !important;
+}
+
+[data-theme="neumorphism"] .btn:hover,
+[data-theme="neumorphism"] .tab-btn:hover,
+[data-theme="neumorphism"] .chip:hover,
+[data-theme="neumorphism"] .audio-chip:hover,
+[data-theme="neumorphism"] .settings-nav-btn:hover,
+[data-theme="neumorphism"] .theme-card:hover {
+  box-shadow: 5px 5px 12px #101317, -5px -5px 12px #2e3644 !important;
+  transform: translateY(-1px);
+}
+
+[data-theme="neumorphism"] .btn:active,
+[data-theme="neumorphism"] .btn.active,
+[data-theme="neumorphism"] .tab-btn.active,
+[data-theme="neumorphism"] .chip:active,
+[data-theme="neumorphism"] .settings-nav-btn.active,
+[data-theme="neumorphism"] .filter-btn.active,
+[data-theme="neumorphism"] .policy-hero-card.active,
+[data-theme="neumorphism"] .theme-card.active {
+  background: #1c2028 !important;
+  box-shadow: inset 3px 3px 6px #101317, inset -3px -3px 6px #2a313d, 0 0 10px rgba(0, 210, 255, 0.2) !important;
+  color: var(--neon-cyan) !important;
+}
+
+[data-theme="neumorphism"] input[type="text"],
+[data-theme="neumorphism"] input[type="password"],
+[data-theme="neumorphism"] input[type="number"],
+[data-theme="neumorphism"] select,
+[data-theme="neumorphism"] textarea,
+[data-theme="neumorphism"] .code-box,
+[data-theme="neumorphism"] .terminal-log-container,
+[data-theme="neumorphism"] #terminal {
+  background: #181b21 !important;
+  box-shadow: inset 3px 3px 7px #0f1115, inset -3px -3px 7px #232933 !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  color: #f1f5f9 !important;
+  border-radius: 8px !important;
+}
+
+[data-theme="neumorphism"] .arc-reactor-core,
+[data-theme="neumorphism"] .voice-circle {
+  background: #20252e !important;
+  box-shadow: 8px 8px 20px #101317, -8px -8px 20px #2a313d, inset 0 0 20px rgba(0, 210, 255, 0.15) !important;
+  border: 2px solid rgba(0, 210, 255, 0.3) !important;
+}
+
+[data-theme="neumorphism"] .modal-content,
+[data-theme="neumorphism"] .glass-modal {
+  background: #20252e !important;
+  box-shadow: 14px 14px 32px #0f1115, -14px -14px 32px #2c3340 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 16px !important;
+}
+
+[data-theme="neumorphism"] ::-webkit-scrollbar-track {
+  background: #181b21 !important;
+}
+
+[data-theme="neumorphism"] ::-webkit-scrollbar-thumb {
+  background: #2e3542 !important;
+  box-shadow: inset 1px 1px 3px #13161c !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 3. AURORA GLASSMORPHISM (CRYSTAL FROSTED SMOKED-GLASS & MULTI-LAYER MESH) */
+[data-theme="glassmorphism"] {
+  /* Deep Cosmic Aurora Canvas */
+  --bg-dark: #070b16;
+  --bg-space: #0b1124;
+
+  /* Frosted Smoked-Glass Panel & Card Tokens */
+  --panel-bg: rgba(13, 22, 44, 0.52);
+  --panel-bg-hover: rgba(20, 32, 62, 0.68);
+  --panel-bg-solid: rgba(11, 18, 36, 0.9);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --panel-border-glow: rgba(0, 229, 255, 0.5);
+  --panel-hover: rgba(255, 255, 255, 0.2);
+  --glass-specular: rgba(255, 255, 255, 0.28);
+
+  /* Luminous Shimmer Accents */
+  --neon-cyan: #00e5ff;
+  --neon-cyan-dim: rgba(0, 229, 255, 0.16);
+  --neon-blue: #3a86ff;
+  --neon-purple: #c77dff;
+  --neon-green: #00f5d4;
+  --neon-red: #ff0054;
+  --neon-amber: #fee440;
+
+  /* Typography */
+  --text-main: #ffffff;
+  --text-muted: #cbd5e1;
+  --text-dim: #94a3b8;
+  --text-cyan: #38bdf8;
+
+  /* Specular Glows & Layered Shadows */
+  --glow: 0 0 24px rgba(0, 229, 255, 0.35);
+  --glow-lg: 0 0 45px rgba(0, 229, 255, 0.55);
+  --glow-amber: 0 0 25px rgba(254, 228, 64, 0.4);
+  --glow-red: 0 0 30px rgba(255, 0, 84, 0.5);
+  --glow-green: 0 0 25px rgba(0, 245, 212, 0.4);
+  --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="glassmorphism"] body {
+  background: radial-gradient(circle at 10% 15%, rgba(0, 229, 255, 0.14) 0%, transparent 45%),
+              radial-gradient(circle at 90% 85%, rgba(217, 70, 239, 0.12) 0%, transparent 45%),
+              radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+              #070b16 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="glassmorphism"] .card,
+[data-theme="glassmorphism"] .audio-only-card,
+[data-theme="glassmorphism"] .settings-sidebar,
+[data-theme="glassmorphism"] .step-card,
+[data-theme="glassmorphism"] .policy-hero-card,
+[data-theme="glassmorphism"] .active-llm-container,
+[data-theme="glassmorphism"] .quick-action-strip,
+[data-theme="glassmorphism"] .kpi-card,
+[data-theme="glassmorphism"] .metric-card,
+[data-theme="glassmorphism"] .filmstrip-item,
+[data-theme="glassmorphism"] .nav-bar,
+[data-theme="glassmorphism"] #tab-bar,
+[data-theme="glassmorphism"] .settings-content {
+  background: rgba(13, 22, 44, 0.52) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(0, 229, 255, 0.04) !important;
+  border-radius: 16px !important;
+}
+
+[data-theme="glassmorphism"] .btn,
+[data-theme="glassmorphism"] .tab-btn,
+[data-theme="glassmorphism"] .chip,
+[data-theme="glassmorphism"] .audio-chip,
+[data-theme="glassmorphism"] .settings-nav-btn,
+[data-theme="glassmorphism"] .filter-btn,
+[data-theme="glassmorphism"] .quick-action-card,
+[data-theme="glassmorphism"] .calendar-nav-btn,
+[data-theme="glassmorphism"] .theme-card,
+[data-theme="glassmorphism"] .anim-style-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border-radius: 12px !important;
+}
+
+[data-theme="glassmorphism"] .btn:hover,
+[data-theme="glassmorphism"] .tab-btn:hover,
+[data-theme="glassmorphism"] .chip:hover,
+[data-theme="glassmorphism"] .audio-chip:hover,
+[data-theme="glassmorphism"] .settings-nav-btn:hover,
+[data-theme="glassmorphism"] .theme-card:hover,
+[data-theme="glassmorphism"] .anim-style-card:hover {
+  background: rgba(0, 229, 255, 0.12) !important;
+  border-color: rgba(0, 229, 255, 0.45) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 229, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px);
+}
+
+[data-theme="glassmorphism"] .btn:active,
+[data-theme="glassmorphism"] .btn.active,
+[data-theme="glassmorphism"] .tab-btn.active,
+[data-theme="glassmorphism"] .chip:active,
+[data-theme="glassmorphism"] .settings-nav-btn.active,
+[data-theme="glassmorphism"] .filter-btn.active,
+[data-theme="glassmorphism"] .policy-hero-card.active,
+[data-theme="glassmorphism"] .theme-card.active,
+[data-theme="glassmorphism"] .anim-style-card.active {
+  background: rgba(0, 229, 255, 0.18) !important;
+  border: 1px solid var(--neon-cyan) !important;
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="glassmorphism"] input[type="text"],
+[data-theme="glassmorphism"] input[type="password"],
+[data-theme="glassmorphism"] input[type="number"],
+[data-theme="glassmorphism"] select,
+[data-theme="glassmorphism"] textarea,
+[data-theme="glassmorphism"] .code-box,
+[data-theme="glassmorphism"] .terminal-log-container,
+[data-theme="glassmorphism"] #terminal {
+  background: rgba(8, 14, 28, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+}
+
+[data-theme="glassmorphism"] .modal-content,
+[data-theme="glassmorphism"] .glass-modal {
+  background: rgba(11, 18, 38, 0.75) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 229, 255, 0.15) !important;
+  border-radius: 20px !important;
+}

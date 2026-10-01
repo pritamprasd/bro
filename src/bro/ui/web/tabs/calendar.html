@@ -1,0 +1,92 @@
+<div id="tab-calendar" class="tab-content">
+      <div class="calendar-container">
+
+        <!-- Left: Interactive Monthly Calendar Grid -->
+        <div class="card" style="display: flex; flex-direction: column;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div class="card-title" style="margin: 0;"><i data-lucide="calendar" class="hud-icon text-cyan"></i>
+                Workstation Schedule</div>
+              <div
+                style="display: flex; align-items: center; gap: 0.4rem; background: rgba(3, 8, 18, 0.7); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.2rem 0.4rem;">
+                <button class="btn btn-sm" onclick="prevCalMonth()"
+                  style="background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); color: var(--neon-cyan); padding: 0.2rem 0.6rem; border-radius: 6px;"><i
+                    data-lucide="chevron-left" class="hud-icon-xs"></i></button>
+                <span id="cal-month-year-label"
+                  style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #ffffff; min-width: 140px; text-align: center;">Month
+                  Year</span>
+                <button class="btn btn-sm" onclick="nextCalMonth()"
+                  style="background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); color: var(--neon-cyan); padding: 0.2rem 0.6rem; border-radius: 6px;"><i
+                    data-lucide="chevron-right" class="hud-icon-xs"></i></button>
+                <button class="btn btn-sm" onclick="goToTodayCal()"
+                  style="background: rgba(0, 240, 255, 0.12); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); font-size: 0.7rem; padding: 0.15rem 0.5rem; margin-left: 0.3rem;">Today</button>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <button class="btn btn-cyan btn-sm" onclick="openAddEventModal()"><i data-lucide="plus"
+                  class="hud-icon-xs"></i> Add Event / Task</button>
+              <button class="btn btn-sm" onclick="promptClearAllCalendar()"
+                style="background: rgba(255, 51, 102, 0.12); border: 1px solid rgba(255, 51, 102, 0.4); color: #ff6b6b;"
+                title="Wipe all tasks from memory"><i data-lucide="trash-2" class="hud-icon-xs"></i> Clear All Tasks</button>
+              <button class="btn btn-sm" onclick="loadCalendar()" style="background: rgba(255,255,255,0.08);"><i
+                  data-lucide="refresh-cw" class="hud-icon-xs"></i></button>
+            </div>
+          </div>
+
+          <!-- Day of Week Headers -->
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 6px;">
+            <div class="cal-day-name">Sun</div>
+            <div class="cal-day-name">Mon</div>
+            <div class="cal-day-name">Tue</div>
+            <div class="cal-day-name">Wed</div>
+            <div class="cal-day-name">Thu</div>
+            <div class="cal-day-name">Fri</div>
+            <div class="cal-day-name">Sat</div>
+          </div>
+
+          <!-- Grid of Day Cells -->
+          <div class="calendar-grid" id="calendar-grid-cells">
+            <!-- Dynamically populated by renderCalendarGrid() -->
+          </div>
+        </div>
+
+        <!-- Right Sidebar: Pending Items & Instant Client Search -->
+        <div class="card" style="display: flex; flex-direction: column; max-height: 800px;">
+          <div class="card-header" style="padding-bottom: 0.75rem;">
+            <div>
+              <div class="card-title"><i data-lucide="check-square" class="hud-icon text-cyan"></i> Pending Tasks</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Synced with <code
+                  style="color: var(--neon-cyan);">calendar.md</code></div>
+            </div>
+            <span class="badge" id="pending-count-badge"
+              style="background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">0
+              Pending</span>
+          </div>
+
+          <!-- Search Input with Instant Client-Side Filter -->
+          <div style="position: relative; margin-bottom: 0.85rem;">
+            <i data-lucide="search" class="hud-icon-xs text-cyan"
+              style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none;"></i>
+            <input type="text" id="calendar-search-input" placeholder="Search tasks, meetings, #tags..."
+              oninput="filterPendingEvents(this.value)"
+              style="width: 100%; background: rgba(3, 8, 18, 0.75); border: 1px solid var(--panel-border); border-radius: 8px; padding: 0.55rem 0.75rem 0.55rem 2.2rem; color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; outline: none;">
+          </div>
+
+          <!-- Scrollable List of Pending Items -->
+          <div id="pending-events-list" style="flex: 1; overflow-y: auto; padding-right: 2px;">
+            <!-- Populated dynamically by renderPendingList() -->
+          </div>
+
+          <div
+            style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; margin-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--text-muted);">
+            <span>Voice Command: <i style="color: var(--neon-cyan);">"How's my calendar today"</i></span>
+            <button class="btn btn-sm" onclick="speakTodayCalendar()"
+              style="background: rgba(0,240,255,0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.2rem 0.5rem;"><i
+                data-lucide="volume-2" class="hud-icon-xs"></i> Recite</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: Main Desktop / Displays Configuration -->

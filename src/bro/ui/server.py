@@ -1203,8 +1203,17 @@ async def setup_ubuntu_shortcut():
         }
     return {"status": "error", "message": "Shortcut script not found"}
 
-# Serve Frontend HTML
+# Serve Frontend HTML & Modular Static Assets
 WEB_DIR = Path(__file__).parent / "web"
+
+if WEB_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static")
+    if (WEB_DIR / "css").exists():
+        app.mount("/css", StaticFiles(directory=str(WEB_DIR / "css")), name="css")
+    if (WEB_DIR / "js").exists():
+        app.mount("/js", StaticFiles(directory=str(WEB_DIR / "js")), name="js")
+    if (WEB_DIR / "tabs").exists():
+        app.mount("/tabs", StaticFiles(directory=str(WEB_DIR / "tabs")), name="tabs")
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
@@ -1212,6 +1221,3 @@ async def serve_index():
     if index_file.exists():
         return FileResponse(str(index_file))
     return HTMLResponse("<h1>Bro HUD Web Interface Loading...</h1>")
-
-if WEB_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static")

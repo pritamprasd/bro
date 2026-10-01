@@ -1,0 +1,53 @@
+<div id="tab-displays" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i data-lucide="monitor" class="hud-icon-sm text-cyan"></i> Multi-Desktop & Display
+              Perception Setup</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+              Choose which physical monitor or virtual canvas Bro perceives when inspecting the screen, locating UI
+              elements, and executing mouse/keyboard actions.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <button class="btn btn-cyan" onclick="loadDesktopMonitors(true)"><i data-lucide="refresh-cw"
+                class="hud-icon-xs"></i> Scan & Refresh Displays</button>
+            <button class="btn" style="background: rgba(255,255,255,0.08);" onclick="previewActiveDesktop()"><i
+                data-lucide="maximize-2" class="hud-icon-xs"></i> Full-Res Inspection</button>
+          </div>
+        </div>
+
+        <!-- Detected Displays Grid -->
+        <div class="display-card-grid" id="display-cards-container">
+          <div style="color: var(--text-muted); padding: 2rem; text-align: center; grid-column: 1/-1;">Detecting
+            connected desktop monitors...</div>
+        </div>
+
+        <!-- Real-Time Desktop Perception Live View -->
+        <div
+          style="margin-top: 2rem; background: var(--panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--panel-border); border-top: 1px solid var(--glass-specular); border-radius: 12px; padding: 1.35rem; box-shadow: var(--glass-shadow);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <i data-lucide="eye" class="hud-icon-md text-cyan"></i>
+              <div>
+                <h4 style="color: #ffffff; font-size: 0.96rem; letter-spacing: 0.5px;" id="active-desktop-title">Active
+                  Desktop Perception</h4>
+                <div style="font-size: 0.74rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;"
+                  id="active-desktop-subtitle">Streaming 1080p visual feed to Qwen2.5-VL 7B</div>
+              </div>
+            </div>
+            <button class="btn btn-cyan" onclick="refreshActivePreview()"><i data-lucide="refresh-cw"
+                class="hud-icon-xs"></i> Refresh Perception</button>
+          </div>
+
+          <div
+            style="display: flex; justify-content: center; align-items: center; background: rgba(3, 7, 16, 0.75); backdrop-filter: blur(14px); border: 1px solid rgba(0, 240, 255, 0.15); border-radius: 8px; padding: 0.85rem; overflow: hidden; min-height: 260px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);">
+            <img id="active-desktop-live-img" src="/api/desktop/preview"
+              style="max-width: 100%; max-height: 480px; border-radius: 6px; border: 1px solid var(--panel-border); box-shadow: 0 0 24px rgba(0, 240, 255, 0.25); cursor: zoom-in;"
+              alt="Active Desktop Preview" onclick="openLightbox(this.src, 'Active Main Desktop Live Perception')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Settings (Unified Master Control Panel) -->

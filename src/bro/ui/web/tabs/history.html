@@ -1,0 +1,130 @@
+<div id="tab-history" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i data-lucide="history" class="hud-icon-sm text-cyan"></i> Audit Trail & Mission
+            Intelligence</div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="report-download-group" id="header-report-download-group">
+              <button class="btn btn-cyan report-main-btn" onclick="downloadMissionReport(null, 'md')"
+                id="btn-export-md" title="Download report for selected mission">
+                <i data-lucide="download" class="hud-icon-xs"></i> Download Report
+              </button>
+              <button class="btn btn-cyan report-dropdown-toggle" onclick="toggleReportDropdown(event)"
+                title="Choose report format">
+                <i data-lucide="chevron-down" class="hud-icon-xs"></i>
+              </button>
+              <div class="report-dropdown-menu" id="report-dropdown-menu">
+                <div class="report-dropdown-item" onclick="downloadMissionReport(null, 'md'); closeReportDropdown();">
+                  <i data-lucide="file-text" class="hud-icon-xs text-cyan"></i> Markdown Document (.md)
+                </div>
+                <div class="report-dropdown-item" onclick="downloadMissionReport(null, 'html'); closeReportDropdown();">
+                  <i data-lucide="globe" class="hud-icon-xs text-green"></i> Interactive HTML Report (.html)
+                </div>
+                <div class="report-dropdown-item" onclick="downloadMissionReport(null, 'json'); closeReportDropdown();">
+                  <i data-lucide="code" class="hud-icon-xs text-amber"></i> Raw Audit JSON (.json)
+                </div>
+                <div class="report-dropdown-divider"></div>
+                <div class="report-dropdown-item" onclick="copyMissionMarkdown(); closeReportDropdown();">
+                  <i data-lucide="copy" class="hud-icon-xs text-cyan"></i> Copy Markdown to Clipboard
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-cyan" onclick="loadHistory()"><i data-lucide="refresh-cw" class="hud-icon-xs"></i>
+              Refresh Analytics</button>
+            <button class="btn btn-danger btn-sm" onclick="promptClearAuditHistory()"
+              title="Archive and clear all audit logs and metrics"><i data-lucide="trash-2" class="hud-icon-xs"></i>
+              Clear Audit &amp; Reset Metrics</button>
+          </div>
+        </div>
+
+        <!-- Human-Readable KPI Analytics Widgets (Variant 3 Compact) -->
+        <div class="kpi-grid compact">
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-total-runs">0</div>
+            <div class="kpi-label"><i data-lucide="target" class="hud-icon-xs text-cyan"></i> Total Missions</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-success-rate" style="color: var(--neon-green);">100%</div>
+            <div class="kpi-label"><i data-lucide="check-circle" class="hud-icon-xs text-green"></i> Success Rate</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-avg-duration">0.0s</div>
+            <div class="kpi-label"><i data-lucide="clock" class="hud-icon-xs text-amber"></i> Avg Duration</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-total-steps">0</div>
+            <div class="kpi-label"><i data-lucide="footprints" class="hud-icon-xs text-purple"></i> Steps Done</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-top-actuator" style="color: #82b1ff;">Desktop</div>
+            <div class="kpi-label"><i data-lucide="cpu" class="hud-icon-xs text-blue"></i> Actuator</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpi-tier0-ratio" style="color: var(--neon-cyan);">CPU (0 VRAM)</div>
+            <div class="kpi-label"><i data-lucide="zap" class="hud-icon-xs text-cyan"></i> Tier-0 Router</div>
+          </div>
+        </div>
+
+        <!-- Visual Analytics Charts Row (Req 2) -->
+        <div class="charts-row">
+          <!-- Left Chart: Native SVG Actuator Donut Chart -->
+          <div class="chart-box">
+            <div class="chart-title"><i data-lucide="pie-chart" class="hud-icon-xs text-cyan"></i> Actuator Invocation
+              Breakdown</div>
+            <div id="donut-chart-container"
+              style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+              <svg id="donut-svg" width="180" height="180" viewBox="0 0 180 180" style="overflow: visible;"></svg>
+              <div class="donut-legend" id="donut-legend"></div>
+            </div>
+          </div>
+
+          <!-- Right Chart: Mission Velocity & Success Ratio -->
+          <div class="chart-box">
+            <div class="chart-title"><i data-lucide="activity" class="hud-icon-xs text-amber"></i> Mission Velocity &
+              Outcome Gauge</div>
+            <div style="width: 100%; margin-bottom: 0.5rem;">
+              <div
+                style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+                <span>Mission Success Ratio</span>
+                <span id="ratio-label">100% Success</span>
+              </div>
+              <div class="ratio-bar">
+                <div class="ratio-segment-success" id="ratio-bar-success" style="width: 100%;"></div>
+                <div class="ratio-segment-failed" id="ratio-bar-failed" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div style="width: 100%; margin-top: 0.75rem;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem;">Execution Latency (Last
+                10 Missions, Seconds)</div>
+              <svg id="velocity-svg" width="100%" height="110"
+                style="background: rgba(0,0,0,0.25); border-radius: 6px;"></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="audit-filter-bar">
+          <input type="text" class="search-input" id="history-search" placeholder="Search missions by goal..."
+            oninput="filterHistoryList()">
+          <div class="filter-pills">
+            <button class="filter-pill active" onclick="setHistoryFilter('all', this)">All</button>
+            <button class="filter-pill" onclick="setHistoryFilter('success', this)"><i data-lucide="check"
+                class="hud-icon-xs"></i> Success</button>
+            <button class="filter-pill" onclick="setHistoryFilter('failed', this)"><i data-lucide="x"
+                class="hud-icon-xs"></i> Failed</button>
+          </div>
+        </div>
+
+        <div class="history-grid">
+          <div class="history-list" id="history-items">
+            <p style="color: var(--text-muted); padding: 1rem;">Loading past runs...</p>
+          </div>
+          <div class="history-filmstrip" id="history-details">
+            <p style="color: var(--text-muted); padding: 1rem;">Select a mission from the left to inspect step
+              screenshots and actions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: System Alerts & Error Logs -->
