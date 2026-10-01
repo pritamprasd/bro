@@ -1,4 +1,4 @@
-"""Unit tests for Jarvis Mark 4 continuation features:
+"""Unit tests for Bro Variant 4 continuation features:
 1. Gen-Z greetings toggle, GreetingMatcher & Memory store
 2. Technical design document endpoint (/api/docs/design)
 3. Calendar clear all events & endpoint
@@ -11,11 +11,11 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from jarvis.config import JarvisConfig, VoiceConfig
-from jarvis.models.local_matcher import GreetingMatcher, _GEN_Z_GREETING_REPLIES, _GEN_Z_THANKS_REPLIES, _GEN_Z_BYE_REPLIES, _GEN_Z_ACK_REPLIES
-from jarvis.memory.calendar_engine import CalendarEngine
-from jarvis.memory.store import MemoryStore
-from jarvis.ui.server import app
+from bro.config import BroConfig, VoiceConfig
+from bro.models.local_matcher import GreetingMatcher, _GEN_Z_GREETING_REPLIES, _GEN_Z_THANKS_REPLIES, _GEN_Z_BYE_REPLIES, _GEN_Z_ACK_REPLIES
+from bro.memory.calendar_engine import CalendarEngine
+from bro.memory.store import MemoryStore
+from bro.ui.server import app
 
 
 def test_greeting_matcher_standard_and_gen_z():
@@ -36,9 +36,9 @@ def test_greeting_matcher_standard_and_gen_z():
     assert genz_thanks in _GEN_Z_THANKS_REPLIES
 
     # Goodbye standard vs Gen-Z
-    std_bye = GreetingMatcher.match("bye jarvis", gen_z=False)
+    std_bye = GreetingMatcher.match("bye bro", gen_z=False)
     assert std_bye is not None
-    genz_bye = GreetingMatcher.match("bye jarvis", gen_z=True)
+    genz_bye = GreetingMatcher.match("bye bro", gen_z=True)
     assert genz_bye in _GEN_Z_BYE_REPLIES
 
     # Acknowledgment standard vs Gen-Z
@@ -49,7 +49,7 @@ def test_greeting_matcher_standard_and_gen_z():
 
 
 def test_memory_store_gen_z_greetings(tmp_path):
-    from jarvis.config import MemoryConfig
+    from bro.config import MemoryConfig
     mem_dir = tmp_path / "sub_mem"
     cfg = MemoryConfig(memory_dir=str(mem_dir), semantic_search_enabled=False)
     store = MemoryStore(cfg)
@@ -83,7 +83,7 @@ def test_api_design_document_endpoint():
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "success"
-    assert "JARVIS Mark 4" in data["content"]
+    assert "BRO Variant 4" in data["content"]
     assert "GreetingMatcher" in data["content"]
     assert "design.md" in data["filename"]
 

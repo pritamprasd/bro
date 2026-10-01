@@ -2,8 +2,8 @@
 
 import tempfile
 import pytest
-from jarvis.config import MemoryConfig
-from jarvis.memory.store import MemoryStore
+from bro.config import MemoryConfig
+from bro.memory.store import MemoryStore
 
 def test_lean_selective_memory_loading():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -33,9 +33,9 @@ def test_save_and_retrieve_custom_workflow():
         assert "Custom data processing with pandas" in mem
 
 def test_default_memory_dir_in_config():
-    from jarvis.config import DEFAULT_MEMORY_DIR
+    from bro.config import DEFAULT_MEMORY_DIR
     config = MemoryConfig()
-    assert str(DEFAULT_MEMORY_DIR) in config.memory_dir or "ai-memory/jarvis" in config.memory_dir
+    assert str(DEFAULT_MEMORY_DIR) in config.memory_dir or "ai-memory/bro" in config.memory_dir
 
 def test_memory_store_migration_from_legacy():
     import pathlib
@@ -46,11 +46,11 @@ def test_memory_store_migration_from_legacy():
         (legacy_path / "workflows" / "custom.md").write_text("# Custom Routine\nDo things", encoding="utf-8")
 
         with tempfile.TemporaryDirectory() as tmp_new:
-            new_path = pathlib.Path(tmp_new) / "jarvis_mem"
+            new_path = pathlib.Path(tmp_new) / "bro_mem"
             config = MemoryConfig(memory_dir=str(new_path))
             store = MemoryStore(config)
 
-            # Manually invoke legacy migration to simulate legacy ~/.jarvis/memory
+            # Manually invoke legacy migration to simulate legacy ~/.bro/memory
             store._migrate_legacy_memory(legacy_path)
 
             assert (new_path / "preferences.md").exists()

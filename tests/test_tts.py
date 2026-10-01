@@ -1,7 +1,7 @@
 """Unit tests for Text-to-Speech markdown text cleaning."""
 
-from jarvis.config import VoiceConfig
-from jarvis.voice.tts import TextToSpeech
+from bro.config import VoiceConfig
+from bro.voice.tts import TextToSpeech
 
 def test_clean_for_speech_bold_words():
     tts = TextToSpeech(VoiceConfig(enabled=False))

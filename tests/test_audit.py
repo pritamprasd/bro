@@ -2,7 +2,7 @@
 
 import tempfile
 from pathlib import Path
-from jarvis.core.audit import AuditManager
+from bro.core.audit import AuditManager
 
 def test_audit_manager_lifecycle():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -64,7 +64,7 @@ def test_audit_manager_lifecycle():
 
 def test_download_report_endpoints():
     from fastapi.testclient import TestClient
-    from jarvis.ui.server import app, audit
+    from bro.ui.server import app, audit
     
     # Create a dummy run if none exists
     run = audit.start_run("Test Download Functionality")

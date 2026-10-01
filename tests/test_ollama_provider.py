@@ -3,8 +3,8 @@
 from unittest.mock import MagicMock, patch
 import pytest
 import requests
-from jarvis.models.base import ChatMessage
-from jarvis.models.ollama_provider import OllamaProvider, normalize_keep_alive
+from bro.models.base import ChatMessage
+from bro.models.ollama_provider import OllamaProvider, normalize_keep_alive
 
 def test_normalize_keep_alive():
     """Ensure keep_alive values are properly normalized for Ollama's Go API."""

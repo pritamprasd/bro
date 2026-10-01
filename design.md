@@ -1,14 +1,14 @@
-# JARVIS Mark 4: System Architecture & Technical Design Specification
+# BRO Variant 4: System Architecture & Technical Design Specification
 
 ## 1. System Overview & Operating Environment
 
-JARVIS Mark 4 is an autonomous, multi-modal cognitive agent designed for local-first execution on Linux workstations.
+BRO Variant 4 is an autonomous, multi-modal cognitive agent designed for local-first execution on Linux workstations.
 
 ### Target Hardware & Host Environment
 * **Workstation OS**: Linux X11 (Ubuntu / GNOME 42+)
-* **GPU**: NVIDIA GeForce RTX 3060 (12 GB GDDR6 VRAM, CUDA Compute 8.6)
-* **CPU**: AMD Ryzen 7 (8 cores / 16 threads, x86_64)
-* **System RAM**: 96 GB DDR4
+* **GPU**: Dedicated NVIDIA GPU (8-12 GB+ VRAM, CUDA Compute 8.0+)
+* **CPU**: Modern Multi-Core x86_64 CPU (4-8+ Cores)
+* **System RAM**: 16-32 GB+ System RAM
 * **Local Inference Runtime**: Ollama daemon (`http://localhost:11434`)
 * **Audio Synthesis & Recognition**: Edge-TTS Neural Pipeline (`en-GB-RyanNeural`) + Browser Web Speech API / Faster-Whisper GPU (`base`, `float16`)
 * **Display Server**: X11 with multi-monitor perception (`mss` + `python-xlib` screen coordinate indexing)
@@ -17,7 +17,7 @@ JARVIS Mark 4 is an autonomous, multi-modal cognitive agent designed for local-f
 
 ## 2. Cognitive Processing Pipeline & Latency Optimization
 
-Jarvis executes an asynchronous **Perception-Reasoning-Action (ReAct)** loop. Every user utterance traverses a deterministic multi-tier cascade optimized for sub-millisecond to sub-second response times:
+Bro executes an asynchronous **Perception-Reasoning-Action (ReAct)** loop. Every user utterance traverses a deterministic multi-tier cascade optimized for sub-millisecond to sub-second response times:
 
 ```
 [User Utterance (Voice / Web HUD / Alt+J / Telegram / CLI)]
@@ -62,9 +62,9 @@ Jarvis executes an asynchronous **Perception-Reasoning-Action (ReAct)** loop. Ev
 
 ## 3. Actuator Subsystems & Tool Protocol
 
-Jarvis tools return structured `ActionResult` objects containing `success: bool`, `output: str`, and optional `screenshot_base64`, `media`, or `step_timings`.
+Bro tools return structured `ActionResult` objects containing `success: bool`, `output: str`, and optional `screenshot_base64`, `media`, or `step_timings`.
 
-### 1. Desktop GUI Actuator (`src/jarvis/actuators/desktop.py`)
+### 1. Desktop GUI Actuator (`src/bro/actuators/desktop.py`)
 * **Screen Coordinate Mapping**: Interacts via `mss` and `pyautogui` with safety pause (0.1s) and fail-safe corners.
 * **Multi-Display Perception**: Supports display indices:
   * `0`: Combined virtual canvas across all physical monitors.
@@ -73,11 +73,11 @@ Jarvis tools return structured `ActionResult` objects containing `success: bool`
 * **Core Actions**: `desktop_click(x, y, button)`, `desktop_double_click(x, y)`, `desktop_type(text, interval)`, `desktop_press_key(key)`, `desktop_hotkey(keys)`, `desktop_scroll(clicks, direction)`, `desktop_drag(x1, y1, x2, y2)`, `desktop_inspect_screen(screen_index)`, `desktop_switch_monitor(screen_index)`.
 
 ### 2. Dual-Browser Automation Architecture
-* **Everyday Chrome via CDP (`src/jarvis/actuators/cdp_browser.py`)**: Attaches directly to the user's running Chrome instance on port `9222` using Chrome DevTools Protocol (`aiohttp` WebSocket client). Preserves active logins, sessions, cookies, and tabs.
+* **Everyday Chrome via CDP (`src/bro/actuators/cdp_browser.py`)**: Attaches directly to the user's running Chrome instance on port `9222` using Chrome DevTools Protocol (`aiohttp` WebSocket client). Preserves active logins, sessions, cookies, and tabs.
   * Actions: `cdp_navigate(url)`, `cdp_click(selector)`, `cdp_type(selector, text)`, `cdp_evaluate(expression)`, `cdp_list_tabs()`, `cdp_screenshot()`.
-* **Isolated Playwright Sandbox (`src/jarvis/actuators/browser.py`)**: Headless/headful sandboxed Chromium instance with dedicated user data directory (`~/.jarvis/browser_data`) for untrusted or isolated web scraping.
+* **Isolated Playwright Sandbox (`src/bro/actuators/browser.py`)**: Headless/headful sandboxed Chromium instance with dedicated user data directory (`~/.bro/browser_data`) for untrusted or isolated web scraping.
 
-### 3. Python Execution Sandbox (`src/jarvis/actuators/python_runner.py`)
+### 3. Python Execution Sandbox (`src/bro/actuators/python_runner.py`)
 * Executes arbitrary Python code via subprocess in isolated working directory.
 * Captures standard output, standard error, execution return code, and wall-clock execution time.
 
@@ -88,20 +88,20 @@ Jarvis tools return structured `ActionResult` objects containing `success: bool`
   * Syntax-highlighted code viewers with line numbers
   * File content visualizers
 
-### 5. Macro Automation Recorder (`src/jarvis/actuators/recorder.py`)
-* Records mouse clicks, keyboard strokes, and timing intervals to `~/.jarvis/macros/<name>.json`.
+### 5. Macro Automation Recorder (`src/bro/actuators/recorder.py`)
+* Records mouse clicks, keyboard strokes, and timing intervals to `~/.bro/macros/<name>.json`.
 * Replays automated workstation sequences at native or accelerated speeds.
 
 ---
 
 ## 4. Security, Secrets Vault & Safety Gatekeeper
 
-### Keyring Vault with Index Registry (`src/jarvis/security/vault.py`)
+### Keyring Vault with Index Registry (`src/bro/security/vault.py`)
 * **Storage Engine**: System Keyring (`secretstorage` / FreeDesktop Secret Service API) with AES-256 fallback.
-* **Key Registry (`~/.jarvis/.vault_index`)**: Dedicated JSON registry tracking stored keys, metadata, timestamps, and description tags without exposing sensitive values.
+* **Key Registry (`~/.bro/.vault_index`)**: Dedicated JSON registry tracking stored keys, metadata, timestamps, and description tags without exposing sensitive values.
 * **Batch Secret Retrieval (`get_secrets(keys=[...])`)**: Allows the agent to fetch multiple vault keys (e.g., `telegram_bot_token` and `telegram_chat_id`) in a single atomic tool call, reducing round-trip latency by 50%.
 
-### Safety Gatekeeper & High-Stakes Intercept (`src/jarvis/security/safety.py`)
+### Safety Gatekeeper & High-Stakes Intercept (`src/bro/security/safety.py`)
 * Scans all planned actions against high-stakes keyword blacklists:
   `["rm -rf", "delete", "destroy", "wipe", "format", "sudo", "passwd", "shutdown", "reboot", "payment", "buy", "purchase", "transfer", "bank", "credit card", "telegram send"]`
 * When triggered, pauses execution, generates an approval token, broadcasts a WebSocket modal to the Web HUD, and requires explicit user authorization before continuing.
@@ -110,7 +110,7 @@ Jarvis tools return structured `ActionResult` objects containing `success: bool`
 
 ## 5. Timing Telemetry, Observability & Waterfall Debugger
 
-### Microsecond StepRecord Telemetry (`src/jarvis/core/audit.py`)
+### Microsecond StepRecord Telemetry (`src/bro/core/audit.py`)
 Each step in an agent run tracks exact timing metrics:
 * `tts_ms`: Wall time spent generating or speaking TTS audio.
 * `llm_inference_ms`: Time spent in Ollama/Gateway text generation.
@@ -126,18 +126,18 @@ Each step in an agent run tracks exact timing metrics:
 
 ## 6. Scheduled Automation, Daily Brief & Memory Engine
 
-### Multi-Slot Daily Brief Engine (`src/jarvis/models/daily_brief.py`)
-* Configured in `~/ai-memory/jarvis/daily_brief_config.json`.
+### Multi-Slot Daily Brief Engine (`src/bro/models/daily_brief.py`)
+* Configured in `~/ai-memory/bro/daily_brief_config.json`.
 * Supports multiple independent briefing slots per day (e.g., `08:00` Morning Standup Brief with Weather + Calendar, `14:00` Midday Markets Brief, `18:00` Evening Summary).
 * Each slot configures: `time: "HH:MM"`, `enabled: bool`, `label: str`, and `topics: ["weather", "calendar", "tech_news", "world_news", "hardware"]`.
 * Scheduled via `CronEngine` background daemon.
 
-### Workstation Calendar Engine (`src/jarvis/memory/calendar_engine.py`)
-* Backed by human-readable markdown file: `~/ai-memory/jarvis/calendar.md`.
+### Workstation Calendar Engine (`src/bro/memory/calendar_engine.py`)
+* Backed by human-readable markdown file: `~/ai-memory/bro/calendar.md`.
 * Format: `- [ ] YYYY-MM-DD HH:MM - Event Title #tag1 #tag2`.
 * Provides atomic add, toggle, natural language recitation ("How's my calendar today"), and a two-step confirmation complete clear (`DELETE /api/calendar`).
 
-### Lean Markdown Memory Store (`src/jarvis/memory/store.py`)
+### Lean Markdown Memory Store (`src/bro/memory/store.py`)
 * Reads structured markdown documents on demand: `preferences.md`, `system.md`, `contacts.md`, `greetings.md`, `workflows/`.
 * Integrates optional semantic vector embeddings via `nomic-embed-text` for RAG-augmented recall.
 
@@ -145,7 +145,7 @@ Each step in an agent run tracks exact timing metrics:
 
 ## 7. Web HUD Dashboard & Interfaces
 
-### World-Class Glassmorphic Architecture (`src/jarvis/ui/web/index.html`)
+### World-Class Glassmorphic Architecture (`src/bro/ui/web/index.html`)
 * Built with pure HTML5, Vanilla CSS, and WebSocket client — no Node/React build pipeline overhead.
 * Dark cybernetic HUD palette: Neon Cyan (`#00f0ff`), Electric Purple (`#9d4edd`), Amber (`#ffaa00`), Carbon Glass backgrounds (`rgba(7, 14, 27, 0.85)`).
 * Primary Master Tabs:
@@ -162,7 +162,7 @@ Each step in an agent run tracks exact timing metrics:
 ### Dedicated Desktop & Voice Access Modalities
 * **Spotlight Bar (`Alt+J`)**: Floating lightweight desktop overlay powered by Tkinter / PyQt for immediate voice/text task execution without opening the browser.
 * **Ubuntu GNOME Shortcut (`Super+Shift+J`)**: System-wide keybinding launching the HUD in Audio-Only continuous loop mode.
-* **Two-Way Telegram Bot (`jarvis/watchdogs/telegram_bot.py`)**: Remote task dispatch, screenshot retrieval, and audio voice-note processing from mobile.
+* **Two-Way Telegram Bot (`bro/watchdogs/telegram_bot.py`)**: Remote task dispatch, screenshot retrieval, and audio voice-note processing from mobile.
 
 ---
 

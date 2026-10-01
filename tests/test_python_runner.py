@@ -1,7 +1,7 @@
 """Unit tests for PythonRunner actuator."""
 
 import pytest
-from jarvis.actuators.python_runner import PythonRunner
+from bro.actuators.python_runner import PythonRunner
 
 def test_python_runner_execution():
     runner = PythonRunner()

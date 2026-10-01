@@ -2,7 +2,7 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from jarvis.ui.server import app
+from bro.ui.server import app
 
 @pytest.fixture
 def client():

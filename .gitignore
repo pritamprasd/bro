@@ -9,8 +9,8 @@ wheels/
 # Virtual environments
 .venv/
 
-# Jarvis Runtime & External Storage
-.jarvis/
+# Bro Runtime & External Storage
+.bro/
 ai-memory/
 /memory/
 runs/

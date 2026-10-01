@@ -1,6 +1,6 @@
 The current web ui is very cluttered. Perform below updates to make it better.
 1. Create a Tab called settings and move below items from web ui topbar to settings tab. Keep settings tab organized. Items to move:  Screen selection, Voice selection including voice speed, AI type selection(local, gemini, hybrid), daily brief button.
-2. Create a new setting in settings tab which control jarvis volumn.
+2. Create a new setting in settings tab which control bro volumn.
 3. On mission control in audio only mode, remove voice selection and voice speed, also remove the chat view button.
 4. Make Proactive Sentinels Matrix buttons clickable. On clicking it toggeles the functionality.
 5. Add toggle buttons for Autonomous Mode, Model Policy in settings tab.

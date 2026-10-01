@@ -2,9 +2,9 @@
 
 import tempfile
 from pathlib import Path
-from jarvis.config import OrganizerConfig, SentinelConfig
-from jarvis.watchdogs.organizer import DownloadOrganizer
-from jarvis.watchdogs.sentinel import HardwareSentinel
+from bro.config import OrganizerConfig, SentinelConfig
+from bro.watchdogs.organizer import DownloadOrganizer
+from bro.watchdogs.sentinel import HardwareSentinel
 
 def test_hardware_sentinel_metrics():
     cfg = SentinelConfig(enabled=True)

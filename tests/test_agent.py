@@ -1,14 +1,14 @@
-"""Integration tests for the Jarvis Agent ReAct loop."""
+"""Integration tests for the Bro Agent ReAct loop."""
 
 from unittest.mock import MagicMock, patch
 import pytest
-from jarvis.config import JarvisConfig
-from jarvis.core.agent import JarvisAgent
-from jarvis.models.base import ModelResponse
+from bro.config import BroConfig
+from bro.core.agent import BroAgent
+from bro.models.base import ModelResponse
 
 def test_agent_react_loop_finish():
-    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
-    agent = JarvisAgent(config)
+    config = BroConfig(output_mode="cli", model={"tier0_enabled": False})
+    agent = BroAgent(config)
 
     # Mock the router to return a finish action
     agent.router.generate_text = MagicMock(return_value=ModelResponse(
@@ -19,8 +19,8 @@ def test_agent_react_loop_finish():
     assert "Result is 42" in result
 
 def test_agent_react_loop_with_python_action():
-    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
-    agent = JarvisAgent(config)
+    config = BroConfig(output_mode="cli", model={"tier0_enabled": False})
+    agent = BroAgent(config)
 
     # 1st step: run python
     step1_resp = ModelResponse(
@@ -37,12 +37,12 @@ def test_agent_react_loop_with_python_action():
     assert "The sum is 4" in result
 
 def test_agent_show_media_action():
-    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
+    config = BroConfig(output_mode="cli", model={"tier0_enabled": False})
     media_captured = []
     def on_media(payload):
         media_captured.append(payload)
 
-    agent = JarvisAgent(config, show_media_cb=on_media)
+    agent = BroAgent(config, show_media_cb=on_media)
 
     # 1st step: show media
     step1_resp = ModelResponse(
@@ -62,12 +62,12 @@ def test_agent_show_media_action():
     assert "graph TD; X-->Y" in media_captured[0]["content"]
 
 def test_agent_auto_detect_mermaid_in_finish():
-    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False})
+    config = BroConfig(output_mode="cli", model={"tier0_enabled": False})
     media_captured = []
     def on_media(payload):
         media_captured.append(payload)
 
-    agent = JarvisAgent(config, show_media_cb=on_media)
+    agent = BroAgent(config, show_media_cb=on_media)
 
     # Model finishes with a mermaid code block in the result string
     finish_resp = ModelResponse(
@@ -83,8 +83,8 @@ def test_agent_auto_detect_mermaid_in_finish():
     assert "Start --> Stop" in media_captured[0]["content"]
 
 def test_agent_desktop_switch_monitor():
-    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": False}, desktop={"screen_index": 1})
-    agent = JarvisAgent(config)
+    config = BroConfig(output_mode="cli", model={"tier0_enabled": False}, desktop={"screen_index": 1})
+    agent = BroAgent(config)
     agent.desktop.monitors = [
         {"width": 3840, "height": 1080, "left": 0, "top": 0, "output": "ALL", "name": "Combined Canvas", "is_primary": False},
         {"width": 1920, "height": 1080, "left": 0, "top": 0, "output": "DP-1", "name": "Display 1", "is_primary": True},
@@ -107,16 +107,16 @@ def test_agent_desktop_switch_monitor():
     assert agent.desktop.screen_index == 2
 
 def test_agent_tier0_conversational_fast_path():
-    from jarvis.models.tier0 import IntentClassification
-    config = JarvisConfig(output_mode="cli", model={"tier0_enabled": True})
-    agent = JarvisAgent(config)
+    from bro.models.tier0 import IntentClassification
+    config = BroConfig(output_mode="cli", model={"tier0_enabled": True})
+    agent = BroAgent(config)
 
     # Tier-0 classifies and provides a direct response
     agent.tier0.classify = MagicMock(return_value=IntentClassification(
         intent="CONVERSATION",
         summary="Greeting",
         can_execute_directly=True,
-        direct_response="Hello! I am Jarvis, standing by.",
+        direct_response="Hello! I am Bro, standing by.",
         elapsed_ms=45.0,
     ))
 
@@ -124,7 +124,7 @@ def test_agent_tier0_conversational_fast_path():
     agent.router.generate_text = MagicMock()
 
     result = agent.run_task("Tell me a fun fact about space")
-    assert result == "Hello! I am Jarvis, standing by."
+    assert result == "Hello! I am Bro, standing by."
     agent.router.generate_text.assert_not_called()
 
 

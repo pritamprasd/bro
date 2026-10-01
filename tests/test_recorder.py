@@ -2,7 +2,7 @@
 
 import tempfile
 from pathlib import Path
-from jarvis.actuators.recorder import MacroRecorder
+from bro.actuators.recorder import MacroRecorder
 
 def test_macro_compilation():
     with tempfile.TemporaryDirectory() as tmpdir:

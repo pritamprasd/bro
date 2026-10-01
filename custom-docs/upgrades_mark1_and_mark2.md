@@ -1,14 +1,14 @@
-# ⚡ JARVIS Architectural Evolution: Mark 1 vs. Mark 2
+# ⚡ BRO Architectural Evolution: Variant 1 vs. Variant 2
 
-Comprehensive technical comparison and capability documentation detailing the architecture, features, and operational improvements introduced in **JARVIS Mark 1** and extended in **JARVIS Mark 2**.
+Comprehensive technical comparison and capability documentation detailing the architecture, features, and operational improvements introduced in **BRO Variant 1** and extended in **BRO Variant 2**.
 
 ---
 
 ## 📊 High-Level Comparison Matrix
 
-| Architectural Subsystem | 🛡️ JARVIS Mark 1 | ⚡ JARVIS Mark 2 |
+| Architectural Subsystem | 🛡️ BRO Variant 1 | ⚡ BRO Variant 2 |
 | :--- | :--- | :--- |
-| **Product Designation** | `JARVIS // Mark 1` | `JARVIS // Mark 2` |
+| **Product Designation** | `BRO // Variant 1` | `BRO // Variant 2` |
 | **Cognitive Core Loop** | Asynchronous Perception-Reasoning-Action (ReAct) with Tier-0 fast router and Tier-1 Gemma 4 12B | ReAct loop enhanced with real-time Knowledge Graph RAG context injection |
 | **Voice Synthesis (TTS)** | Microsoft Edge Neural (`en-GB-RyanNeural`), speed/pitch/volume controls | Edge Neural + **Subprocess tracking** with instantaneous player termination |
 | **Audio Barge-In** | None (User had to wait for speech synthesis audio to finish completely) | **Sub-10ms Instant Barge-In** via Arc Reactor click, operator speech detection, or <kbd>Esc</kbd> key (`POST /api/voice/stop`) |
@@ -22,9 +22,9 @@ Comprehensive technical comparison and capability documentation detailing the ar
 
 ---
 
-## 🛡️ JARVIS Mark 1: Foundational Architecture & Capabilities
+## 🛡️ BRO Variant 1: Foundational Architecture & Capabilities
 
-JARVIS Mark 1 was designed from the ground up for a Linux workstation (X11) powered by an **AMD Ryzen 7**, **NVIDIA RTX 3060 (12 GB VRAM)**, and **96 GB of RAM**, running completely local with zero cloud subscription requirements.
+BRO Variant 1 was designed from the ground up for a Linux workstation (X11) powered by an **Modern Multi-Core CPU (4-8+ Cores)**, **Dedicated NVIDIA GPU (8-12 GB+ VRAM)**, and **16-32 GB+ System RAM**, running completely local with zero cloud subscription requirements.
 
 ### 1. Multi-Tier Cognitive ReAct Hierarchy
 - **Tier-0 Intent Classifier:** Sub-100ms intent routing via `llama3.2:3b`. Distinguishes conversational questions from high-stakes computer actions.
@@ -34,7 +34,7 @@ JARVIS Mark 1 was designed from the ground up for a Linux workstation (X11) powe
 ### 2. Four Seamless Communication Modalities
 1. **Tactical Glassmorphic Web HUD (`:8765`):** Monospace terminal stream, system status, hardware gauges, and live run inspection.
 2. **Context-Aware Spotlight Bar (<kbd>Alt</kbd> + <kbd>J</kbd>):** Native translucent X11 overlay capturing active window titles and clipboard buffers.
-3. **CLI Terminal Interface (`jarvis voice`):** Interactive terminal and voice command runner.
+3. **CLI Terminal Interface (`bro voice`):** Interactive terminal and voice command runner.
 4. **Two-Way Telegram Remote Bot:** Remote workstation execution and voice note replies while away from the desk.
 
 ### 3. Everyday Browser CDP vs. Sandboxed Web
@@ -47,25 +47,25 @@ JARVIS Mark 1 was designed from the ground up for a Linux workstation (X11) powe
 
 ### 5. Multi-Desktop Display Perception
 - Physical and virtual monitor enumeration using `xrandr` and `mss`.
-- Allows the user to dictate which display screen Jarvis inspects and interacts with.
+- Allows the user to dictate which display screen Bro inspects and interacts with.
 
 ### 6. Proactive Sentinels Matrix
 - **Hardware Sentinel:** Continuous background watchdog tracking GPU VRAM, temperatures, and storage thresholds.
 - **Download Auto-Organizer:** Periodic cleanup and rule-based sorting of `~/Downloads`.
-- **Morning Workstation Brief:** On-demand or scheduled briefing delivered via the Iron Man British butler voice (`en-GB-RyanNeural`).
+- **Morning Workstation Brief:** On-demand or scheduled briefing delivered via the Bro Neural Voice (`en-GB-RyanNeural`).
 
 ### 7. Dedicated Fullscreen Audio HUD Stage
 - Symmetrical Arc Reactor holographic core with multi-ring animation (`ring-outer`, `ring-middle`, `ring-inner`).
-- Hands-Free continuous microphone loop automatically re-arming after Jarvis finishes speaking.
+- Hands-Free continuous microphone loop automatically re-arming after Bro finishes speaking.
 
 ---
 
-## ⚡ JARVIS Mark 2: Evolutionary Upgrades & Innovations
+## ⚡ BRO Variant 2: Evolutionary Upgrades & Innovations
 
-JARVIS Mark 2 advances the platform into a fluid, enterprise-grade personal operating assistant with immediate voice responsiveness, offline neural STT, deep personal knowledge retrieval, and tactile audio-visual ergonomics.
+BRO Variant 2 advances the platform into a fluid, enterprise-grade personal operating assistant with immediate voice responsiveness, offline neural STT, deep personal knowledge retrieval, and tactile audio-visual ergonomics.
 
 ```
-                           JARVIS MARK 2 ARCHITECTURE
+                           BRO VARIANT 2 ARCHITECTURE
   
        ┌────────────────────────────────────────────────────────┐
        │                  USER INPUT CHANNELS                   │
@@ -80,7 +80,7 @@ JARVIS Mark 2 advances the platform into a fluid, enterprise-grade personal oper
                                    │
        ┌───────────────────────────▼────────────────────────────┐
        │          HYBRID SEMANTIC RAG KNOWLEDGE ENGINE          │
-       │   ~/ai-memory/jarvis  +  ~/obsidian/KnowledgeBase/...  │
+       │   ~/ai-memory/bro  +  ~/obsidian/KnowledgeBase/...  │
        │       BM25 Keyword Scoring + Ollama Embeddings         │
        └───────────────────────────┬────────────────────────────┘
                                    │ (Enriched System Prompt)
@@ -100,25 +100,25 @@ JARVIS Mark 2 advances the platform into a fluid, enterprise-grade personal oper
 ```
 
 ### 1. Instant Voice Barge-In & Subprocess Cancellation
-- **The Problem in Mark 1:** When Jarvis was reciting long explanations or system statuses, the operator had to wait until audio playback completed or mute system volume.
-- **The Mark 2 Solution:**
-  - `TextToSpeech` in [tts.py](file:///home/pritam/code/ai/jarvis/src/jarvis/voice/tts.py) now maintains reference to `self._current_player_process: Optional[subprocess.Popen]`.
+- **The Problem in Variant 1:** When Bro was reciting long explanations or system statuses, the operator had to wait until audio playback completed or mute system volume.
+- **The Variant 2 Solution:**
+  - `TextToSpeech` in [tts.py](file://src/bro/voice/tts.py) now maintains reference to `self._current_player_process: Optional[subprocess.Popen]`.
   - Added `stop()` method to kill active `ffplay` or `mpv` processes in sub-10ms.
-  - Exposed via `POST /api/voice/stop` in [server.py](file:///home/pritam/code/ai/jarvis/src/jarvis/ui/server.py).
+  - Exposed via `POST /api/voice/stop` in [server.py](file://src/bro/ui/server.py).
   - In the Tactical HUD, clicking the Arc Reactor core while speaking, pressing <kbd>Esc</kbd>, or speaking into the mic immediately triggers a low punchy reactor cutoff tone and resets the system to `LISTENING`.
 
 ### 2. Dual STT Pipeline (Browser Cloud vs. Local GPU Faster-Whisper)
-- **The Problem in Mark 1:** Speech recognition relied entirely on the browser's Web Speech API, requiring an internet connection to Google/browser cloud servers.
-- **The Mark 2 Solution:**
-  - Integrated `SpeechToText.transcribe_bytes()` utilizing local CUDA `faster-whisper` (`base.en` or `small.en`) on the workstation's RTX 3060.
+- **The Problem in Variant 1:** Speech recognition relied entirely on the browser's Web Speech API, requiring an internet connection to Google/browser cloud servers.
+- **The Variant 2 Solution:**
+  - Integrated `SpeechToText.transcribe_bytes()` utilizing local CUDA `faster-whisper` (`base.en` or `small.en`) on the workstation's Local GPU.
   - Added `POST /api/voice/transcribe` endpoint for multipart audio buffer processing.
   - Operator can select between **Browser Cloud Streaming** and **Local GPU Faster-Whisper** directly in **Settings -> Voice & Speech Matrix**.
 
 ### 3. Obsidian Knowledge Base Hybrid Semantic RAG Engine
-- **The Problem in Mark 1:** Memory retrieval was constrained to exact keyword checks across hardcoded files (`preferences.md`, `system.md`, `contacts.md`).
-- **The Mark 2 Solution:**
-  - Created [rag.py](file:///home/pritam/code/ai/jarvis/src/jarvis/memory/rag.py) featuring `HybridRAGEngine`.
-  - Recursively indexes both `~/ai-memory/jarvis` and the operator's entire Obsidian Vault (`~/obsidian/KnowledgeBase/ai-memory/`).
+- **The Problem in Variant 1:** Memory retrieval was constrained to exact keyword checks across hardcoded files (`preferences.md`, `system.md`, `contacts.md`).
+- **The Variant 2 Solution:**
+  - Created [rag.py](file://src/bro/memory/rag.py) featuring `HybridRAGEngine`.
+  - Recursively indexes both `~/ai-memory/bro` and the operator's entire Obsidian Vault (`~/obsidian/KnowledgeBase/ai-memory/`).
   - Chunks documents by markdown header boundaries (`#`, `##`, `###`), preserving semantic context.
   - Combines BM25 term frequency / inverse document frequency (TF-IDF) scoring with local vector embeddings (`nomic-embed-text` via Ollama).
   - Context is formatted as clean section markdown comments and injected directly into the LLM system prompt:
@@ -166,13 +166,13 @@ JARVIS Mark 2 advances the platform into a fluid, enterprise-grade personal oper
 
 | Subsystem | File Path | Scope of Enhancement |
 | :--- | :--- | :--- |
-| **RAG Engine** | [src/jarvis/memory/rag.py](file:///home/pritam/code/ai/jarvis/src/jarvis/memory/rag.py) | **[NEW]** `HybridRAGEngine`, markdown section chunking, BM25 scoring, and Ollama embedding integration |
-| **Memory Store** | [src/jarvis/memory/store.py](file:///home/pritam/code/ai/jarvis/src/jarvis/memory/store.py) | Upgraded `get_relevant_memory()` to query `HybridRAGEngine`, auto-reindexing on `save_workflow()` |
-| **Voice Playback** | [src/jarvis/voice/tts.py](file:///home/pritam/code/ai/jarvis/src/jarvis/voice/tts.py) | Subprocess PID tracking (`self._current_player_process`), `stop()` termination method |
-| **Voice STT** | [src/jarvis/voice/stt.py](file:///home/pritam/code/ai/jarvis/src/jarvis/voice/stt.py) | Added `transcribe_bytes()` for memory buffer transcription |
-| **Configuration** | [src/jarvis/config.py](file:///home/pritam/code/ai/jarvis/src/jarvis/config.py) & [config.yaml](file:///home/pritam/code/ai/jarvis/config.yaml) | Added `stt_engine`, `sfx_enabled`, `obsidian_vault_dir`, `semantic_search_enabled`, `embedding_model` |
-| **API Server** | [src/jarvis/ui/server.py](file:///home/pritam/code/ai/jarvis/src/jarvis/ui/server.py) | Added `/api/voice/stop`, `/api/voice/transcribe`, `/api/memory/obsidian`, `/api/memory/reindex` |
-| **Tactical HUD** | [src/jarvis/ui/web/index.html](file:///home/pritam/code/ai/jarvis/src/jarvis/ui/web/index.html) | Mark 2 branding, Web Audio SFX, Shortcuts modal, Obsidian RAG UI, STT selector, code copy buttons |
-| **Testing** | [tests/test_mark2_features.py](file:///home/pritam/code/ai/jarvis/tests/test_mark2_features.py) | **[NEW]** Unit tests for RAG chunking, BM25, `/api/voice/stop`, `/api/voice/transcribe`, and Obsidian config |
-| **User Guide** | [user-guide.md](file:///home/pritam/code/ai/jarvis/user-guide.md) | Comprehensive Mark 2 manual updates |
-| **README** | [README.md](file:///home/pritam/code/ai/jarvis/README.md) | Mark 2 architecture and capabilities summary |
+| **RAG Engine** | [src/bro/memory/rag.py](file://src/bro/memory/rag.py) | **[NEW]** `HybridRAGEngine`, markdown section chunking, BM25 scoring, and Ollama embedding integration |
+| **Memory Store** | [src/bro/memory/store.py](file://src/bro/memory/store.py) | Upgraded `get_relevant_memory()` to query `HybridRAGEngine`, auto-reindexing on `save_workflow()` |
+| **Voice Playback** | [src/bro/voice/tts.py](file://src/bro/voice/tts.py) | Subprocess PID tracking (`self._current_player_process`), `stop()` termination method |
+| **Voice STT** | [src/bro/voice/stt.py](file://src/bro/voice/stt.py) | Added `transcribe_bytes()` for memory buffer transcription |
+| **Configuration** | [src/bro/config.py](file://src/bro/config.py) & [config.yaml](file://config.yaml) | Added `stt_engine`, `sfx_enabled`, `obsidian_vault_dir`, `semantic_search_enabled`, `embedding_model` |
+| **API Server** | [src/bro/ui/server.py](file://src/bro/ui/server.py) | Added `/api/voice/stop`, `/api/voice/transcribe`, `/api/memory/obsidian`, `/api/memory/reindex` |
+| **Tactical HUD** | [src/bro/ui/web/index.html](file://src/bro/ui/web/index.html) | Variant 2 branding, Web Audio SFX, Shortcuts modal, Obsidian RAG UI, STT selector, code copy buttons |
+| **Testing** | [tests/test_mark2_features.py](file://tests/test_mark2_features.py) | **[NEW]** Unit tests for RAG chunking, BM25, `/api/voice/stop`, `/api/voice/transcribe`, and Obsidian config |
+| **User Guide** | [user-guide.md](file://user-guide.md) | Comprehensive Variant 2 manual updates |
+| **README** | [README.md](file://README.md) | Variant 2 architecture and capabilities summary |

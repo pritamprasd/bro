@@ -54,11 +54,11 @@ browser:
   headless: false
   viewport_width: 1280
   viewport_height: 800
-  user_data_dir: ~/.jarvis/browser_data
+  user_data_dir: ~/.bro/browser_data
   cdp_port: 9222
 memory:
-  memory_dir: ~/ai-memory/jarvis
-  obsidian_vault_dir: /tmp/tmp6ck0_64y
+  memory_dir: /home/pritam/ai-memory/bro
+  obsidian_vault_dir: /tmp/tmpyvo77nln
   semantic_search_enabled: true
   embedding_model: nomic-embed-text
 watchdogs:
@@ -68,8 +68,8 @@ watchdogs:
     gpu_temp_threshold: 80
     disk_threshold_percent: 90
   organizer:
-    enabled: true
-    watch_dir: ~/Downloads
+    enabled: false
+    watch_dir: /home/pritam/Downloads
     rules:
       pdf: ~/Documents/PDFs
       csv,xlsx,json: ~/Documents/Data

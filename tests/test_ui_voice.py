@@ -3,7 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch, AsyncMock
-from jarvis.ui.server import app
+from bro.ui.server import app
 
 @pytest.fixture
 def client():
@@ -40,7 +40,7 @@ def test_select_voice(client):
     assert revert_res.json()["current_voice"] == "en-GB-RyanNeural"
 
 def test_preview_voice(client):
-    with patch("jarvis.voice.tts.TextToSpeech.speak") as mock_speak:
+    with patch("bro.voice.tts.TextToSpeech.speak") as mock_speak:
         response = client.post("/api/voice/preview", json={
             "voice": "en-GB-RyanNeural",
             "rate": "+25%",

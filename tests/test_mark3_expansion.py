@@ -1,4 +1,4 @@
-"""Comprehensive unit tests for Jarvis Mark 3 feature expansions."""
+"""Comprehensive unit tests for Bro Variant 3 feature expansions."""
 
 import asyncio
 import json
@@ -7,15 +7,15 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from jarvis.config import JarvisConfig, ModelConfig, VoiceConfig
-from jarvis.voice.tts import TextToSpeech
-from jarvis.actuators.desktop import DesktopActuator
-from jarvis.models.tier0 import Tier0Router
-from jarvis.gateway.router import LLMGatewayRouter
-from jarvis.gateway.models import GatewayRequest, GatewayResponse
-from jarvis.gateway.config import GatewaySettings, GatewayProviderConfig
-from jarvis.watchdogs.daily_brief import DailyBriefEngine
-from jarvis.ui.server import app
+from bro.config import BroConfig, ModelConfig, VoiceConfig
+from bro.voice.tts import TextToSpeech
+from bro.actuators.desktop import DesktopActuator
+from bro.models.tier0 import Tier0Router
+from bro.gateway.router import LLMGatewayRouter
+from bro.gateway.models import GatewayRequest, GatewayResponse
+from bro.gateway.config import GatewaySettings, GatewayProviderConfig
+from bro.watchdogs.daily_brief import DailyBriefEngine
+from bro.ui.server import app
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +69,7 @@ def test_desktop_window_inspection_mock():
         if "_NET_ACTIVE_WINDOW" in cmd_str:
             mock_res.stdout = "_NET_ACTIVE_WINDOW(WINDOW): window id # 0x3400003\n"
         elif "0x3400003" in cmd_str:
-            mock_res.stdout = '_NET_WM_NAME(UTF8_STRING) = "Antigravity IDE - jarvis"\nWM_CLASS(STRING) = "antigravity", "Antigravity"\n'
+            mock_res.stdout = '_NET_WM_NAME(UTF8_STRING) = "Antigravity IDE - bro"\nWM_CLASS(STRING) = "antigravity", "Antigravity"\n'
         elif "_NET_CLIENT_LIST" in cmd_str:
             mock_res.stdout = "_NET_CLIENT_LIST(WINDOW): window id # 0x3400003, 0x2200001\n"
         elif "0x2200001" in cmd_str:
@@ -131,7 +131,7 @@ def test_tier0_cpu_device_option():
         }
         mock_post.return_value = mock_resp
 
-        res = router_gpu.classify("Hello Jarvis")
+        res = router_gpu.classify("Hello Bro")
         assert res.intent == "CONVERSATION"
 
         call_args, call_kwargs = mock_post.call_args
@@ -217,7 +217,7 @@ def test_daily_brief_engine(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# 6. Mark 3 API Endpoints Tests
+# 6. Variant 3 API Endpoints Tests
 # ---------------------------------------------------------------------------
 def test_mark3_api_endpoints():
     client = TestClient(app)
@@ -242,7 +242,7 @@ def test_mark3_api_endpoints():
     assert resp.json().get("status") == "ok"
 
     # 4. Gateway test ping (mocked)
-    with patch("jarvis.gateway.router.LLMGatewayRouter.test_provider", return_value={"status": "ok", "latency_ms": 42.0}):
+    with patch("bro.gateway.router.LLMGatewayRouter.test_provider", return_value={"status": "ok", "latency_ms": 42.0}):
         resp = client.post("/api/gateway/test", json={"provider_id": "ollama"})
         assert resp.status_code == 200
         assert resp.json().get("status") == "ok"

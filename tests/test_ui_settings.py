@@ -3,8 +3,8 @@
 import tempfile
 from pathlib import Path
 from fastapi.testclient import TestClient
-from jarvis.core.audit import AuditManager
-from jarvis.ui.server import app, audit, config
+from bro.core.audit import AuditManager
+from bro.ui.server import app, audit, config
 
 
 def test_audit_backup_and_clear():

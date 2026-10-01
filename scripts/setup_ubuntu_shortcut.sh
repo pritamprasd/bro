@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Configure Ubuntu GNOME shortcut Super+Shift+J to launch Jarvis HUD in audio-only hands-free mode
+# Configure Ubuntu GNOME shortcut Super+Shift+J to launch Bro HUD in audio-only hands-free mode
 
 set -e
 
-SHORTCUT_NAME="Jarvis HUD Voice Mode"
+SHORTCUT_NAME="Bro HUD Voice Mode"
 SHORTCUT_CMD='xdg-open "http://127.0.0.1:8765/?mode=audio_only&greet=1&loop=1"'
 SHORTCUT_BINDING="<Super><Shift>j"
 
@@ -18,7 +18,7 @@ fi
 CURRENT=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "@as []")
 
 # Determine custom path
-BASE_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/jarvis/"
+BASE_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/bro/"
 SCHEMA="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$BASE_PATH"
 
 # Set binding details
@@ -38,4 +38,4 @@ if [[ "$CURRENT" != *"$BASE_PATH"* ]]; then
     gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$NEW_LIST"
 fi
 
-echo "Successfully configured keybinding Super+Shift+J to open Jarvis HUD with auto-greeting and hands-free loop."
+echo "Successfully configured keybinding Super+Shift+J to open Bro HUD with auto-greeting and hands-free loop."

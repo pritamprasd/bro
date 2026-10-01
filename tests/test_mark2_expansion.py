@@ -1,4 +1,4 @@
-"""Comprehensive unit tests for Jarvis Mark 2 feature expansions."""
+"""Comprehensive unit tests for Bro Variant 2 feature expansions."""
 
 import json
 import time
@@ -7,12 +7,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from jarvis.config import JarvisConfig, MemoryConfig
-from jarvis.core.agent import JarvisAgent
-from jarvis.memory.calendar_engine import CalendarEngine
-from jarvis.memory.store import MemoryStore
-from jarvis.models.local_matcher import LocalIntentMatcher
-from jarvis.ui.server import app
+from bro.config import BroConfig, MemoryConfig
+from bro.core.agent import BroAgent
+from bro.memory.calendar_engine import CalendarEngine
+from bro.memory.store import MemoryStore
+from bro.models.local_matcher import LocalIntentMatcher
+from bro.ui.server import app
 
 
 @pytest.fixture
@@ -34,26 +34,26 @@ def test_calendar_engine_crud(temp_memory_dir):
 
     # Add new event
     new_ev = engine.add_event(
-        title="Test Mark 2 Verification Meeting",
+        title="Test Variant 2 Verification Meeting",
         event_date="2026-09-24",
         event_time="11:30",
         tags=["review", "test"],
     )
-    assert new_ev["title"] == "Test Mark 2 Verification Meeting"
+    assert new_ev["title"] == "Test Variant 2 Verification Meeting"
     assert new_ev["completed"] is False
     assert "review" in new_ev["tags"]
 
     # Check pending events
     pending = engine.get_pending_events()
-    assert any(e["title"] == "Test Mark 2 Verification Meeting" for e in pending)
+    assert any(e["title"] == "Test Variant 2 Verification Meeting" for e in pending)
 
     # Toggle event completion
-    toggled = engine.toggle_event("Test Mark 2 Verification Meeting", completed=True)
+    toggled = engine.toggle_event("Test Variant 2 Verification Meeting", completed=True)
     assert toggled is True
 
     # Ensure it is now marked completed
     all_events = engine.get_events()
-    matching = [e for e in all_events if "Test Mark 2 Verification Meeting" in e["title"]]
+    matching = [e for e in all_events if "Test Variant 2 Verification Meeting" in e["title"]]
     assert len(matching) == 1
     assert matching[0]["completed"] is True
 
@@ -79,7 +79,7 @@ def test_local_intent_matcher_performance(temp_memory_dir):
 
     # 1. Greeting utterance (<5ms)
     t0 = time.perf_counter()
-    res1 = matcher.match_and_execute("Hey Jarvis")
+    res1 = matcher.match_and_execute("Hey Bro")
     dt1 = (time.perf_counter() - t0) * 1000
     assert dt1 < 10.0  # Must be sub-10ms (typically <0.1ms)
     assert res1 is not None
@@ -111,15 +111,15 @@ def test_local_intent_matcher_performance(temp_memory_dir):
 
 
 def test_agent_local_fast_path(temp_memory_dir):
-    config = JarvisConfig(output_mode="cli")
+    config = BroConfig(output_mode="cli")
     config.memory.memory_dir = str(temp_memory_dir)
-    agent = JarvisAgent(config)
+    agent = BroAgent(config)
 
     # Router and Tier0 should NOT be called for offline instant triggers
     agent.router.generate_text = MagicMock()
     agent.tier0.classify = MagicMock()
 
-    result = agent.run_task("Hey Jarvis")
+    result = agent.run_task("Hey Bro")
     assert result != ""
     agent.router.generate_text.assert_not_called()
     agent.tier0.classify.assert_not_called()

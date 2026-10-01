@@ -2,8 +2,8 @@
 
 from unittest.mock import MagicMock, patch
 import pytest
-from jarvis.config import ModelConfig
-from jarvis.models.tier0 import Tier0Router
+from bro.config import ModelConfig
+from bro.models.tier0 import Tier0Router
 
 def test_tier0_disabled_fallback():
     cfg = ModelConfig(tier0_enabled=False)
@@ -46,7 +46,7 @@ def test_tier0_direct_conversational_response():
         assert "hardware malfunction" in res.direct_response
 
 def test_pre_responses_list():
-    from jarvis.voice.pre_responses import PRE_RESPONSES, get_random_pre_response
+    from bro.voice.pre_responses import PRE_RESPONSES, get_random_pre_response
     assert len(PRE_RESPONSES) >= 10
     phrase = get_random_pre_response()
     assert phrase in PRE_RESPONSES

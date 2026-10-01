@@ -1,8 +1,8 @@
-"""Unit tests for Jarvis Safety Gatekeeper."""
+"""Unit tests for Bro Safety Gatekeeper."""
 
 import pytest
-from jarvis.config import SafetyConfig
-from jarvis.core.safety import SafetyClassifier
+from bro.config import SafetyConfig
+from bro.core.safety import SafetyClassifier
 
 def test_safe_action():
     config = SafetyConfig()

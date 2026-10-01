@@ -1,19 +1,19 @@
-# 📘 JARVIS // Mark 3: Comprehensive User Guide
+# 📘 BRO // Variant 3: Comprehensive User Guide
 
-Welcome to **JARVIS // Mark 3**, your autonomous, multi-modal personal AI assistant built for Linux X11 workstations powered by an **NVIDIA RTX 3060 (12 GB VRAM)**, **AMD Ryzen 7 (16 threads)**, and **96 GB of RAM**.
+Welcome to **BRO // Variant 3**, your autonomous, multi-modal personal AI assistant built for Linux X11 workstations powered by an **Dedicated NVIDIA GPU (8-12 GB+ VRAM)**, **Modern Multi-Core x86_64 CPU (4-8+ Cores)**, and **16-32 GB+ System RAM**.
 
-This guide covers everything you need to operate, customize, and communicate with Jarvis across voice, desktop GUI, terminal, and mobile remote control.
+This guide covers everything you need to operate, customize, and communicate with Bro across voice, desktop GUI, terminal, and mobile remote control.
 
 ---
 
 ## Table of Contents
-1. [How Jarvis Works: Architecture & Runtime Processes](#1-how-jarvis-works)
-2. [Lifecycle: Starting & Stopping Jarvis (Kill-Switch)](#2-lifecycle-management)
+1. [How Bro Works: Architecture & Runtime Processes](#1-how-bro-works)
+2. [Lifecycle: Starting & Stopping Bro (Kill-Switch)](#2-lifecycle-management)
 3. [Command Center Homepage Widgets](#3-command-center-homepage-widgets)
-4. [How to Communicate with Jarvis (4 Modalities)](#4-communication-modalities)
+4. [How to Communicate with Bro (4 Modalities)](#4-communication-modalities)
    - [A. Web HUD Dashboard (Interactive Microphone)](#a-web-hud-dashboard)
    - [B. Desktop Spotlight Bar (Alt + J)](#b-desktop-spotlight-bar-alt--j)
-   - [C. Terminal CLI & Voice (`jarvis voice`)](#c-terminal-cli--voice)
+   - [C. Terminal CLI & Voice (`bro voice`)](#c-terminal-cli--voice)
    - [D. Telegram Remote Control from Phone](#d-telegram-remote-control)
 5. [Resource Attachments & On-Demand Missing File Prompting](#5-resource-attachments--on-demand-prompting)
 6. [Conversational Voice Assistant & Voice Reply Toggle](#6-conversational-voice-assistant)
@@ -45,14 +45,14 @@ This guide covers everything you need to operate, customize, and communicate wit
 28. [Configurable Multi-Topic Daily Brief Matrix](#28-multi-topic-daily-brief)
 29. [Pronunciation Engine & Natural Speech Normalization](#29-pronunciation-engine)
 30. [Interactive SVG Audit Trail & Mission Velocity Filter](#30-interactive-audit-visuals)
-31. [Architectural Evolution: Mark 1 vs. Mark 2](custom-docs/upgrades_mark1_and_mark2.md)
+31. [Architectural Evolution: Variant 1 vs. Variant 2](custom-docs/upgrades_mark1_and_mark2.md)
 32. [Vocal Salutations, Custom Greetings & Gen-Z Mode](#32-vocal-salutations-custom-greetings--gen-z-mode)
 
 ---
 
-## 1. How Jarvis Works
+## 1. How Bro Works
 
-Jarvis operates on an asynchronous **Perception-Reasoning-Action (ReAct)** cognitive loop with multi-tier intelligence:
+Bro operates on an asynchronous **Perception-Reasoning-Action (ReAct)** cognitive loop with multi-tier intelligence:
 
 ```
 [User Input] (Voice / Web HUD / Alt+J / Telegram / CLI)
@@ -60,7 +60,7 @@ Jarvis operates on an asynchronous **Perception-Reasoning-Action (ReAct)** cogni
      ▼
 [Tier-0 Instant Router: Llama 3.2 3B] (<100ms intent classification)
      │
-     ├── If Conversation ──> Direct Assistant Voice Reply (Iron Man JARVIS)
+     ├── If Conversation ──> Direct Assistant Voice Reply (Bro)
      │
      └── If Complex Task ──> [Tier-1 Logic: Gemma 4 12B] (Kept pinned in VRAM)
                                   │
@@ -74,34 +74,34 @@ Jarvis operates on an asynchronous **Perception-Reasoning-Action (ReAct)** cogni
                                         └── Python Runner (Data/Telegram)
 ```
 
-### Runtime Processes When Jarvis is Running (`jarvis start`):
-When you run `jarvis start`, a centralized **Process Supervisor** (`jarvis/core/supervisor.py`) coordinates two background processes:
-1. **`ui_server` (FastAPI + Uvicorn on port 8765):** Serves the Jarvis Tactical HUD dashboard and manages WebSocket streaming, hardware telemetry, audit runs, and model switching.
+### Runtime Processes When Bro is Running (`bro start`):
+When you run `bro start`, a centralized **Process Supervisor** (`bro/core/supervisor.py`) coordinates two background processes:
+1. **`ui_server` (FastAPI + Uvicorn on port 8765):** Serves the Bro Tactical HUD dashboard and manages WebSocket streaming, hardware telemetry, audit runs, and model switching.
 2. **`worker` daemon:** Listens for the global <kbd>Alt</kbd> + <kbd>J</kbd> desktop hotkey, runs the Two-Way Telegram polling bot, and manages hardware sentinels.
 
 ---
 
 ## 2. Lifecycle Management
 
-### Starting Jarvis
+### Starting Bro
 To start all background components (Web HUD, Spotlight Bar, Telegram Bot, Watchdogs):
 ```bash
-uv run jarvis start
+uv run bro start
 ```
 * The Web HUD will be accessible at: [`http://127.0.0.1:8765`](http://127.0.0.1:8765)
 * The Spotlight Bar is armed: press <kbd>Alt</kbd> + <kbd>J</kbd> anywhere on your desktop.
 
 ### Checking System Status
 ```bash
-uv run jarvis status
+uv run bro status
 ```
 Displays running PIDs, Web HUD address, and hardware health.
 
-### Stopping Jarvis (Master Kill-Switch)
-To immediately and cleanly terminate all Jarvis services:
+### Stopping Bro (Master Kill-Switch)
+To immediately and cleanly terminate all Bro services:
 - **Via CLI:**
   ```bash
-  uv run jarvis stop
+  uv run bro stop
   ```
 - **Via Web HUD:** Click the red **🛑 KILL SWITCH** button in the top right header.
 - **Via Telegram:** Send `/kill` to your bot.
@@ -119,12 +119,12 @@ The Command Center ([`http://127.0.0.1:8765`](http://127.0.0.1:8765)) serves as 
    - Bold **🚀 Execute Button** aligned with surgical precision.
 
 2. **Holographic Quick Action Launchers (6 Uniform Tiles):**
-   - **☀️ Daily brief:** Spoken workstation health summary via Iron Man Ryan voice.
+   - **☀️ Daily brief:** Spoken workstation health summary via Bro Neural Voice.
    - **📋 Paste Clip:** Instantly injects current desktop clipboard into the task prompt.
    - **🌐 Attach Chrome:** One-click launch of everyday Chrome with remote debugging on `:9222`.
    - **📁 Organize Files:** Triggers rule-based categorization of `~/Downloads`.
    - **📷 Inspect Screen:** Captures active desktop and analyzes open windows via Qwen2.5-VL.
-   - **📊 Show Diagram:** Opens the Jarvis Mark 2 Tactical Architecture diagram in high-res SVG.
+   - **📊 Show Diagram:** Opens the Bro Variant 2 Tactical Architecture diagram in high-res SVG.
 
 3. **Resource Attachment Bar:**
    - Easily attach local files (`.csv`, `.pdf`, `.png`, `.py`, `.json`) directly to your mission before execution.
@@ -161,12 +161,12 @@ The Command Center ([`http://127.0.0.1:8765`](http://127.0.0.1:8765)) serves as 
 
 ## 4. Communication Modalities
 
-You can communicate with Jarvis using four distinct methods:
+You can communicate with Bro using four distinct methods:
 
 ### A. Web HUD Dashboard (Interactive Microphone)
 1. Open [`http://127.0.0.1:8765`](http://127.0.0.1:8765) in Chrome or Brave.
 2. Click the 🎙️ **Microphone Button** next to the input box.
-3. Speak your command (e.g. *"Hello Jarvis"*, *"Open calculator and compute 123 times 456"*).
+3. Speak your command (e.g. *"Hello Bro"*, *"Open calculator and compute 123 times 456"*).
 4. The HUD transcribes your voice in real time and executes the task automatically.
 
 ### B. Desktop Spotlight Bar (<kbd>Alt</kbd> + <kbd>J</kbd>)
@@ -178,13 +178,13 @@ Press <kbd>Alt</kbd> + <kbd>J</kbd> from any window (VS Code, terminal, browser,
 ### C. Terminal CLI & Voice
 * **Direct Task Execution:**
   ```bash
-  uv run jarvis run "Summarize Wikipedia article on Artemis II" -f ~/Downloads/paper.pdf
+  uv run bro run "Summarize Wikipedia article on Artemis II" -f ~/Downloads/paper.pdf
   ```
 * **Dedicated Voice Mode:**
   ```bash
-  uv run jarvis voice
+  uv run bro voice
   ```
-  Listens to your microphone for 5 seconds using `faster-whisper` on your RTX 3060, transcribes the speech, and executes.
+  Listens to your microphone for 5 seconds using `faster-whisper` on your Local GPU, transcribes the speech, and executes.
 
 ### D. Telegram Remote Control
 Message your private bot from your phone anywhere:
@@ -197,44 +197,44 @@ Message your private bot from your phone anywhere:
 
 ## 5. Resource Attachments & On-Demand Prompting
 
-Jarvis Mark 2 can ingest and analyze documents, datasets, and scripts:
+Bro Variant 2 can ingest and analyze documents, datasets, and scripts:
 
 ### Attaching Files Upfront
-- **In Web HUD:** Click **📎 Attach File / Resource** or drag & drop files into the resource bar. Files are uploaded to `~/.jarvis/attachments/` and previewed for the model.
+- **In Web HUD:** Click **📎 Attach File / Resource** or drag & drop files into the resource bar. Files are uploaded to `~/.bro/attachments/` and previewed for the model.
 - **In CLI:** Pass one or more files with `-f` or `--file`:
   ```bash
-  uv run jarvis run "Analyze sales trends" -f ./q3_sales.csv -f ./q4_sales.csv
+  uv run bro run "Analyze sales trends" -f ./q3_sales.csv -f ./q4_sales.csv
   ```
 
 ### On-Demand Missing File Prompting
-If you ask Jarvis to perform a task requiring a file that you forgot to attach (e.g., *"Summarize the financial projection spreadsheet"*), Jarvis detects the missing resource during reasoning and calls `request_file`:
+If you ask Bro to perform a task requiring a file that you forgot to attach (e.g., *"Summarize the financial projection spreadsheet"*), Bro detects the missing resource during reasoning and calls `request_file`:
 1. **Interactive Prompt Modal Appears:** Execution pauses safely.
 2. **Supply Options:**
    - **Option 1:** Pick or drop the required file to upload.
    - **Option 2:** Enter an existing local file path on your system (e.g. `~/finances/proj.xlsx`).
-   - **Option 3:** Click **File Unavailable / Skip** to gracefully let Jarvis know the file cannot be provided so it can try an alternative plan.
-3. Once supplied, Jarvis immediately resumes execution with the file loaded into context.
+   - **Option 3:** Click **File Unavailable / Skip** to gracefully let Bro know the file cannot be provided so it can try an alternative plan.
+3. Once supplied, Bro immediately resumes execution with the file loaded into context.
 
 ---
 
 ## 6. Conversational Voice Assistant & Web UI Modes
 
-Jarvis Mark 2 speaks with the **Iron Man British AI persona** (`en-GB-RyanNeural`, tuned pitch `-4Hz`, rate `+2%`).
+Bro Variant 2 speaks with the **Bro Neural Voice Persona** (`en-GB-RyanNeural`, tuned pitch `-4Hz`, rate `+2%`).
 
 ### Web UI Conversation Modes:
 You can choose your conversational modality at any time using the header segmented selector or settings:
 1. **🎙️ Audio Only (`audio_only`):**
    - Immersive hands-free voice dialogue!
-   - Reveals an animated **Iron Man Arc Reactor Voice Interface** with dynamic soundwave equalizers.
-   - **Hands-Free Continuous Loop:** When enabled, the microphone automatically re-arms after Jarvis finishes speaking, enabling fluid, continuous back-and-forth verbal dialogue without touching the keyboard or mouse.
-   - Live visual subtitle captions show both user speech and Jarvis replies.
+   - Reveals an animated **Bro Arc Reactor Voice Interface** with dynamic soundwave equalizers.
+   - **Hands-Free Continuous Loop:** When enabled, the microphone automatically re-arms after Bro finishes speaking, enabling fluid, continuous back-and-forth verbal dialogue without touching the keyboard or mouse.
+   - Live visual subtitle captions show both user speech and Bro replies.
 2. **⚡ Audio + Chat (`audio+chat` - Default):**
    - The ideal operational hybrid.
    - Real-time terminal streaming, ReAct thoughts, and action chips alongside spoken voice replies for all conversational interactions and task finishes.
 3. **💬 Chat Only (`chat_only`):**
    - Silent text-only interaction.
    - Spoken audio playback is completely muted.
-   - Jarvis executes commands and replies silently in the terminal and chat console.
+   - Bro executes commands and replies silently in the terminal and chat console.
 
 ### Configuration in `config.yaml`:
 ```yaml
@@ -247,11 +247,11 @@ voice:
   always_voice_response: false  # Speak answers to all tasks
 ```
 
-* **Chat & Greetings:** If you say *"Hello"*, *"Who are you?"*, or ask general questions, Jarvis recognizes this as a conversational intent and speaks back as your AI butler.
+* **Chat & Greetings:** If you say *"Hello"*, *"Who are you?"*, or ask general questions, Bro recognizes this as a conversational intent and speaks back as your AI butler.
 * **Header Toggle:** Click **🔊 Voice Reply: ON / OFF** or the mode pills in the top header to cycle modes instantly.
 
 ### Edge-TTS Neural Voice Persona & Speed Rate Controls:
-You can dynamically customize Jarvis's spoken voice persona and playback speed directly from the Web HUD:
+You can dynamically customize Bro's spoken voice persona and playback speed directly from the Web HUD:
 * **Header Controls Capsule:**
   - **Voice Dropdown (`VOICE:`):** Switch between curated neural voices (British male `en-GB-RyanNeural`, American male `en-US-GuyNeural`, American female `en-US-JennyNeural`, Sonia, Christopher, etc.) or any installed Edge-TTS language voice.
   - **Speech Speed Slider (`SPD:`):** Interactive range slider from **0.50x (Slow)** to **2.00x (Hyper)** with real-time numeric multiplier badge (`1.00x` = `+0%`, `1.25x` = `+25%`, `1.50x` = `+50%`, etc.). Dragging adjusts speed on the fly.
@@ -270,16 +270,16 @@ The Daily Brief delivers a spoken and visual summary of workstation readiness, m
 
 * **On-Demand via CLI:**
   ```bash
-  uv run jarvis brief
+  uv run bro brief
   ```
 * **On-Demand via Web HUD:** Click the yellow **☀️ Daily brief** button in the top navigation bar.
-* **Auto-Start:** By default, auto-start is **disabled** so Jarvis never interrupts you unexpectedly. If you want scheduled morning briefings at 08:30 AM, toggle it in `config.yaml` (`watchdogs.cron.enabled: true`).
+* **Auto-Start:** By default, auto-start is **disabled** so Bro never interrupts you unexpectedly. If you want scheduled morning briefings at 08:30 AM, toggle it in `config.yaml` (`watchdogs.cron.enabled: true`).
 
 ---
 
 ## 8. Selecting AI Execution Engine (Local LLM vs Cloud Gemini 3.8 Flash vs Hybrid)
 
-Jarvis Mark 2 supports flexible, zero-friction AI execution across local hardware and cloud intelligence:
+Bro Variant 2 supports flexible, zero-friction AI execution across local hardware and cloud intelligence:
 
 ```
                   ┌──────────────────────────────────────────────┐
@@ -288,14 +288,14 @@ Jarvis Mark 2 supports flexible, zero-friction AI execution across local hardwar
                           │              │              │
            ┌──────────────▼────┐   ┌─────▼────────┐   ┌─▼──────────────────┐
            │ 🖥️ Local LLM Only  │   │ ☁️ Cloud Only │   │  ⚡ Hybrid Fallback │
-           │ (RTX 3060 / Ollama│   │ (Gemini 3.8  │   │  (Local first,     │
+           │ (Local GPU / Ollama│   │ (Gemini 3.8  │   │  (Local first,     │
            │  100% Private, $0)│   │  Flash API)  │   │   auto-escalates)  │
            └───────────────────┘   └──────────────┘   └────────────────────┘
 ```
 
 ### 1. Instant 1-Click Header Capsule
 In the top navigation controls bar, you can instantly toggle the active AI backend without leaving your mission:
-* **🖥️ Local LLM:** Direct offline execution pinned to your RTX 3060 via Ollama (`gemma4:12b`, `qwen2.5vl:7b`).
+* **🖥️ Local LLM:** Direct offline execution pinned to your Local GPU via Ollama (`gemma4:12b`, `qwen2.5vl:7b`).
 * **☁️ Gemini 3.8:** Ultra-fast multimodal reasoning via Google AI Studio Free Tier API (`gemini-2.5-flash`).
 * **⚡ Hybrid:** Executes locally first; seamlessly escalates to Cloud Gemini Flash if local models encounter errors or low confidence.
 
@@ -309,7 +309,7 @@ Under Tab 2 (**Model Selection**):
    - `gemini-2.0-flash`: Fast multimodal reasoning
    - `gemini-1.5-flash`: Standard lightweight reasoning
    - `gemini-2.5-pro`: Deep reasoning & coding
-3. **Gemini API Key:** Enter or update your Google AI Studio API key directly from the UI with password masking and visibility toggle. If left blank, Jarvis automatically falls back to the `GEMINI_API_KEY` system environment variable.
+3. **Gemini API Key:** Enter or update your Google AI Studio API key directly from the UI with password masking and visibility toggle. If left blank, Bro automatically falls back to the `GEMINI_API_KEY` system environment variable.
 4. **Local Subsystem Model Assignments:**
    - **Text & Reasoning Model** (Default: `gemma4:12b`)
    - **Vision UI Grounding Model** (Default: `qwen2.5vl:7b`)
@@ -321,19 +321,19 @@ Under Tab 2 (**Model Selection**):
 ## 9. Automation Capabilities
 
 ### Vision-Based Computer Use
-Jarvis captures your physical X11 display (1920×1080) in <20ms using `mss` and feeds it to `qwen2.5vl:7b` to calculate pixel coordinates and click/type using `pyautogui`.
+Bro captures your physical X11 display (1920×1080) in <20ms using `mss` and feeds it to `qwen2.5vl:7b` to calculate pixel coordinates and click/type using `pyautogui`.
 
 ### Dual Browser Strategy
 * **Everyday Chrome (CDP Mode):**
-  Click **Attach Chrome (CDP :9222)** or run `uv run jarvis cdp`. Jarvis connects directly to your active, logged-in browser session—allowing it to interact with GitHub, Gmail, or Jira without 2FA or CAPTCHAs.
+  Click **Attach Chrome (CDP :9222)** or run `uv run bro cdp`. Bro connects directly to your active, logged-in browser session—allowing it to interact with GitHub, Gmail, or Jira without 2FA or CAPTCHAs.
 * **Isolated Sandbox:**
-  When performing disposable or privacy-sensitive web automation, Jarvis spins up an isolated Playwright browser with its own sandbox directory (`~/.jarvis/browser_data`).
+  When performing disposable or privacy-sensitive web automation, Bro spins up an isolated Playwright browser with its own sandbox directory (`~/.bro/browser_data`).
 
 ### Python Runner
-Jarvis can execute background Python scripts, data processing algorithms, and Telegram messages via `requests`. Passwords and API tokens in the secret vault are automatically injected as environment variables.
+Bro can execute background Python scripts, data processing algorithms, and Telegram messages via `requests`. Passwords and API tokens in the secret vault are automatically injected as environment variables.
 
 ### "Watch & Learn" Macro Recorder
-Whenever Jarvis executes a multi-step workflow, it compiles the action sequence into a clean, deterministic Python script in `~/ai-memory/jarvis/workflows/<name>.py`. Subsequent runs execute in <0.5 seconds without LLM visual grounding.
+Whenever Bro executes a multi-step workflow, it compiles the action sequence into a clean, deterministic Python script in `~/ai-memory/bro/workflows/<name>.py`. Subsequent runs execute in <0.5 seconds without LLM visual grounding.
 
 ---
 
@@ -342,13 +342,13 @@ Whenever Jarvis executes a multi-step workflow, it compiles the action sequence 
 By default, `autonomous_mode: false`:
 * Any destructive command (e.g. `rm -rf`, `sudo`, database drops, payments, email sending) pauses execution and summons an on-screen **Floating Approval Overlay**.
 * Press <kbd>Enter</kbd> to authorize or <kbd>Esc</kbd> to reject.
-* To run unattended, toggle autonomous mode via `uv run jarvis run "<task>" --autonomous` or in the Web HUD.
+* To run unattended, toggle autonomous mode via `uv run bro run "<task>" --autonomous` or in the Web HUD.
 
 ---
 
 ## 11. Audit Trail & Visual Analytics
 
-Every mission is recorded in `~/.jarvis/runs/` with metadata, step observations, and full-resolution screenshot filmstrips.
+Every mission is recorded in `~/.bro/runs/` with metadata, step observations, and full-resolution screenshot filmstrips.
 
 In the **🎞️ Audit & History** tab:
 1. **Human-Readable KPI Cards:** Total Missions, Success Rate (%), Average Duration (s), Total Steps Executed, and Primary Actuator.
@@ -375,7 +375,7 @@ In the **🎞️ Audit & History** tab:
 
 ## 12. System Failure Alerts & Error Logs
 
-Jarvis Mark 2 tracks all system exceptions, model connection failures, timeouts, and hardware sentinel warnings:
+Bro Variant 2 tracks all system exceptions, model connection failures, timeouts, and hardware sentinel warnings:
 1. In the Web HUD, click **⚠️ System Alerts**.
 2. If an error occurs, an error badge in the navigation bar highlights the count.
 3. Each log displays timestamp, error classification, context, and full stack trace.
@@ -385,23 +385,23 @@ Jarvis Mark 2 tracks all system exceptions, model connection failures, timeouts,
 
 ## 13. Lean Memory & Vault Secrets
 
-* **Structured Memory:** Files are stored in `~/ai-memory/jarvis/` (omitted from git commit, configurable via the Web UI in the **Memory & Secrets** tab):
+* **Structured Memory:** Files are stored in `~/ai-memory/bro/` (omitted from git commit, configurable via the Web UI in the **Memory & Secrets** tab):
   - `preferences.md`: Personal guidelines and persona rules.
   - `system.md`: Linux workstation hardware details.
   - `contacts.md`: People and messaging handles.
   - `workflows/`: Application recipes and compiled macros.
 * **Secret Vault:** Store tokens safely in Linux Keyring:
   ```bash
-  uv run jarvis vault set telegram_bot_token "YOUR_TOKEN"
-  uv run jarvis vault set telegram_chat_id "YOUR_CHAT_ID"
-  uv run jarvis vault list
+  uv run bro vault set telegram_bot_token "YOUR_TOKEN"
+  uv run bro vault set telegram_chat_id "YOUR_CHAT_ID"
+  uv run bro vault list
   ```
 
 ---
 
 ## 14. In-UI System Manual
 
-Jarvis features a built-in **📖 System Manual** tab directly inside the Web HUD (`http://127.0.0.1:8765`):
+Bro features a built-in **📖 System Manual** tab directly inside the Web HUD (`http://127.0.0.1:8765`):
 * Searchable 13-section sidebar.
 * Formatted code blocks with one-click copy buttons.
 * Embedded quick-action triggers to test features (Daily brief, Attach Chrome, Spotlight, Voice Toggle, Diagrams) directly from the documentation!
@@ -410,7 +410,7 @@ Jarvis features a built-in **📖 System Manual** tab directly inside the Web HU
 
 ## 15. Visual Media Display: Diagrams, Charts & System Windows
 
-When interacting with Jarvis, any requested or generated visual artifact—including system architecture diagrams, data charts, and screenshots—can be displayed via an interactive in-HUD dialog or a native X11 desktop window.
+When interacting with Bro, any requested or generated visual artifact—including system architecture diagrams, data charts, and screenshots—can be displayed via an interactive in-HUD dialog or a native X11 desktop window.
 
 ### Supported Visual Artifacts:
 1. **Mermaid Diagrams:** Interactive SVG rendering of flowcharts, sequence diagrams, and architecture graphs powered by Mermaid.js.
@@ -429,19 +429,19 @@ When interacting with Jarvis, any requested or generated visual artifact—inclu
   - High-quality image scaling via Pillow (`LANCZOS`), native resolution labels, and keyboard clipboard copy.
 
 ### How to Trigger:
-* **Automatic Detection:** Simply ask Jarvis to generate a diagram (e.g., *"Draw an architecture diagram of your ReAct loop"*). When Jarvis finishes with a ` ```mermaid ` block or an image markdown tag, the visual modal appears automatically.
-* **Explicit Action:** In ReAct loop, Jarvis uses action 19:
+* **Automatic Detection:** Simply ask Bro to generate a diagram (e.g., *"Draw an architecture diagram of your ReAct loop"*). When Bro finishes with a ` ```mermaid ` block or an image markdown tag, the visual modal appears automatically.
+* **Explicit Action:** In ReAct loop, Bro uses action 19:
   ```json
   Action: show_media
   Action Input: {"media_type": "diagram", "content": "graph TD; A-->B", "title": "Flow", "target": "both"}
   ```
-* **Command Center Quick Tile:** Click **📊 Show Diagram** in the Web HUD to view the Jarvis Mark 2 Tactical Architecture diagram instantly.
+* **Command Center Quick Tile:** Click **📊 Show Diagram** in the Web HUD to view the Bro Variant 2 Tactical Architecture diagram instantly.
 
 ---
 
 ## 16. Multi-Desktop & Display Perception Setup
 
-Workstations running Linux X11 often utilize multiple physical monitors or virtual desktop arrangements. Jarvis allows you to designate a **Main Desktop** so its vision-based actuators (`mss`, `pyautogui`, and `Qwen2.5-VL`) ground their vision and mouse clicks accurately on the screen you are working on.
+Workstations running Linux X11 often utilize multiple physical monitors or virtual desktop arrangements. Bro allows you to designate a **Main Desktop** so its vision-based actuators (`mss`, `pyautogui`, and `Qwen2.5-VL`) ground their vision and mouse clicks accurately on the screen you are working on.
 
 ### Multi-Monitor Topologies
 On Linux X11 systems, the display actuator detects:
@@ -450,14 +450,14 @@ On Linux X11 systems, the display actuator detects:
 * **Display 2 (Physical Screen 2):** The secondary monitor (e.g., `HDMI-0` at `1920×1080`, offset `left: 0, top: 0`).
 
 ### Coordinate Grounding & Calibration
-When Jarvis captures a screenshot of an individual display, vision models reason over local coordinates `(0 <= x <= width, 0 <= y <= height)`.
-Jarvis's **DesktopActuator** automatically maps these coordinates to global X11 space:
+When Bro captures a screenshot of an individual display, vision models reason over local coordinates `(0 <= x <= width, 0 <= y <= height)`.
+Bro's **DesktopActuator** automatically maps these coordinates to global X11 space:
 $$\text{Global } X = \text{Local } X + \text{Monitor Left Offset}$$
 $$\text{Global } Y = \text{Local } Y + \text{Monitor Top Offset}$$
 This ensures clicks, double clicks, and drag operations land exactly on target regardless of whether your active monitor is placed to the left, right, top, or bottom.
 
 ### Selecting the Main Desktop
-You can change Jarvis's main desktop in four convenient ways:
+You can change Bro's main desktop in four convenient ways:
 
 1. **Top Header Selector (Web HUD):**
    * Use the **DESKTOP** dropdown in the top navigation bar to switch between `Display 1`, `Display 2`, or `Display 0 (All)`.
@@ -471,14 +471,14 @@ You can change Jarvis's main desktop in four convenient ways:
    * Review the **Active Desktop Perception** live panel with real-time coordinate offset status and click **📸 Refresh Perception** anytime.
 
 3. **Persistent Configuration (`config.yaml`):**
-   * The selected desktop is saved to `~/.jarvis/config.yaml`:
+   * The selected desktop is saved to `~/.bro/config.yaml`:
      ```yaml
      desktop:
        screen_index: 1  # 1 for primary physical monitor, 2 for secondary, 0 for all combined
      ```
 
 4. **Agent ReAct Actions:**
-   * Jarvis can switch or inspect monitors during autonomous task execution:
+   * Bro can switch or inspect monitors during autonomous task execution:
      - **Action 20 (`desktop_switch_monitor`):** Sets the active perception screen index for subsequent visual reasoning and clicks.
      - **Action 21 (`desktop_inspect_screen`):** Captures and displays any monitor in the visual modal without permanently changing the primary desktop setting.
 
@@ -491,7 +491,7 @@ You can change Jarvis's main desktop in four convenient ways:
 
 ## 17. Terminal Typography & Interactive Font Scaling
 
-To ensure optimal readability across varied workstation displays, DPI settings, and viewing distances, Jarvis Mark 2 features an enhanced, high-contrast monospace console with interactive font size scaling.
+To ensure optimal readability across varied workstation displays, DPI settings, and viewing distances, Bro Variant 2 features an enhanced, high-contrast monospace console with interactive font size scaling.
 
 ### Typography Specifications
 * **Font Family:** `JetBrains Mono` (with fallbacks to `Fira Code`, `Cascadia Code`, and system monospace).
@@ -507,7 +507,7 @@ Located in the terminal controls bar directly beneath the console window:
 * **`[A+]` Button:** Increases the terminal font size by 1px (maximum 26px).
 * **`[Reset]` Button:** Restores the recommended default size (15px).
 
-> **Persistence:** Your selected font size is automatically stored in your browser's `localStorage` (`jarvis_terminal_font_size`). It persists across browser restarts, page reloads, and tab navigation without requiring code edits.
+> **Persistence:** Your selected font size is automatically stored in your browser's `localStorage` (`bro_terminal_font_size`). It persists across browser restarts, page reloads, and tab navigation without requiring code edits.
 
 ### Categorized Log Accent Badges
 Each output type in the ReAct execution loop is rendered with distinct styling:
@@ -521,11 +521,11 @@ Each output type in the ReAct execution loop is rendered with distinct styling:
 
 ## 18. World-Class Glassmorphic HUD Design & Layout Architecture
 
-Jarvis Mark 2 features an uncompromising, futuristic glassmorphic design system modeled after advanced tactical HUD interfaces.
+Bro Variant 2 features an uncompromising, futuristic glassmorphic design system modeled after advanced tactical HUD interfaces.
 
 ### Core Layout Architecture
 1. **Floating Symmetrical Glass Header:**
-   - **Left Zone:** Pulsing Arc Reactor core and `JARVIS // MARK 2` brand title with live hardware status (`● SYSTEM READY // RTX 3060 ARMED`).
+   - **Left Zone:** Pulsing Arc Reactor core and `BRO // VARIANT 2` brand title with live hardware status (`● SYSTEM READY // NEURAL CORE ARMED`).
    - **Center Capsule:** A unified glass pill bar grouping the **Conversation Mode segmented controls** (`Audio` | `Audio+Chat` | `Chat`) and the **Desktop Monitor Selector** (`SCREEN: [Display 1] [👁️]`).
    - **Right Zone:** Quick action pills: **Daily brief** (warm amber), **Voice Reply** toggle (neon cyan), and the master emergency **KILL SWITCH** (crimson alert).
    - **Non-Wrapping Design:** Keeps all header controls strictly on a single row from 1280px up to 4K resolutions.
@@ -550,17 +550,17 @@ Jarvis Mark 2 features an uncompromising, futuristic glassmorphic design system 
 
 ## 19. Workstation Calendar App & Markdown Schedule
 
-Jarvis Mark 2 includes a native, markdown-driven Workstation Calendar application accessible via the **Calendar** tab in the Web HUD.
+Bro Variant 2 includes a native, markdown-driven Workstation Calendar application accessible via the **Calendar** tab in the Web HUD.
 
 ### Storage & Data Model
-- All schedule items, tasks, and deadlines are persisted in plain markdown in `~/ai-memory/jarvis/calendar.md`.
+- All schedule items, tasks, and deadlines are persisted in plain markdown in `~/ai-memory/bro/calendar.md`.
 - Format:
   ```markdown
   - [ ] 2026-09-24 10:00 - Team standup and sprint demo #meeting
-  - [ ] 2026-09-24 14:30 - Deploy Jarvis Mark 2 to staging #task
+  - [ ] 2026-09-24 14:30 - Deploy Bro Variant 2 to staging #task
   - [x] 2026-09-23 18:00 - Evolution verification completed #release
   ```
-- Any edits made in Obsidian, Vim, or VS Code to `calendar.md` are immediately recognized by Jarvis upon reload.
+- Any edits made in Obsidian, Vim, or VS Code to `calendar.md` are immediately recognized by Bro upon reload.
 
 ### Web HUD Calendar Features
 1. **Interactive Monthly Grid:**
@@ -572,25 +572,25 @@ Jarvis Mark 2 includes a native, markdown-driven Workstation Calendar applicatio
    - **Instant Browser Filter:** Type keywords, dates, or tags into the search input (`#calendar-search-input`) to filter items instantly with zero network roundtrips.
    - **Checkbox Completion:** Click any task checkbox to mark it complete; the markdown file is updated and the event toggles to checked (`[x]`).
 3. **Voice Scheduling & Recitation:**
-   - Spoken vocal check: *"How's my calendar look like today?"* triggers Jarvis to summarize your schedule (e.g., *"You have 2 items scheduled for today: Team standup at 10:00, and Deploy Jarvis Mark 2 at 14:30."*).
+   - Spoken vocal check: *"How's my calendar look like today?"* triggers Bro to summarize your schedule (e.g., *"You have 2 items scheduled for today: Team standup at 10:00, and Deploy Bro Variant 2 at 14:30."*).
    - Click the **Recite** button in the sidebar to hear the day's agenda spoken aloud at any time.
 
 ---
 
 ## 20. Sub-5ms Local Intent Matcher & Cached Utterances
 
-To achieve instant conversational responses with zero GPU compute overhead, Jarvis Mark 2 features a two-stage **Local Intent Matcher**:
+To achieve instant conversational responses with zero GPU compute overhead, Bro Variant 2 features a two-stage **Local Intent Matcher**:
 
 ### How It Works
 1. **Compiled Regex Slot Extractor (<0.1ms):**
-   - Utterances configured in `~/ai-memory/jarvis/local_intents.md` are compiled into regex matchers during initialization.
+   - Utterances configured in `~/ai-memory/bro/local_intents.md` are compiled into regex matchers during initialization.
    - Extracts dynamic slot tokens such as `{time}`, `{period}`, `{calendar_events}`, `{file}`, and `{path}`.
 2. **Local Variations Cache (`local_intents_cache.json`):**
    - Natural language variations are cached alongside an MD5 hash of `local_intents.md`.
    - Bypasses both the heavy ReAct loop and Tier-0 LLM router, delivering instant sub-millisecond responses.
 
 ### Default Local Workflows
-* **Vocal Greetings:** *"Hey Jarvis"*, *"Hello Jarvis"*, *"Wake up Jarvis"* -> Instant contextual response.
+* **Vocal Greetings:** *"Hey Bro"*, *"Hello Bro"*, *"Wake up Bro"* -> Instant contextual response.
 * **Current Time:** *"What's the time right now?"*, *"Tell me the time"* -> *"It's 7:45 PM in the evening."*
 * **Calendar Summary:** *"How's my calendar look like today"* -> Reads today's uncompleted agenda from `calendar.md`.
 * **Instant File Viewer:** *"Show content of pyproject.toml"* -> Locates the file, reads content, and opens the high-contrast transparent HUD File Viewer modal.
@@ -599,7 +599,7 @@ To achieve instant conversational responses with zero GPU compute overhead, Jarv
 
 ## 21. Zero-Drop Interim Voice STT & Continuous Speech Loop
 
-Mark 2 resolves voice input cutoffs and dropped words with a continuous Web Speech API integration:
+Variant 2 resolves voice input cutoffs and dropped words with a continuous Web Speech API integration:
 
 1. **Continuous Recognition (`recognition.continuous = true`):**
    - The microphone remains armed across pauses, allowing the user to speak naturally without being cut off mid-sentence.
@@ -626,7 +626,7 @@ For complex missions requiring multiple desktop or browser actions, the **Autono
 
 ## 23. Ubuntu GNOME Shortcut Launcher (Super + Shift + J)
 
-Jarvis Mark 2 can be summoned from anywhere on your Ubuntu desktop with a single global key combination:
+Bro Variant 2 can be summoned from anywhere on your Ubuntu desktop with a single global key combination:
 
 * **Keybinding:** <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd>
 * **Action:** Launches your browser directly into:
@@ -634,8 +634,8 @@ Jarvis Mark 2 can be summoned from anywhere on your Ubuntu desktop with a single
   http://127.0.0.1:8765/?mode=audio_only&greet=1&loop=1
   ```
 * **Behaviors Activated:**
-  1. Opens the HUD in **Audio Only** mode with the glowing Iron Man Arc Reactor.
-  2. Fetches a random greeting from `~/ai-memory/jarvis/greetings.md` and speaks it aloud.
+  1. Opens the HUD in **Audio Only** mode with the glowing Bro Arc Reactor.
+  2. Fetches a random greeting from `~/ai-memory/bro/greetings.md` and speaks it aloud.
   3. Automatically arms the **Hands-Free Continuous Microphone Loop**, allowing you to start speaking your command immediately after the greeting finishes.
 * **Configuration:**
   - Click **Ubuntu Shortcut (Super+Shift+J)** in the **Settings** tab under Voice Setup, OR
@@ -648,7 +648,7 @@ Jarvis Mark 2 can be summoned from anywhere on your Ubuntu desktop with a single
 
 ## 24. Enterprise LLM Gateway & Multi-Provider Cascading
 
-Jarvis Mark 3 introduces an enterprise-grade LLM Gateway subsystem (`src/jarvis/gateway/`) enabling multi-provider routing and resilient fallback cascading:
+Bro Variant 3 introduces an enterprise-grade LLM Gateway subsystem (`src/bro/gateway/`) enabling multi-provider routing and resilient fallback cascading:
 
 ```
 [Agent Query]
@@ -674,17 +674,17 @@ Jarvis Mark 3 introduces an enterprise-grade LLM Gateway subsystem (`src/jarvis/
 ### Gateway Key Capabilities
 1. **Priority Fallback Cascading:** If a cloud provider experiences HTTP 429 rate limits, token exhaustion, or connection timeouts, the gateway seamlessly fails over to the next configured provider without interrupting the user's mission.
 2. **Circuit Breaking & Automatic Cooldown:** Providers with 3 consecutive failures enter an automatic cooldown state (default: 60s) to prevent hammering failing APIs and degrading user latency.
-3. **Vault & Keyring Resolution:** API keys are resolved with zero-exposure security directly from the Linux Keyring Secret Vault (`jarvis vault set gemini_api_key ...`), OS environment variables, or encrypted config.
+3. **Vault & Keyring Resolution:** API keys are resolved with zero-exposure security directly from the Linux Keyring Secret Vault (`bro vault set gemini_api_key ...`), OS environment variables, or encrypted config.
 4. **Live Latency & Diagnostic Pings:** Each provider card in the **Settings** tab features a live `Test Ping` button, success rate percentage indicator, and real-time round-trip millisecond telemetry.
 
 ---
 
 ## 25. Tier-0 Fast Classifier CPU Offloading
 
-To ensure maximum GPU VRAM is reserved for the primary 12B reasoning model (`gemma4:12b`) and 7B multimodal vision model (`qwen2.5-vl:7b`), Jarvis Mark 3 introduces a dedicated **Tier-0 CPU Execution Mode**:
+To ensure maximum GPU VRAM is reserved for the primary 12B reasoning model (`gemma4:12b`) and 7B multimodal vision model (`qwen2.5-vl:7b`), Bro Variant 3 introduces a dedicated **Tier-0 CPU Execution Mode**:
 
-* **Why Offload to CPU:** The RTX 3060 has 12 GB of VRAM. Hosting a 12B model (~7 GB) and a 7B vision model (~4.5 GB) leaves minimal room for the 3B classifier. Running the classifier on CPU (`num_gpu: 0` in Ollama) eliminates VRAM contention.
-* **CPU Latency Profile:** On AMD Ryzen 7 (16 threads), the small 3B model infers in ~60-95ms on CPU—well within real-time voice latency limits.
+* **Why Offload to CPU:** The Local GPU has 12 GB of VRAM. Hosting a 12B model (~7 GB) and a 7B vision model (~4.5 GB) leaves minimal room for the 3B classifier. Running the classifier on CPU (`num_gpu: 0` in Ollama) eliminates VRAM contention.
+* **CPU Latency Profile:** On Modern Multi-Core x86_64 CPU (4-8+ Cores), the small 3B model infers in ~60-95ms on CPU—well within real-time voice latency limits.
 * **How to Configure:**
   - In the **Settings** tab under **Model Architecture**, set **Tier-0 Compute Device** to `CPU (Preserve GPU VRAM for Gemma/Qwen)`.
   - Alternatively, edit `config.yaml`:
@@ -697,10 +697,10 @@ To ensure maximum GPU VRAM is reserved for the primary 12B reasoning model (`gem
 
 ## 26. Contextual 90% Screen Explanation Dialog
 
-When you ask Jarvis to explain a concept, architecture, workflow, or system behavior, Mark 3 enforces a two-tier explanation protocol designed for optimal cognitive load:
+When you ask Bro to explain a concept, architecture, workflow, or system behavior, Variant 3 enforces a two-tier explanation protocol designed for optimal cognitive load:
 
-1. **Executive Summary First:** Jarvis immediately answers with a 2-3 sentence executive summary followed by an invitation: *"Would you like me to dig deeper into the architectural details or step-by-step components?"*
-2. **Contextual 90% Modal Stage:** When visual context, Mermaid diagrams, or charts are required, Jarvis opens an expansive modal occupying **90% of screen space (90vw $\times$ 90vh)**:
+1. **Executive Summary First:** Bro immediately answers with a 2-3 sentence executive summary followed by an invitation: *"Would you like me to dig deeper into the architectural details or step-by-step components?"*
+2. **Contextual 90% Modal Stage:** When visual context, Mermaid diagrams, or charts are required, Bro opens an expansive modal occupying **90% of screen space (90vw $\times$ 90vh)**:
    - **Left Canvas (65% width):** High-resolution interactive SVG Mermaid diagram renderer with zoom controls (`[+]`, `[-]`, `[Reset]`) and 1-click **Export SVG** button.
    - **Right Sidebar (35% width):** Real-time streaming markdown text sidebar detailing the architectural breakdown, accompanied by a follow-up prompt input to query deeper without losing the visual diagram context.
 
@@ -708,32 +708,32 @@ When you ask Jarvis to explain a concept, architecture, workflow, or system beha
 
 ## 27. Deep Desktop Screen Inspection & X11 Workspace Perception
 
-In Mark 2, screen inspection only returned physical monitor geometry and dimensions. In Mark 3, `inspect_screen` conducts deep inspection of the Linux X11 desktop environment:
+In Variant 2, screen inspection only returned physical monitor geometry and dimensions. In Variant 3, `inspect_screen` conducts deep inspection of the Linux X11 desktop environment:
 
-* **Active Focused Window:** Interrogates `_NET_ACTIVE_WINDOW` to retrieve the exact focused application name and window title (e.g., `Antigravity IDE - jarvis`, `Google Chrome - GitHub Pull Request`).
+* **Active Focused Window:** Interrogates `_NET_ACTIVE_WINDOW` to retrieve the exact focused application name and window title (e.g., `Antigravity IDE - bro`, `Google Chrome - GitHub Pull Request`).
 * **Open Desktop Applications:** Interrogates `_NET_CLIENT_LIST` and `WM_CLASS` to catalog all running apps, terminal sessions, and browser tabs.
-* **Visual Context Synthesis:** When asked *"What's on my screen?"* or *"Inspect active screen"*, Jarvis synthesizes both the optical screenshot and the running window hierarchy to provide rich, situational awareness.
+* **Visual Context Synthesis:** When asked *"What's on my screen?"* or *"Inspect active screen"*, Bro synthesizes both the optical screenshot and the running window hierarchy to provide rich, situational awareness.
 
 ---
 
 ## 28. Configurable Multi-Topic Daily Brief Matrix
 
-The Daily Brief engine in Mark 3 is completely configurable via `daily_brief_config.json` and the HUD **Settings** tab:
+The Daily Brief engine in Variant 3 is completely configurable via `daily_brief_config.json` and the HUD **Settings** tab:
 
 * **Weighted Topic Matrix:** Custom sliders allow you to allocate interest percentages across 5 distinct categories:
   - **Local Weather (15%):** Live conditions and temperatures for your configured city (e.g., Bangalore).
-  - **Workstation Calendar (25%):** Today's pending agenda and items from `~/ai-memory/jarvis/calendar.md`.
+  - **Workstation Calendar (25%):** Today's pending agenda and items from `~/ai-memory/bro/calendar.md`.
   - **Technology & AI Headlines (30%):** Top stories fetched directly from Hacker News.
   - **Top World News (20%):** Global breaking news from Google News RSS.
   - **Hardware Sentinel Health (10%):** GPU temperatures, VRAM consumption, NVMe storage, and RAM usage.
-* **Audio Voice Styles:** Select between `butler` (refined Iron Man Jarvis style), `executive` (direct bulleted summary), or `concise` (speed briefing).
-* **Instant Preview & Audio Trigger:** Test your briefing immediately using the **Preview Brief** or **Hear Spoken Brief** buttons in Settings or via CLI (`uv run jarvis brief`).
+* **Audio Voice Styles:** Select between `butler` (refined Bro style), `executive` (direct bulleted summary), or `concise` (speed briefing).
+* **Instant Preview & Audio Trigger:** Test your briefing immediately using the **Preview Brief** or **Hear Spoken Brief** buttons in Settings or via CLI (`uv run bro brief`).
 
 ---
 
 ## 29. Pronunciation Engine & Natural Speech Normalization
 
-Mark 3 eliminates awkward robotic letter spelling in the Text-to-Speech pipeline (`src/jarvis/voice/tts.py`):
+Variant 3 eliminates awkward robotic letter spelling in the Text-to-Speech pipeline (`src/bro/voice/tts.py`):
 
 * **Binary Memory Units:** `"12 GiB"` is spoken naturally as *"12 GB"* rather than *"12 G-I-B"*; `"512 MiB"` becomes *"512 MB"*; `"64 KiB"` becomes *"64 KB"*; `"2 TiB"` becomes *"2 TB"*.
 * **Latencies & Frequencies:** `"45 ms"` is spoken as *"45 milliseconds"*; `"4.2 GHz"` as *"4.2 gigahertz"*; `"3200 MHz"` as *"3200 megahertz"*.
@@ -753,21 +753,21 @@ The **Audit & History** tab features compact high-density layout with interactiv
 
 ## 32. Vocal Salutations, Custom Greetings & Gen-Z Mode
 
-Jarvis Mark 4 features an ultra-responsive, zero-network vocal greeting engine powered by `GreetingMatcher` and the workstation memory file `~/ai-memory/jarvis/greetings.md`.
+Bro Variant 4 features an ultra-responsive, zero-network vocal greeting engine powered by `GreetingMatcher` and the workstation memory file `~/ai-memory/bro/greetings.md`.
 
 ### How Greetings & Salutations Work
-1. **Sub-Millisecond Regex Fast Path (`GreetingMatcher`):** When you say *"Hello"*, *"Good morning"*, *"Hey Jarvis"*, *"Thanks"*, or *"Goodbye"*, the agent intercepts the utterance in `<1ms` purely on the CPU using compiled regexes—completely bypassing the LLM and avoiding unnecessary GPU compute.
-2. **Contextual Memory File (`greetings.md`):** All vocal greetings and opening salutations are stored in `~/ai-memory/jarvis/greetings.md`. When the Web HUD loads or when the Ubuntu GNOME shortcut (`Super+Shift+J`) is triggered, Jarvis picks a random salutation from this file and speaks it aloud.
+1. **Sub-Millisecond Regex Fast Path (`GreetingMatcher`):** When you say *"Hello"*, *"Good morning"*, *"Hey Bro"*, *"Thanks"*, or *"Goodbye"*, the agent intercepts the utterance in `<1ms` purely on the CPU using compiled regexes—completely bypassing the LLM and avoiding unnecessary GPU compute.
+2. **Contextual Memory File (`greetings.md`):** All vocal greetings and opening salutations are stored in `~/ai-memory/bro/greetings.md`. When the Web HUD loads or when the Ubuntu GNOME shortcut (`Super+Shift+J`) is triggered, Bro picks a random salutation from this file and speaks it aloud.
 
 ### How to Add or Update Salutations
-You can customize Jarvis's greetings by editing `~/ai-memory/jarvis/greetings.md` directly:
+You can customize Bro's greetings by editing `~/ai-memory/bro/greetings.md` directly:
 1. Open the file in your preferred editor or in the HUD **Memory & Secrets** tab:
    ```bash
-   nano ~/ai-memory/jarvis/greetings.md
+   nano ~/ai-memory/bro/greetings.md
    ```
 2. Add your custom salutations under the appropriate section header using markdown bullet points (`- `):
    ```markdown
-   # Jarvis Mark 4 Vocal Greetings & Salutations
+   # Bro Variant 4 Vocal Greetings & Salutations
 
    ## General Greetings
    - Greetings, Sir. Workstation is armed and ready for your command.
@@ -780,18 +780,18 @@ You can customize Jarvis's greetings by editing `~/ai-memory/jarvis/greetings.md
    - Good afternoon, Sir. Systems standing by for your next directive.
 
    ## Evening Greetings
-   - Good evening, Sir. Jarvis Mark 4 standing by for your evening workflow.
+   - Good evening, Sir. Bro Variant 4 standing by for your evening workflow.
 
    ## Gen-Z Greetings & Slang
-   - Yo, what's good! Jarvis in the building, no cap.
+   - Yo, what's good! Bro in the building, no cap.
    - Vibe check passed. All systems bussin and ready to slay, boss.
    - Sup! Neural core is locked in, highkey ready for whatever you got.
    - Ayo, we're live fr fr. What's the move today?
    ```
-3. Save the file. Jarvis detects file changes immediately without requiring a restart.
+3. Save the file. Bro detects file changes immediately without requiring a restart.
 
 ### Enabling or Disabling Gen-Z Mode in Settings
-If you want Jarvis to respond with modern vernacular, snappy slang, and high-energy phrases:
+If you want Bro to respond with modern vernacular, snappy slang, and high-energy phrases:
 1. Navigate to the **Settings** tab in the Web HUD (`http://127.0.0.1:8765`).
 2. Open the **Voice & Acoustic Butler** settings group (`Voice`).
 3. Toggle the **Gen-Z Mode (Slang & Dynamic Greetings)** switch to **ON** or **OFF**.

@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
-from jarvis.ui.server import app, config, memory_store
+from bro.ui.server import app, config, memory_store
 
 @pytest.fixture
 def client():
